@@ -1,0 +1,3 @@
+accessWidener v2 named
+accessible method net/minecraft/text/MutableText <init> (Lnet/minecraft/text/TextContent;Ljava/util/List;Lnet/minecraft/text/Style;)V
+accessible field net/minecraft/text/MutableText language Lnet/minecraft/util/Language;

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "stackthecards",
+  "version": "${version}",
+  "name": "StackTheCards",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/Stijn/StackTheCards"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/stackthecards/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "drai.dev.stackthecards.client.StackTheCardsClient"
+    ],
+    "main": [
+      "drai.dev.stackthecards.StackTheCards"
+    ]
+  },
+  "mixins": [
+    "stackthecards.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  },
+  "accessWidener" : "stack_the_cards.accesswidener"
+}

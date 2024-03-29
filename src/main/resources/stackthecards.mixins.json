@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "drai.dev.stackthecards.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "ItemFrameEntityMixin",
+    "ItemStackMixin"
+  ],
+  "client": [
+    "BakedModelManagerMixin",
+    "DrawContextMixin",
+    "HandledScreenMixin",
+    "HeldItemRendererMixin",
+    "ItemFrameEntityRendererMixin",
+    "ItemRendererMixin",
+    "KeyboardMixin",
+    "OrderedTextTooltipComponentMixin",
+    "TooltipBackgroundRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
