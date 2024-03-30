@@ -62,7 +62,7 @@ public class Card extends Item {
         NbtList nbtList = Card.getCardDataNBT(topCard, STORED_ATTACHED_CARDS_KEY);
         nbtList.add(CardIdentifier.createNbt(newCard));
         topCard.getOrCreateNbt().put(STORED_ATTACHED_CARDS_KEY, nbtList);
-        System.out.println("added card to stack");
+//        System.out.println("added card to stack");
     }
 
     public static NbtList getCardDataNBT(ItemStack stack, String key) {
@@ -88,7 +88,7 @@ public class Card extends Item {
         var poppedCard = nbtList.getCompound(nbtList.size()-1);
         nbtList.remove(nbtList.size()-1);
         holder.getOrCreateNbt().put(STORED_ATTACHED_CARDS_KEY, nbtList);
-        System.out.println("removed bottom card from stack: current size ="+nbtList.size());
+//        System.out.println("removed bottom card from stack: current size ="+nbtList.size());
         return CardIdentifier.getCardIdentifier(poppedCard);
     }
 

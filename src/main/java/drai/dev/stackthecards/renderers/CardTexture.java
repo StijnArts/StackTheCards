@@ -26,7 +26,7 @@ public class CardTexture {
         //TODO add option to shift cards into a direction for cards that connect with each other
         this.cardData = cardData;
         this.texture = createCardTexture(cardData, this);
-        Identifier identifier = StackTheCardsClient.CARD_RENDERER.getTextureManager().registerDynamicTexture("stc_card/"+this.cardData.getCardId(), this.texture);
+        Identifier identifier = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("stc_card/"+this.cardData.getCardId(), this.texture);
         this.renderLayer = RenderLayer.getText(identifier);
         this.texture.upload();
     }
@@ -62,15 +62,17 @@ public class CardTexture {
         return nativeImageBackedTexture;
     }
 
-    public static void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, RenderLayer renderLayer, int layersHigh, int amountOfCardsAttached, double scale) {
-        var cardDistance = -1F;
+    public static void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, RenderLayer renderLayer, int layersHigh, int amountOfCardsAttached, double scale, CardGame game) {
+        var cardDistance = game.cardStackingDistance;
         var y = 0F;
+        var x = 0F;
         if(layersHigh != 0){
-            y = -18F;
+            x = cardDistance * game.cardStackingDirection.xMod;
+            y = cardDistance * game.cardStackingDirection.yMod;
         }
 
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-        matrix4f.translate(0, y, amountOfCardsAttached*0.1F);
+        matrix4f.translate(x, y, amountOfCardsAttached*0.1F);
 //        matrix4f Maybe rotate a little if cards attached
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(renderLayer);
         vertexConsumer.vertex(matrix4f, 0.0F, (float) (128.0F * scale), -0.01F).color(255, 255, 255, 255).texture(0.0F, 1.0F).light(light).next();
@@ -150,8 +152,8 @@ public class CardTexture {
     public void close() {
         texture.close();
     }
-    public static void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, RenderLayer renderLayer, int layersHigh, int amountOfCardsAttached) {
-        draw(matrices, vertexConsumers, light, renderLayer, layersHigh,  amountOfCardsAttached,1);
+    public static void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, RenderLayer renderLayer, int layersHigh, int amountOfCardsAttached, CardGame game) {
+        draw(matrices, vertexConsumers, light, renderLayer, layersHigh,  amountOfCardsAttached,1, game);
     }
 
 

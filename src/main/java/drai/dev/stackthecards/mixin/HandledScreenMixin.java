@@ -1,8 +1,10 @@
 package drai.dev.stackthecards.mixin;
 
+import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.tooltips.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.item.*;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.*;
 import org.jetbrains.annotations.*;
@@ -16,6 +18,8 @@ public class HandledScreenMixin {
     @Shadow
     protected ScreenHandler handler;
 
+    @Shadow private ItemStack touchDragStack;
+    @Shadow @Nullable protected Slot focusedSlot;
     @Unique
     @Nullable
     private Slot mouseLockSlot = null;
@@ -23,22 +27,15 @@ public class HandledScreenMixin {
     private int mouseLockX = 0;
     @Unique
     private int mouseLockY = 0;
-    @Inject(at = @At("HEAD"), method = "isPointOverSlot(Lnet/minecraft/screen/slot/Slot;DD)Z", cancellable = true)
-    private void forceFocusSlot(Slot slot, double pointX, double pointY, CallbackInfoReturnable<Boolean> cir) {
-        if (this.mouseLockSlot != null) {
-            // Handling the case where the hovered item stack get swapped for air while the tooltip is locked
-            // When this happens, the lockTooltipPosition() hook will not be called (there is no tooltip for air),
-            // so we need to perform cleanup logic here.
-            //
-            // We also need to check if the slot is still part of the handler,
-            // as it may have been removed (this is the case when switching tabs in the creative inventory)
 
-            if (this.mouseLockSlot.hasStack() && this.handler.slots.contains(this.mouseLockSlot))
-                cir.setReturnValue(slot == this.mouseLockSlot && this.handler.getCursorStack().isEmpty());
-            else
-                // reset the lock if the stack is no longer present
-                this.mouseLockSlot = null;
+    @Inject(at = @At("TAIL"), method = "drawMouseoverTooltip")
+    private void checkStackInSlot(DrawContext context, int x, int y, CallbackInfo ci) {
+        if (((ScreenHandler)this.handler).getCursorStack().isEmpty() && this.focusedSlot != null) {
+            ItemStack itemStack = this.focusedSlot.getStack();
+            System.out.println("checking scrolling from handledscreenmixin");
+            StackTheCardsClient.checkToolTipForScrolling(itemStack);
         }
+//
     }
 
     /**
