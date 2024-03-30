@@ -1,26 +1,39 @@
 package drai.dev.stackthecards.data;
 
 import drai.dev.stackthecards.client.*;
-import net.minecraft.client.texture.*;
+import drai.dev.stackthecards.renderers.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 
 import java.util.*;
 
 public class CardData {
+    private static CardSet TEST_CARD_SET = new CardSet();
     private CardSet cardSet;
-    private String cardId;
+    private String cardId = "missing";
 //    private NativeImage cardImage = ;
 
-    public CardSet getCardSet() {
-        return cardSet;
+
+    public CardData(String cardId) {
+//        this.cardSet = cardSet;
+        this.cardId = cardId;
     }
-    public NativeImage getCardImage(){
-        return StackTheCardsClient.TEST;
+
+    public CardData() {
+    }
+
+    public CardSet getCardSet() {
+        return TEST_CARD_SET;
+    }
+    public Pair<Integer, Integer> getCardImage(){
+        var cardTexture = CardRenderer.getCardTexture(this, false);
+        return new Pair<>(cardTexture.getOriginalImageHeight(),
+                cardTexture.getOriginalImageWidth());
+//        return StackTheCardsClient.TEST;
     }
     public String getCardId() {
 //        return cardSet.getSetIdentifier() + "_" + cardId; //TODO
-        return "stc_card";
+        return cardId;
     }
 
     public Identifier getIdentifier() {
@@ -32,11 +45,11 @@ public class CardData {
     }
 
     public int getMaxSide() {
-        return Math.max(getCardImage().getHeight(), getWidth());
+        return Math.max(getHeight(), getWidth());
     }
 
     public int getWidth() {
-        return getCardImage().getWidth();
+        return getCardImage().getRight();
     }
 
     public double getYOffset() {
@@ -48,7 +61,7 @@ public class CardData {
     }
 
     public int getHeight() {
-        return getCardImage().getHeight();
+        return getCardImage().getLeft();
     }
 
     public static Text NEW_LINE = Text.literal(" ");
@@ -57,7 +70,7 @@ public class CardData {
         var tooltips = new ArrayList<Text>();
         MutableText label = Text.literal("Pokemon Power: Energy Burn");
         label.fillStyle(Style.EMPTY.withColor(Formatting.DARK_PURPLE).withBold(true));
-        CardMutableText abilityLore = new CardMutableText(Text.literal("As often as you like during your turn (before your attack), you may turn all Energy attached to Charizard into Fire Energy for the rest of the turn. This power can’t be used if Charizard is Asleep, Confused, or Paralyzed."));
+        MutableText abilityLore = Text.literal("As often as you like during your turn (before your attack), you may turn all Energy attached to Charizard into Fire Energy for the rest of the turn. This power can’t be used if Charizard is Asleep, Confused, or Paralyzed.");
         abilityLore.setStyle(Style.EMPTY.withColor(Formatting.GRAY));
         tooltips.add(label);
         tooltips.add(abilityLore);
@@ -68,7 +81,7 @@ public class CardData {
                 .append(Text.literal(" - ").fillStyle(Style.EMPTY.withColor(Formatting.GRAY)))
                 .append(Text.literal("100").fillStyle(Style.EMPTY.withColor(Formatting.WHITE).withBold(true)));
         attack.fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
-        CardMutableText attackLore = new CardMutableText(Text.literal("Discard 2 Energy cards attached to Charizard in order to use this attack."));
+        MutableText attackLore = Text.literal("Discard 2 Energy cards attached to Charizard in order to use this attack.");
         attackLore.setStyle(Style.EMPTY.withColor(Formatting.GRAY).withItalic(true));
         MutableText cost = Text.literal("Cost: ");
         cost.fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
@@ -89,7 +102,7 @@ public class CardData {
                 .literal("Retreat Cost: ").fillStyle(Style.EMPTY.withColor(Formatting.BLUE).withBold(true))
                 .append(Text.literal("Energy ").fillStyle(Style.EMPTY.withColor(Formatting.BLUE).withBold(false)))
                 .append(Text.literal("x 3").fillStyle(Style.EMPTY.withColor(Formatting.GRAY).withBold(false)));
-        CardMutableText pokedex = new CardMutableText(Text.literal("Spits fire that is hot enough to melt boulders. Known to unintentionally cause forest fires.").fillStyle(Style.EMPTY.withItalic(true).withColor(Formatting.GRAY)));
+        MutableText pokedex = Text.literal("Spits fire that is hot enough to melt boulders. Known to unintentionally cause forest fires.").fillStyle(Style.EMPTY.withItalic(true).withColor(Formatting.GRAY));
         tooltips.add(weakness);
         tooltips.add(resistance);
         tooltips.add(retreatCost);
@@ -98,12 +111,12 @@ public class CardData {
     }
 
     public Text getCardNameLabel() {
-        if(!StackTheCardsClient.cardLoreKeyPressed){
+        if(!StackTheCardsClient.shiftKeyPressed){
             return Text.literal(getCardName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
         } else {
             return Text.literal(getCardName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE).withBold(true))
                     .append(Text.literal(" - ").fillStyle(Style.EMPTY.withColor(Formatting.GRAY)))
-                    .append(Text.literal("120 HP").fillStyle(Style.EMPTY.withColor(Formatting.WHITE).withBold(StackTheCardsClient.cardLoreKeyPressed)));
+                    .append(Text.literal("120 HP").fillStyle(Style.EMPTY.withColor(Formatting.WHITE).withBold(StackTheCardsClient.shiftKeyPressed)));
         }
     }
 
@@ -118,5 +131,9 @@ public class CardData {
         tooltips.add(stage);
         tooltips.add(set);
         return tooltips;
+    }
+
+    public boolean hasRoundedCorners() {
+        return true;
     }
 }

@@ -32,18 +32,14 @@ public abstract class ItemFrameEntityRendererMixin<T extends ItemFrameEntity> {
             } else {
                 matrixStack.translate(0.0F, 0.0F, 0.4375F);
             }
-            var card = (Card) itemStack.getItem();
-            CardData cardData = card.getCardData();
             int j = itemFrameEntity.getRotation();
             matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float)j * 360.0F / 8.0F));
             matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
             matrixStack.scale(0.0078125F, 0.0078125F, 0.0078125F);
             matrixStack.translate(-64.0F, -64.0F, 0.0F);
             matrixStack.translate(0.0F, 0.0F, -1.0F);
-//            if (cardData != null) {
-                int k = this.getLight(itemFrameEntity, LightmapTextureManager.MAX_SKY_LIGHT_COORDINATE | 210, i);
-                StackTheCardsClient.CARD_RENDERER.draw(matrixStack, vertexConsumerProvider, cardData, k);
-//            }
+            int k = this.getLight(itemFrameEntity, LightmapTextureManager.MAX_SKY_LIGHT_COORDINATE | 210, i);
+            StackTheCardsClient.CARD_RENDERER.draw(matrixStack, vertexConsumerProvider, itemStack, k);
             matrixStack.pop();
             ci.cancel();
         }

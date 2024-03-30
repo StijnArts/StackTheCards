@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "stack_the_cards:item/card_back"
+    "layer0": "stack_the_cards:item/modern_pokemon_card_back"
   }
 }

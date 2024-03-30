@@ -1,5 +1,6 @@
 package drai.dev.stackthecards.data;
 
+import drai.dev.stackthecards.registry.*;
 import net.minecraft.client.*;
 import net.minecraft.client.item.*;
 import net.minecraft.client.render.model.*;
@@ -11,8 +12,8 @@ import java.util.*;
 public class CardSet {
     public Map<String, Identifier> textures;
     private CardGame cardGame;
-    private String setId;
-
+    private String setId= "missing";
+    private Map<String, CardData> cards = new HashMap<>();
     public CardGame getCardGame() {
         return cardGame;
     }
@@ -21,20 +22,20 @@ public class CardSet {
         return cardGame.getGameIdentifier() + "_" + setId;
     }
 
-    /*public BakedModel getItemModel() {
-        // Get the model identifier for the item
-        ModelIdentifier modelIdentifier = getModelIdentifier();
+    public Map<String, CardData> getCards() {
+        return cards;
+    }
 
-        // Load the unbaked model
-        UnbakedModel unbakedModel = ModelLoader.MODELS_FINDER.toResourceId().getModelOrMissing(modelIdentifier);
+    public static CardData charizard = new CardData("charizard");
+    public CardData getCardData(String cardId){
+        if(cardId.equals("charizard")){
+            return charizard;
+        }
+        return CardGameRegistry.MISSING_CARD_DATA;
+    }
 
-        // Bake the model with the new texture
-        BakedModel bakedModel = unbakedModel.bake(ModelLoader.defaultTextureGetter(), ModelLoader.defaultModelGetter(), ModelLoader.getVanillaResourceProvider(), new ModelBakeSettings(null, ModelLoader.defaultModelLoader().getOutliner()));
-
-        // Register the baked model with the model loader
-        ModelLoader.instance().putModel(modelIdentifier, bakedModel);
-
-        // Invalidate the model predicate provider for the item
-        ModelPredicateProviderRegistry.register(this, modelIdentifier, (stack, world, entity, seed) -> 0);
-    }*/
+    public static CardData cardBackData = new CardData("high_res_modern_card_back");
+    public CardData getCardBackData() {
+        return cardBackData;
+    }
 }

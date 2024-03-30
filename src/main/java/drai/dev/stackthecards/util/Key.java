@@ -28,4 +28,8 @@ public final class Key {
     public static Key cardLoreKey() {
             return new Key(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_LEFT_SHIFT));
     }
+    @Nullable
+    public static Key flipCardKey() {
+            return new Key(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_LEFT_CONTROL));
+    }
 }

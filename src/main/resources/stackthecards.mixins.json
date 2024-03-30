@@ -15,7 +15,6 @@
     "ItemFrameEntityRendererMixin",
     "ItemRendererMixin",
     "KeyboardMixin",
-    "OrderedTextTooltipComponentMixin",
     "TooltipBackgroundRendererMixin"
   ],
   "injectors": {

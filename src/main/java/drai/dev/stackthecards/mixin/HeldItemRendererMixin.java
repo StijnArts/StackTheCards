@@ -105,8 +105,6 @@ public abstract class HeldItemRendererMixin {
         matrices.scale(0.38F, 0.38F, 0.38F);
         matrices.translate(-0.5F, -0.5F, 0.0F);
         matrices.scale(0.0078125F, 0.0078125F, 0.0078125F);
-        var card = (Card) stack.getItem();
-        var cardData = card.getCardData();
 //        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getText(new Identifier("stack_the_cards","textures/card/card_background.png")));
 //        System.out.println("got the vertexConsumer");
 //        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
@@ -117,7 +115,7 @@ public abstract class HeldItemRendererMixin {
 //        vertexConsumer.vertex(matrix4f, -7.0F, -7.0F, 0.0F).color(255, 255, 255, 255).texture(0.0F, 0.0F).light(swingProgress).next();
 //        System.out.println("got through the texture matrix");
 //        //        if (cardData != null) {
-            StackTheCardsClient.CARD_RENDERER.draw(matrices, vertexConsumers, cardData, swingProgress);
+            StackTheCardsClient.CARD_RENDERER.draw(matrices, vertexConsumers, stack, swingProgress);
 //        }
     }
 }

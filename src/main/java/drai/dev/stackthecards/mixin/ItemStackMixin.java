@@ -35,10 +35,10 @@ public abstract class ItemStackMixin {
         if(self.isOf(Items.CARD)){
             var tooltip = ci.getReturnValue();
             var card = (Card) self.getItem();
-            if(StackTheCardsClient.cardLoreKeyPressed){
-                tooltip.addAll(card.getCardData().getLoreToolTips());
+            if(StackTheCardsClient.shiftKeyPressed){
+                tooltip.addAll(Card.getCardData(self).getLoreToolTips());
             } else {
-                tooltip.addAll(card.getCardData().getTooltipsDescriptors());
+                tooltip.addAll(Card.getCardData(self).getTooltipsDescriptors());
                 StackTheCardsClient.modifyStackTooltip(self, tooltip::addAll);
             }
         }
@@ -46,9 +46,10 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getName", at = @At("HEAD"), cancellable = true)
     private void customCardName(CallbackInfoReturnable<Text> cir){
-        if(this.isOf(Items.CARD)){
+        var self  =(ItemStack) (Object) this;
+        if(self.isOf(Items.CARD)){
             var card = (Card)this.getItem();
-            cir.setReturnValue(card.getCardData().getCardNameLabel());
+            cir.setReturnValue(Card.getCardData(self).getCardNameLabel());
         }
     }
 }
