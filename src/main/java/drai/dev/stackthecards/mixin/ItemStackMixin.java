@@ -16,7 +16,6 @@ import java.util.*;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
-    @Shadow public abstract boolean isOf(Item item);
 
     @Shadow public abstract Item getItem();
 
@@ -34,7 +33,6 @@ public abstract class ItemStackMixin {
         var self  =(ItemStack) (Object) this;
         if(self.isOf(Items.CARD)){
             var tooltip = ci.getReturnValue();
-            var card = (Card) self.getItem();
             if(StackTheCardsClient.shiftKeyPressed){
                 tooltip.addAll(Card.getCardData(self).getLoreToolTips());
             } else {
@@ -42,13 +40,14 @@ public abstract class ItemStackMixin {
                 StackTheCardsClient.modifyStackTooltip(self, tooltip::addAll);
             }
         }
+        StackTheCardsClient.checkToolTipForScrolling(self);
+
     }
 
     @Inject(method = "getName", at = @At("HEAD"), cancellable = true)
     private void customCardName(CallbackInfoReturnable<Text> cir){
         var self  =(ItemStack) (Object) this;
         if(self.isOf(Items.CARD)){
-            var card = (Card)this.getItem();
             cir.setReturnValue(Card.getCardData(self).getCardNameLabel());
         }
     }

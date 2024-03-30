@@ -16,7 +16,7 @@ import java.lang.Math;
 import java.util.*;
 @Environment(EnvType.CLIENT)
 public class CardRenderer {
-    TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+    TextureManager textureManager = getTextureManager();
     private final HashMap<CardData, CardTexture> cardTextures = new HashMap<>();
 
     public static CardTexture getCardTextureFromMap(CardData cardData) {
@@ -29,25 +29,27 @@ public class CardRenderer {
 
     public void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack, int light){
         var cardData = Card.getCardData(stack);
+        var cardGame = cardData.getCardSet().getCardGame();
         if(textureManager == null) textureManager = MinecraftClient.getInstance().getTextureManager();
         var isFlipped = Card.getIsFlipped(stack);
-        CardTexture.draw(matrices, vertexConsumers, light, getCardTexture(cardData, isFlipped).getRenderLayer(), 0, Card.getAttachedCards(stack).size()*-1);
-        drawAttachedCards(matrices, vertexConsumers, stack, light, 1, isFlipped);
+        CardTexture.draw(matrices, vertexConsumers, light, getCardTexture(cardData, isFlipped).getRenderLayer(), 0, Card.getAttachedCards(stack).size()*-1, cardGame);
+        drawAttachedCards(matrices, vertexConsumers, stack, light, 1, isFlipped,cardGame);
     }
 
     public void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack,int light, double scale){
         var cardData = Card.getCardData(stack);
+        var cardGame = cardData.getCardSet().getCardGame();
         if(textureManager == null) textureManager = MinecraftClient.getInstance().getTextureManager();
-        CardTexture.draw(matrices, vertexConsumers, light, getCardTexture(cardData, false).getRenderLayer(), 0, Card.getAttachedCards(stack).size()*-1, scale);
-        drawAttachedCards(matrices, vertexConsumers, stack, light, scale, false);
+        CardTexture.draw(matrices, vertexConsumers, light, getCardTexture(cardData, false).getRenderLayer(), 0, Card.getAttachedCards(stack).size()*-1, scale, cardGame);
+        drawAttachedCards(matrices, vertexConsumers, stack, light, scale, false, cardGame);
         cardTextures.size();
     }
 
-    private static void drawAttachedCards(MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack, int light, double scale, boolean isFlipped) {
+    private static void drawAttachedCards(MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack, int light, double scale, boolean isFlipped, CardGame cardGame) {
         var attachedCards= Card.getAttachedCards(stack);
         for (int i = 0; i < attachedCards.size(); i++) {
             var attachedCardData = Card.getCardData(Card.getAsItemStack(attachedCards.get(i)));
-            CardTexture.draw(matrices, vertexConsumers, light, getCardTexture(attachedCardData, isFlipped).getRenderLayer(), i+1, 1, scale);
+            CardTexture.draw(matrices, vertexConsumers, light, getCardTexture(attachedCardData, isFlipped).getRenderLayer(), i+1, 1, scale, cardGame);
         }
     }
 
@@ -68,7 +70,7 @@ public class CardRenderer {
     }
 
     public TextureManager getTextureManager() {
-        return textureManager;
+        return MinecraftClient.getInstance().getTextureManager();
     }
 
     public HashMap<CardData, CardTexture> getCardTextures() {

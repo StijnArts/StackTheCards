@@ -1,5 +1,6 @@
 package drai.dev.stackthecards.mixin;
 
+import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.tooltips.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.tooltip.*;

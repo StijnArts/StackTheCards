@@ -49,7 +49,7 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
             }
             if(StackTheCardsClient.ctrlKeyPressed){
                 Card.toggleCardFlipped(value);
-                System.out.println("flipped the card");
+//                System.out.println("flipped the card");
             }
             this.setFlag(5, true);
 
@@ -78,7 +78,7 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
                 if(itemStack.isEmpty() || !itemStack.isOf(Items.CARD)){
                     if(StackTheCardsClient.ctrlKeyPressed){
                         setHeldItemStack(currentItemstack);
-                        System.out.println("flipped the card");
+//                        System.out.println("flipped the card");
                         cir.setReturnValue(ActionResult.CONSUME);
                     }
                 }else {
@@ -135,7 +135,7 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
             var attachedCards = Card.getAttachedCards(stack);
             if(alwaysDrop){
                 for (var attachedCard: attachedCards) {
-                    System.out.println(attachedCard.forPrint());
+//                    System.out.println(attachedCard.forPrint());
                     var attachedCardItemStack = Card.getAsItemStack(attachedCard);
                     Card.removeAttachedCards(attachedCardItemStack);
                     dropStack(attachedCardItemStack);

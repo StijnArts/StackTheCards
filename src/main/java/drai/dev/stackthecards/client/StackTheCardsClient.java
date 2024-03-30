@@ -6,10 +6,15 @@ import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.util.*;
 import net.fabricmc.api.*;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.*;
 import net.fabricmc.fabric.api.client.model.loading.v1.*;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
+import net.fabricmc.fabric.api.client.screen.v1.*;
 import net.fabricmc.fabric.api.resource.*;
 import net.minecraft.client.*;
+import net.minecraft.client.gui.screen.*;
+import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.client.option.*;
 import net.minecraft.client.render.item.*;
 import net.minecraft.client.texture.*;
 import net.minecraft.client.texture.Sprite;
@@ -19,6 +24,7 @@ import net.minecraft.resource.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
+import org.lwjgl.glfw.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -39,22 +45,36 @@ public class StackTheCardsClient implements ClientModInitializer {
     public static NativeImage TOOLTIP_TEXTURE;
     public static boolean shiftKeyPressed;
     public static boolean ctrlKeyPressed;
+    public static int scrollModifier = 0;
+    public static int getScrollModifier(){
+        return scrollModifier * 3;
+    }
     private static ItemStack previousStack = null;
+    public static boolean shiftKeyReleased = false;
 
-    public static void modifyStackTooltip(ItemStack itemStack, Consumer<Collection<Text>> tooltip) {
+    public static void modifyStackTooltip(ItemStack stack, Consumer<Collection<Text>> tooltip) {
         MutableText loreKeyHint = Text.literal("Shift: ");
         loreKeyHint.fillStyle(Style.EMPTY.withColor(Formatting.GOLD));
         loreKeyHint.append(Text.literal("view card lore").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
         tooltip.accept(List.of(loreKeyHint));
     }
 
+    public static void checkToolTipForScrolling(ItemStack stack){
+        if (previousStack == null || !ItemStack.areEqual(stack, previousStack) || stack.isEmpty()) {
+            scrollModifier = 0;
+            previousStack = stack;
+        }
+        if(shiftKeyReleased) {
+            scrollModifier = 0;
+            shiftKeyReleased = false;
+        }
+    }
+
     @Override
     public void onInitializeClient() {
-
         CARD_RENDERER = new CardRenderer();
         CARD_TOOLTIP_RENDERER = new CardTooltipRenderer(CARD_RENDERER);
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
-
             @Override
             public Identifier getFabricId() {
                 return new Identifier("stack_the_cards", "card_resources");
@@ -62,15 +82,9 @@ public class StackTheCardsClient implements ClientModInitializer {
 
             @Override
             public void reload(ResourceManager manager) {
-//                cardTextures.clear();
                 CARD_RENDERER.clearStateTextures();
                 for (var resource : manager.findResources("stc_cards/cards", path-> path.getPath().endsWith(".png")).entrySet()){
-//                    MinecraftClient.getInstance().getTextureManager().registerTexture(resource.getKey(), new SpriteAtlasTexture(resource.getKey()));
-                    /*try(InputStream is = resource.getValue().getInputStream()){
-                        TEST = NativeImage.read(is);
-                    } catch (Exception e){
 
-                    }*/
                 }
             }
         });
@@ -84,6 +98,10 @@ public class StackTheCardsClient implements ClientModInitializer {
                 return new CardTooltipComponent(previewData);
             return null;
         });
+        ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> ScreenMouseEvents.afterMouseScroll(screen).register((_screen, x, y, horiz, vert) -> {
+            scrollModifier+= vert;
+//            System.out.println("scrollModifier: " + scrollModifier);
+        }));
         Items.register();
     }
 
@@ -95,7 +113,9 @@ public class StackTheCardsClient implements ClientModInitializer {
 
     //TODO add card tooltip scrolling by tracking which stack was viewed and resetting the value if a new stack is viewed
     public static void updateKeys() {
+        var previousShiftKeyState = shiftKeyPressed;
         shiftKeyPressed = isKeyPressed(Key.cardLoreKey());
+        if(previousShiftKeyState && !shiftKeyPressed) shiftKeyReleased = true;
         ctrlKeyPressed = isKeyPressed(Key.flipCardKey());
     }
 }

@@ -1,5 +1,7 @@
 package drai.dev.stackthecards.mixin;
 
+import com.llamalad7.mixinextras.sugar.*;
+import com.llamalad7.mixinextras.sugar.ref.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
@@ -8,14 +10,29 @@ import drai.dev.stackthecards.tooltips.*;
 import net.minecraft.client.font.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.tooltip.*;
+import net.minecraft.client.render.model.*;
+import net.minecraft.client.render.model.json.*;
+import net.minecraft.entity.*;
 import net.minecraft.item.*;
 import net.minecraft.text.*;
+import net.minecraft.world.*;
+import org.joml.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
+import org.spongepowered.asm.mixin.injection.invoke.arg.*;
+
+import java.util.*;
 
 @Mixin(DrawContext.class)
-public class DrawContextMixin implements DrawContextExtensions{
+public abstract class DrawContextMixin implements DrawContextExtensions{
+
+    @Shadow @Deprecated public abstract void draw(Runnable drawCallback);
+
+    @Shadow public abstract int getScaledWindowWidth();
+
+    @Shadow public abstract int getScaledWindowHeight();
+
     @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/tooltip/TooltipComponent;"
             + "drawItems(Lnet/minecraft/client/font/TextRenderer;IILnet/minecraft/client/gui/DrawContext;)V"), method =
             "Lnet/minecraft/client/gui/DrawContext;drawTooltip("
@@ -31,21 +48,55 @@ public class DrawContextMixin implements DrawContextExtensions{
         }
     }
 
-   /* @Inject(method = "drawtool", at = @At("HEAD"), cancellable = true)
-    private void reset(TextRenderer textRenderer, ItemStack stack, int x, int y, CallbackInfo ci){
-        System.out.println("mixin into drawcontext");
-        if(stack.isOf(Items.CARD)){
-            System.out.println("tried to draw a card tooltip");
-            var card = (Card)stack.getItem();
-            StackTheCardsClient.CARD_TOOLTIP_RENDERER.drawTooltip(card, textRenderer, stack, x, y);
-            ci.cancel();
+    @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw(Ljava/lang/Runnable;)V"), method =
+            "Lnet/minecraft/client/gui/DrawContext;drawTooltip("
+                    + "Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;II"
+                    + "Lnet/minecraft/client/gui/tooltip/TooltipPositioner;)V")
+    private void drawPosAwareComponent(DrawContext context, Runnable drawCallback, TextRenderer textRenderer, List<TooltipComponent> components, int x, int y, TooltipPositioner positioner) {
+        int i = 0;
+        int j = components.size() == 1 ? -2 : 0;
+        for (TooltipComponent tooltipComponent : components) {
+            int k = tooltipComponent.getWidth(textRenderer);
+            if (k > i) {
+                i = k;
+            }
+            j += tooltipComponent.getHeight();
         }
-        ci.cancel();
+        int l = i;
+        int m = j;
+        Vector2ic vector2ic = positioner.getPosition(this.getScaledWindowWidth(), this.getScaledWindowHeight(), x, y, l, m);
+        int n = vector2ic.x();
+        int o = vector2ic.y();
+        this.draw(() -> TooltipBackgroundRenderer.render((DrawContext) (Object)this, n, o + StackTheCardsClient.getScrollModifier(), l, m, 400));
+    }
+
+
+
+    /*@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/tooltip/TooltipComponent;drawText(Lnet/minecraft/client/font/TextRenderer;IILorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;)V"), method =
+            "Lnet/minecraft/client/gui/DrawContext;drawTooltip("
+                    + "Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;II"
+                    + "Lnet/minecraft/client/gui/tooltip/TooltipPositioner;)V")
+    private void modifyText(TooltipComponent component, TextRenderer textRenderer, int x, int y,
+                                       DrawContext context) {
+        if(component instanceof CardTooltipComponent cardTooltipComponent){
+            cardTooltipComponent.drawItemsWithTooltipPosition(textRenderer, x, y, context, this.getTooltipTopYPosition(),
+                    this.getTooltipBottomYPosition(), this.getMouseX(), this.getMouseY());
+        } else {
+            component.drawItems(textRenderer, x, y+StackTheCardsClient.scrollModifier, context);
+        }
+    }*/
+
+    /*@ModifyVariable(method = "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;)V", at = @At("STORE"), ordinal = 9)
+    private int injected(int n) {
+        if(StackTheCardsClient.shiftKeyPressed){
+            var newY = n + StackTheCardsClient.scrollModifier*3;
+            System.out.println("modified Y, was "+n+", is "+newY);
+            return newY;
+        }
+        return n;
     }*/
     @Unique
     private int tooltipTopYPosition = 0;
-    @Unique
-    private int tooltipTopXPosition = 0;
     @Unique
     private int tooltipBottomYPosition = 0;
     @Unique

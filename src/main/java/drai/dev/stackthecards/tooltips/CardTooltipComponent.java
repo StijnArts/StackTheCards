@@ -66,10 +66,10 @@ public class CardTooltipComponent implements TooltipComponent {
             y = tooltipTopY - h - 2;
             if(y < 0){
                 y = tooltipTopY + 3;
-                x = x - w -7;
+                x = x - w -8;
             }
         }
-        drawAt(stack, x, y, context, textRenderer, mouseX, mouseY, offsetScale);
+        drawAt(stack, x, Math.max(y,5), context, textRenderer, mouseX, mouseY, offsetScale);
     }
 
     private double getCardPreviewSize() {

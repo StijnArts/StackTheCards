@@ -4,8 +4,8 @@ import java.util.*;
 
 public class CardGame {
     private String gameId= "missing";
-    public CardStackingDirection cardStackingDirection = CardStackingDirection.BOTTOM;
-    public float cardStackingDistance = 10F;
+    public CardStackingDirection cardStackingDirection = CardStackingDirection.TOP;
+    public float cardStackingDistance = 18F;
     public String getGameIdentifier() {
         return gameId;
     }
