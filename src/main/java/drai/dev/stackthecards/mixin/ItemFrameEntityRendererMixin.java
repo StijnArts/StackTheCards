@@ -33,7 +33,11 @@ public abstract class ItemFrameEntityRendererMixin<T extends ItemFrameEntity> {
                 matrixStack.translate(0.0F, 0.0F, 0.4375F);
             }
             int j = itemFrameEntity.getRotation();
-            matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float)j * 360.0F / 8.0F));
+//            System.out.println("ItemFrame Rotation ="+j);
+            var modifierRotation = (float)j * 360.0F / 8.0F;
+//            System.out.println("ItemFrame modified Rotation = "+modifierRotation);
+            var rotationDegrees = RotationAxis.POSITIVE_Z.rotationDegrees(modifierRotation);
+            matrixStack.multiply(rotationDegrees);
             matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
             matrixStack.scale(0.0078125F, 0.0078125F, 0.0078125F);
             matrixStack.translate(-64.0F, -64.0F, 0.0F);

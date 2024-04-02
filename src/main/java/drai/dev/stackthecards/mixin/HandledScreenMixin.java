@@ -32,7 +32,7 @@ public class HandledScreenMixin {
     private void checkStackInSlot(DrawContext context, int x, int y, CallbackInfo ci) {
         if (((ScreenHandler)this.handler).getCursorStack().isEmpty() && this.focusedSlot != null) {
             ItemStack itemStack = this.focusedSlot.getStack();
-            System.out.println("checking scrolling from handledscreenmixin");
+//            System.out.println("checking scrolling from handledscreenmixin");
             StackTheCardsClient.checkToolTipForScrolling(itemStack);
         }
 //

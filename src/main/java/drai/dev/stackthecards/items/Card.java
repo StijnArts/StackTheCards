@@ -12,6 +12,7 @@ import java.util.*;
 
 public class Card extends Item {
     public static final String STORED_CARD_DATA_KEY = "CardData";
+    public static final String STORED_CARD_CONNECTION_KEY = "CardConnection";
     public static final String STORED_ATTACHED_CARDS_KEY = "AttachedCards";
     public static final String STORED_CARD_FLIPPED_STATE = "CardFlipped";
     public static final String FLIPPED_KEY = "flipped";
@@ -56,6 +57,7 @@ public class Card extends Item {
         nbtCompound.putBoolean(FLIPPED_KEY, !isFlipped);
         nbtList.add(nbtCompound);
         stack.getOrCreateNbt().put(STORED_CARD_FLIPPED_STATE, nbtList);
+        //TODO flip connectedCards
     }
 
     public static void attachCard(ItemStack topCard, CardIdentifier newCard){

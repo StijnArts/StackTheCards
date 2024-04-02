@@ -1,6 +1,7 @@
 package drai.dev.stackthecards.mixin;
 
 import drai.dev.stackthecards.client.*;
+import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.Items;
 import net.minecraft.block.*;
@@ -16,6 +17,8 @@ import net.minecraft.world.event.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
+
+import java.util.*;
 
 @Mixin(ItemFrameEntity.class)
 public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
@@ -73,8 +76,8 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
         ItemStack itemStack = player.getStackInHand(hand);
         ItemStack currentItemstack = this.getHeldItemStack();
         boolean bl = !currentItemstack.isEmpty();
-        if(currentItemstack.isOf(Items.CARD)) {
-            if(!this.fixed && !this.getWorld().isClient && bl){
+        if(!this.fixed && !this.getWorld().isClient && bl){
+            if(currentItemstack.isOf(Items.CARD)) {
                 if(itemStack.isEmpty() || !itemStack.isOf(Items.CARD)){
                     if(StackTheCardsClient.ctrlKeyPressed){
                         setHeldItemStack(currentItemstack);
@@ -83,19 +86,23 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
                     }
                 }else {
                     if (!this.isRemoved()) {
-                        if(StackTheCardsClient.shiftKeyPressed){
+                        if(CardConnection.checkCardConnection(currentItemstack, itemStack)){
+                            this.setHeldItemStack(currentItemstack);
+                            cir.setReturnValue(ActionResult.CONSUME);
+                            return;
+                        } else if(StackTheCardsClient.shiftKeyPressed){
 //                    var cardsToAttach = new ArrayList<>();
                             var oldTopCardItemStack = currentItemstack.copyWithCount(1);
                             var newTopCardItemStack = itemStack.copyWithCount(1);
                             Card.removeAttachedCards(oldTopCardItemStack);
                             Card.attachCard(newTopCardItemStack, Card.getCardIdentifier(oldTopCardItemStack));
                             Card.attachCards(newTopCardItemStack, Card.getAttachedCards(currentItemstack));
-
                             this.setHeldItemStack(newTopCardItemStack);
                         } else {
                             Card.attachCard(currentItemstack, Card.getCardIdentifier(itemStack));
                             this.setHeldItemStack(currentItemstack);
                         }
+
                         this.emitGameEvent(GameEvent.BLOCK_CHANGE, player);
                         if (!player.getAbilities().creativeMode) {
                             itemStack.decrement(1);
@@ -107,23 +114,21 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
         }
     }
 
-    //TODO write logic for detecting if all cards around the card thats placed are able to connect and if so set isConnected in cardData to true
-    //TODO cards should be able to be in multiple configurations and should be able to define a position for each of those configurations
-    //example of how to access worlds and blockstates to check if theres an item frame next to
-   /* @Override
-    public boolean canStayAttached() {
-        if (this.fixed) {
-            return true;
+    @Inject(method = "getPickBlockStack", at = @At("HEAD"), cancellable = true)
+    private void setCardItem(CallbackInfoReturnable<ItemStack> cir){
+        ItemStack currentItemstack = this.getHeldItemStack();
+        boolean bl = !currentItemstack.isEmpty();
+        if(bl){
+            if(currentItemstack.isOf(Items.CARD)) {
+                var pickedStack = currentItemstack.copy();
+                Card.removeAttachedCards(pickedStack);
+                CardConnection.breakConnections(pickedStack);
+                cir.setReturnValue(pickedStack);
+                cir.cancel();
+            }
         }
-        if (!this.getWorld().isSpaceEmpty(this)) {
-            return false;
-        }
-        BlockState blockState = this.getWorld().getBlockState(this.attachmentPos.offset(this.facing.getOpposite()));
-        if (!(blockState.isSolid() || this.facing.getAxis().isHorizontal() && AbstractRedstoneGateBlock.isRedstoneGate(blockState))) {
-            return false;
-        }
-        return this.getWorld().getOtherEntities(this, this.getBoundingBox(), PREDICATE).isEmpty();
-    }*/
+    }
+
     @Inject(method = "dropHeldStack", at = @At("HEAD"), cancellable = true)
     private void dropCardItem(Entity entity, boolean alwaysDrop, CallbackInfo ci){
         if (this.fixed) {
@@ -132,20 +137,24 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
         }
         ItemStack stack = this.getHeldItemStack();
         if(stack.isOf(Items.CARD)){
+            //TODO break connections after removing all the attached cards unless shift is pressed
             var attachedCards = Card.getAttachedCards(stack);
             if(alwaysDrop){
                 for (var attachedCard: attachedCards) {
-//                    System.out.println(attachedCard.forPrint());
                     var attachedCardItemStack = Card.getAsItemStack(attachedCard);
                     Card.removeAttachedCards(attachedCardItemStack);
+                    CardConnection.breakConnections(attachedCardItemStack);
                     dropStack(attachedCardItemStack);
                 }
                 Card.removeAttachedCards(stack);
+                CardConnection.breakConnections(stack);
                 dropStack(stack);
                 ci.cancel();
                 return;
             }
-
+            if(StackTheCardsClient.shiftKeyPressed && CardConnection.hasConnectedCards(stack)){
+                if (detachedConnectedCard(entity, ci, stack)) return;
+            }
             if(attachedCards.size()>0){
                 ItemStack detachingCardItemstack = null;
                 if(StackTheCardsClient.shiftKeyPressed){
@@ -165,9 +174,35 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
                 dropStack(detachingCardItemstack);
                 ci.cancel();
             } else {
+                if(CardConnection.hasConnectedCards(stack)) {
+                    if (detachedConnectedCard(entity, ci, stack)) return;
+                }
                 Card.removeAttachedCards(stack);
                 this.setFlag(5, false);
             }
         }
+    }
+
+    private boolean detachedConnectedCard(Entity entity, CallbackInfo ci, ItemStack stack) {
+        var detachingCardItemstack = Card.getAsItemStack(CardConnection.removeConnection(stack));
+        var connectedCards = CardConnection.getConnectedCards(stack);
+        var connections = Card.getCardData(stack).getCardGame().getConnections(Card.getCardIdentifier(stack));
+        for (CardConnection connection : connections) {
+            if(connection.matches(connectedCards) && connection.contains(connectedCards)) {
+                CardConnection.breakConnections(stack);
+                for (var card : connectedCards) {
+                    CardConnection.addToConnection(stack, card, connection);
+                }
+                break;
+            }
+        }
+        setHeldItemStack(stack);
+        if (entity instanceof PlayerEntity playerEntity && playerEntity.getAbilities().creativeMode) {
+            ci.cancel();
+            return true;
+        }
+        dropStack(detachingCardItemstack);
+        ci.cancel();
+        return false;
     }
 }

@@ -17,6 +17,7 @@ public class CardGameRegistry {
     }
 
     public static CardData getCardData(CardIdentifier cardIdentifier) {
+        if(cardIdentifier == null /*|| !CardIdentifier.isValid(cardIdentifier)*/) return MISSING_CARD_DATA;
         if(cardIdentifier.ToList().stream().allMatch(id-> id.equals("missing"))){
             return MISSING_CARD_DATA;
         }

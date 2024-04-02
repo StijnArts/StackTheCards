@@ -6,9 +6,9 @@ import net.minecraft.server.command.*;
 import java.util.*;
 
 public class CardIdentifier {
-    private static final String CARD_ID_KEY = "card_id";
-    private static final String SET_ID_KEY = "set_id";
-    private static final String GAME_ID_KEY = "game_id";
+    public static final String CARD_ID_KEY = "card_id";
+    public static final String SET_ID_KEY = "set_id";
+    public static final String GAME_ID_KEY = "game_id";
     public String cardId;
     public String gameId;
     public String setId;
@@ -28,7 +28,7 @@ public class CardIdentifier {
     public static NbtElement createNbt(CardIdentifier cardIdentifier) {
         NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.putString(CARD_ID_KEY, String.valueOf(cardIdentifier.cardId));
-        nbtCompound.putString(SET_ID_KEY, String.valueOf(cardIdentifier.cardId));
+        nbtCompound.putString(SET_ID_KEY, String.valueOf(cardIdentifier.setId));
         nbtCompound.putString(GAME_ID_KEY, String.valueOf(cardIdentifier.gameId));
         return nbtCompound;
     }
@@ -75,8 +75,20 @@ public class CardIdentifier {
 
     public static boolean isValid(CardIdentifier cardIdentifier) {
         return cardIdentifier.cardId.equalsIgnoreCase("missing") ||
-                cardIdentifier.setId.equalsIgnoreCase("missing") ||
+                cardIdentifier.setId.equalsIgnoreCase("missing") || //TODO check if set could be missing if a card is just in a game
                 cardIdentifier.gameId.equalsIgnoreCase("missing");
+    }
+
+    public boolean isEqual(CardIdentifier other){
+        return areEqual(this, other);
+    }
+
+    public static boolean areEqual(CardIdentifier identifier1, CardIdentifier identifier2){
+        if(identifier1 == null || identifier2 == null) return false;
+        var sameGame = identifier1.gameId.equalsIgnoreCase(identifier2.gameId);
+        var sameSet = identifier1.setId.equalsIgnoreCase(identifier2.setId);
+        var sameCard = identifier1.cardId.equalsIgnoreCase(identifier2.cardId);
+        return sameGame && sameSet && sameCard;
     }
 
     public List<String> ToList() {
