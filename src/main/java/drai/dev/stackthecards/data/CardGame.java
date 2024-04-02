@@ -20,43 +20,11 @@ public class CardGame {
 
     public CardGame() {
         var layout = new ArrayList<List<CardConnectionEntry>>();
-        layout.add(List.of(new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                )
-        );
-        layout.add(List.of(new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                        ,CardConnectionEntry.EMPTY
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                )
-        );
-        layout.add(List.of(new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)
-                )
-        );
-        layout.add(List.of(new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)
-                )
-        );
-        layout.add(List.of(new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)
-                        ,new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)
-                )
-        );
+        layout.add(List.of(new CardConnectionEntry(CardSet.hoohTop.getCardIdentifier(),0,0, 0, CardConnectingDirection.BOTTOM, CardRotation.LEFT)));
+
 //        layout.add(List.of(new CardConnectionEntry(CardSet.hoohBottom.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT),
 //                new CardConnectionEntry(CardSet.hoohBottom.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)));
-//        layout.add(List.of(new CardConnectionEntry(CardSet.hoohBottom.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)));
+        layout.add(List.of(new CardConnectionEntry(CardSet.hoohBottom.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)));
 //        layout.add(List.of(new CardConnectionEntry(CardGameRegistry.MISSING_CARD_DATA.getCardIdentifier(),0,0, 0, CardConnectingDirection.TOP, CardRotation.LEFT)));
 //        layout.add(List.of());
         var connection = new CardConnection("hooh_connection", this, layout);
