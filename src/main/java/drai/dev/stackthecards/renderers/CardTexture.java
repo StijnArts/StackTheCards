@@ -1,7 +1,7 @@
 package drai.dev.stackthecards.renderers;
 
 import drai.dev.stackthecards.data.*;
-import drai.dev.stackthecards.registry.*;
+import drai.dev.stackthecards.data.cardData.*;
 import net.minecraft.client.*;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.*;
@@ -26,85 +26,10 @@ public class CardTexture {
         //TODO add option to shift cards into a direction for cards that connect with each other
         this.cardData = cardData;
         this.texture = createCardTexture(cardData, this);
-        Identifier identifier = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("stc_card/"+this.cardData.getCardId(), this.texture);
+        Identifier identifier = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("stc_card/"+this.cardData.getTextureId(), this.texture);
         this.renderLayer = RenderLayer.getText(identifier);
         this.texture.upload();
     }
-
-    /*public CardTexture(CardConnection connection, List<CardIdentifier> containedCards, boolean isFlipped) {
-        this.texture = createConnectedCardTexture(connection, containedCards, isFlipped, this);
-        Identifier identifier = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("stc_card/"+this.cardData.getCardId(), this.texture);
-        this.renderLayer = RenderLayer.getText(identifier);
-        this.texture.upload();
-    }
-
-    private NativeImageBackedTexture createConnectedCardTexture(CardConnection connection, List<CardIdentifier> containedCards, boolean isFlipped, CardTexture texture) {
-        var cardData = CardConnection.getCardDataFromLayout(connection.getLayout());
-        var foundTextures = getCardTexturesFromConnection(cardData);
-        var transposedFoundTextures = transposeFoundTextures(foundTextures);
-        NativeImageBackedTexture nativeImageBackedTexture;
-        if(foundTextures.size()<1 || foundTextures.get(0).size()<1){
-            nativeImageBackedTexture = new NativeImageBackedTexture(16,16, true);
-        } else {
-            biggestCardNativeImageBackedTexture = createCardTexture(getBiggestCard(foundTextures), this);
-            nativeImageBackedTexture = new NativeImageBackedTexture(getWidestSide(foundTextures,connection.getLayout()),getTallestSide(transposedFoundTextures,connection.getLayoutByColumn()), true);
-            var xCentre = nativeImageBackedTexture.getImage().getWidth()/2;
-            var yCentre = nativeImageBackedTexture.getImage().getHeight()/2;
-            var layout = connection.getLayout();
-            var layers = connection.getLayers();
-            for (int z = 0; z < layers; z++) {
-                var previousRowHeight = 0;
-                for (int i = 0; i < layout.size(); i++) {
-                    var row = layout.get(i);
-                    var rowSize = CardConnection.getSizeIgnoringEmpty(row);
-                    var rowHeight = getMaxHeight(foundTextures.get(i));
-                    var rowWidth = getMaxHeight(foundTextures.get(i))/2;
-                    for (int j = 0; j < rowSize; j++) {
-                        var connectionSlot = row.stream().filter(element-> element != CardConnectionEntry.EMPTY).toList().get(j);
-                            var previousColumnWidth = 0;
-                            for (int previous = 0; previous < j; previous++) {
-                                previousColumnWidth += getMaxWidth(transposedFoundTextures.get(previous));
-                            }
-                            var rowStart = previousColumnWidth;
-                            var columnStart = previousRowHeight;
-                            var columnWidth = getMaxWidth(transposedFoundTextures.get(j));
-                            var slotTexture = createCardTexture(CardGameRegistry.getCardData(connectionSlot.self), this).getImage();
-                            var slotTextureOffsetx = (slotTexture.getWidth() - originalImageWidth)/2;
-                            var slotTextureOffsety = (slotTexture.getHeight() - originalImageHeight)/2;
-
-                            slotTexture.resizeSubRectTo();
-                            drawConnectedCardOntoTexture(nativeImageBackedTexture, connectionSlot, slotTexture)
-
-                    }
-                    previousRowHeight += rowHeight;
-                }
-            }
-
-
-        }
-        return nativeImageBackedTexture;
-
-    }
-
-    private int getMaxHeight(List<NativeImage> nativeImages) {
-
-    }
-
-    private int getMaxWidth(List<NativeImage> column) {
-
-    }
-
-    private int getTallestSide(List<List<NativeImage>> foundTextures, List<List<CardConnectionEntry>> layoutByColumn) {
-
-    }
-
-    private int getWidestSide(List<List<NativeImage>> foundTextures, List<List<CardConnectionEntry>> layout) {
-
-    }
-
-    private List<List<NativeImage>> getCardTexturesFromConnection(List<List<CardData>> cardData) {
-
-    }*/
 
     private static NativeImageBackedTexture createCardTexture(CardData cardData, CardTexture texture) {
         var foundTexture = getCardTextureFromData(cardData);
@@ -183,15 +108,6 @@ public class CardTexture {
 
     public static void drawConnectedCard(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light,
                                          RenderLayer renderLayer, int layersHigh, int amountOfCardsAttached, CardGame game, double xOffset, double yOffset, CardRotation rotation) {
-//        var modifierRotation = (float)rotation.rotation * 360.0F / 8.0F;
-//        var rotationDegrees = RotationAxis.POSITIVE_Z.rotationDegrees(modifierRotation);
-//        matrices.multiply(rotationDegrees);
-        /*if(rotation == CardRotation.LEFT || rotation == CardRotation.UPRIGHT){
-            matrices.translate(0, -128.0F, 0.0F);
-        }*/
-
-        //128 is a block
-//        matrices.translate(16,16, 0);
         var cardDistance = game.cardStackingDistance;
         var y = 0F;
         var x = 0F;
@@ -216,12 +132,7 @@ public class CardTexture {
         //top left
         vertexConsumer.vertex(matrix4f, (float) (rotation.topLeft.getLeft() + xOffset),
                 (float) (rotation.topLeft.getRight() + yOffset), -0.01F).color(255, 255, 255, 255).texture(0.0F, 0.0F).light(light).next();
-        /*if(rotation == CardRotation.LEFT || rotation == CardRotation.UPRIGHT){
-            matrices.translate(0, 128.0F, 0.0F);
-        }*/
         matrices.translate(0, 0, (amountOfCardsAttached*0.1F)*-1);
-//        matrices.translate(-16,-16, 0);
-//        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(modifierRotation*-1));
     }
 
     private static void roundCorners(NativeImage foundTexture, NativeImageBackedTexture nativeImageBackedTexture, int xOffset, int yOffset) {
@@ -231,12 +142,6 @@ public class CardTexture {
 
         for (int y = 0; y < ySize; y++) {
             for (int x = 0; x < xSize; x++) {
-                /*double distance = Math.sqrt(Math.pow(x - xSize / 2.0, 2) + Math.pow(y - ySize / 2.0, 2));
-
-                // If the distance is greater than the radius, set the pixel to transparent
-                if (distance < radius) {
-                    nativeImageBackedTexture.getImage().setColor(x+xOffset, y+yOffset, 0); // Set pixel to transparent
-                }*/
                 if(y < ySize/2 && x < xSize/2){
                     //correctly placed
                     //top left corner
@@ -276,8 +181,7 @@ public class CardTexture {
 
     private static NativeImage getCardTextureFromData(CardData cardData) {
         ResourceManager testResourceManager = MinecraftClient.getInstance().getResourceManager();
-
-        Identifier textureId = new Identifier("stack_the_cards", "stc_cards/cards/"+cardData.getCardId()+".png");
+        Identifier textureId = new Identifier("stack_the_cards", "stc_cards/cards/"+ cardData.getCardTextureLocation() +".png");
         NativeImage textureImage = null;
         try {
             Optional<Resource> resource = testResourceManager.getResource(textureId);

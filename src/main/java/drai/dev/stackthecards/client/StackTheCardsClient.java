@@ -60,12 +60,6 @@ public class StackTheCardsClient implements ClientModInitializer {
             scrollModifier+= vert;
 //            System.out.println("scrollModifier: " + scrollModifier);
         }));
-        Items.register();
-        var cardSet = new CardSet();
-        System.out.println("Testing-Cards give commands");
-        for (var card : cardSet.getCards().keySet() ) {
-            System.out.println("/give @a stack_the_cards:card{CardData:[{card_id:"+card+", set_id:base, game_id:pokemon_tcg}]}");
-        }
     }
 
     private static boolean isKeyPressed(@Nullable Key key) {

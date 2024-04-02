@@ -1,32 +1,83 @@
 package drai.dev.stackthecards.data;
 
+import com.google.gson.stream.*;
+import drai.dev.stackthecards.data.cardData.*;
 import drai.dev.stackthecards.registry.*;
-import net.minecraft.client.*;
-import net.minecraft.client.item.*;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.util.*;
 import net.minecraft.util.*;
+import org.jetbrains.annotations.*;
+import org.json.simple.*;
 
 import java.util.*;
 
-public class CardSet {
-    public Map<String, Identifier> textures;
-    public String cardGameId;
-    private String setId= "missing";
-    private Map<String, CardData> cards = new HashMap<>();
+import static drai.dev.stackthecards.data.CardGame.JSON_GAME_CARD_BACK_CARD_KEY;
+import static drai.dev.stackthecards.data.CardGame.JSON_GAME_CARD_BACK_ITEM_MODEL_KEY;
+import static drai.dev.stackthecards.data.cardData.CardData.JSON_ROUNDED_CORNERS_ID_KEY;
 
-    public CardSet() {
-        cards.put("charizard", charizard);
-        cards.put("hooh_top", hoohTop);
-        cards.put("hooh_bottom", hoohBottom);
+public class CardSet {
+    private static final String JSON_SET_ID_KEY = "setId";
+    public String gameId;
+    private final String setId;
+    private final Map<String, CardData> cards = new HashMap<>();
+    @Nullable
+    public String cardBackTextureName;
+    @Nullable
+    private Identifier cardBackModel;
+    private final Map<String, CardPack> cardPacks = new HashMap<>();
+    @Nullable
+    private GameCardData cardBackData;
+    public Optional<Boolean> hasRoundedCorners = Optional.empty();
+
+    public CardSet(String cardSetId) {
+        this.setId = cardSetId;
+    }
+
+    public static CardSet parse(JSONObject json) throws MalformedJsonException {
+        if(json.isEmpty() || !json.containsKey(JSON_SET_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+        CardSet cardSet;
+        try{
+            cardSet = new CardSet((String) json.get(JSON_SET_ID_KEY));
+        } catch (Exception e){
+            throw new MalformedJsonException("Card game id was malformed");
+        }
+        if(json.containsKey(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)){
+            try{
+                var identifierArray = ((String) json.get(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)).split(":");
+                cardSet.setCardBackModel(new Identifier(identifierArray[0], identifierArray[1]));
+            } catch (Exception e){
+                throw new MalformedJsonException("Card back identifier was malformed");
+            }
+        }
+        if(json.containsKey(JSON_GAME_CARD_BACK_CARD_KEY)){
+            try{
+                cardSet.setCardBackTextureName((String) json.get(JSON_GAME_CARD_BACK_CARD_KEY));
+            } catch (Exception e){
+                throw new MalformedJsonException("Card back cardId was malformed");
+            }
+        }
+        if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
+            try{
+                cardSet.hasRoundedCorners = Optional.of((boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY));
+            } catch (Exception e){
+                throw new MalformedJsonException("Card has rounded corners value was malformed");
+            }
+        }
+        return cardSet;
+    }
+
+    private void setCardBackModel(Identifier identifier) {
+        this.cardBackModel = identifier;
+    }
+
+    private void setCardBackTextureName(String cardBackTextureName) {
+        this.cardBackTextureName = cardBackTextureName;
     }
 
     public CardGame getCardGame() {
-        return CardGameRegistry.getCardGame(cardGameId);//cardGame;
+        return CardGameRegistry.getCardGame(gameId);//cardGame;
     }
 
     public String getSetIdentifier() {
-        return getCardGame().getGameIdentifier() + "_" + setId;
+        return getCardGame().getGameId() + "_" + setId;
     }
 
     public Map<String, CardData> getCards() {
@@ -42,9 +93,32 @@ public class CardSet {
         } else
         return CardGameRegistry.MISSING_CARD_DATA;
     }
-
-    public static CardData cardBackData = new CardData("high_res_modern_card_back");
-    public CardData getCardBackData() {
+    @Nullable
+    public CardData getCardBackTextureName() {
+        if(cardBackTextureName==null) return null;
+        if(this.cardBackData == null){
+            this.cardBackData = new GameCardData(gameId, cardBackTextureName);
+        }
         return cardBackData;
+    }
+
+    public Identifier getCardBackModel() {
+        return cardBackModel;
+    }
+
+    public String getSetId() {
+        return setId;
+    }
+
+    public void addCard(CardData cardData) {
+        cards.put(cardData.getCardId(), cardData);
+    }
+
+    public void addPack(CardPack cardPack) {
+        cardPacks.put(cardPack.getPackId(), cardPack);
+    }
+
+    public void setGame(CardGame cardGame) {
+        this.gameId = cardGame.getGameId();
     }
 }

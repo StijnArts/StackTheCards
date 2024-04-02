@@ -4,6 +4,7 @@ import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
+import org.json.simple.*;
 
 import java.util.*;
 import java.util.stream.*;
@@ -14,13 +15,13 @@ import static drai.dev.stackthecards.data.CardIdentifier.GAME_ID_KEY;
 public class CardConnection {
     public static final String CONNECTION_ID = "connection_id";
     private final String connectionId;
-    private final CardGame cardGame;
+    private String cardGameId;
     private final List<List<CardConnectionEntry>> layout;
     private final List<List<CardConnectionEntry>> layoutByColumn;
 
-    public CardConnection(String connectionId, CardGame cardGame, List<List<CardConnectionEntry>> layout) {
+    public CardConnection(String connectionId, String cardGame, List<List<CardConnectionEntry>> layout) {
         this.connectionId = connectionId;
-        this.cardGame = cardGame;
+        this.cardGameId = cardGame;
         this.layout = layout;
         this.layoutByColumn = transposeLayout(layout);
     }
@@ -53,6 +54,10 @@ public class CardConnection {
         }
 
         return maxSize;
+    }
+
+    public static CardConnection parse(JSONObject jsonObjectCard) {
+        return null;
     }
 
 //    public static List<List<CardData>> getCardDataFromLayout(List<List<CardConnectionEntry>> layout) {
@@ -234,7 +239,7 @@ public class CardConnection {
     private static NbtElement createNbt(CardConnection connection) {
         NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.putString(CardConnection.CONNECTION_ID, String.valueOf(connection.connectionId));
-        nbtCompound.putString(GAME_ID_KEY, String.valueOf(connection.cardGame));
+        nbtCompound.putString(GAME_ID_KEY, String.valueOf(connection.cardGameId));
         return nbtCompound;
     }
 
@@ -264,10 +269,14 @@ public class CardConnection {
     }
 
     public CardGame getCardGame() {
-        return cardGame;
+        return CardGameRegistry.getCardGame(cardGameId);
     }
 
     public List<List<CardConnectionEntry>> getLayout() {
         return layout;
+    }
+
+    public void setGame(CardGame cardGame) {
+        this.cardGameId = cardGame.getGameId();
     }
 }
