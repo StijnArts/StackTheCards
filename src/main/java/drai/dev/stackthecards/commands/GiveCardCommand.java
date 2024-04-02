@@ -19,11 +19,30 @@ public class GiveCardCommand {
     public static final int MAX_STACKS = 100;
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("giveCard").requires(source -> source.hasPermissionLevel(2))).then(CommandManager.argument("targets", EntityArgumentType.players())
-                .then((ArgumentBuilder<ServerCommandSource, ?>)((RequiredArgumentBuilder)CommandManager.argument("item", ItemStackArgumentType.itemStack(commandRegistryAccess))
-                        .executes(context -> GiveCardCommand.execute((ServerCommandSource)context.getSource(), ItemStackArgumentType.getItemStackArgument(context, "item"), EntityArgumentType.getPlayers(context, "targets"), 1)))
+       /* dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("giveCard")
+                .requires(source -> source.hasPermissionLevel(2)))
+                .then(CommandManager.argument("targets", EntityArgumentType.players()))
+                .then(CommandManager.argument("game", GameArgumentType.games())
+                .then((ArgumentBuilder<ServerCommandSource, ?>)((RequiredArgumentBuilder)CommandManager
+                        .argument("game", ItemStackArgumentType.itemStack(commandRegistryAccess))
+                        .executes(context -> GiveCardCommand.execute((ServerCommandSource)context.getSource(),
+                                ItemStackArgumentType.getItemStackArgument(context, "item"),
+                                EntityArgumentType.getPlayers(context, "targets"), 1)))
                         .then(CommandManager.argument("count", IntegerArgumentType.integer(1))
-                        .executes(context -> GiveCardCommand.execute((ServerCommandSource)context.getSource(), ItemStackArgumentType.getItemStackArgument(context, "item"), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "count")))))));
+                        .executes(context -> GiveCardCommand.execute((ServerCommandSource)context.getSource(),
+                                ItemStackArgumentType.getItemStackArgument(context, "item"),
+                                EntityArgumentType.getPlayers(context, "targets"),
+                                IntegerArgumentType.getInteger(context, "count"))))
+                        .then(CommandManager.argument("count", IntegerArgumentType.integer(1))
+                        .executes(context -> GiveCardCommand.execute((ServerCommandSource)context.getSource(),
+                                ItemStackArgumentType.getItemStackArgument(context, "item"),
+                                EntityArgumentType.getPlayers(context, "targets"),
+                                IntegerArgumentType.getInteger(context, "count"))))
+                        .then(CommandManager.argument("count", IntegerArgumentType.integer(1))
+                        .executes(context -> GiveCardCommand.execute((ServerCommandSource)context.getSource(),
+                                ItemStackArgumentType.getItemStackArgument(context, "item"),
+                                EntityArgumentType.getPlayers(context, "targets"),
+                                IntegerArgumentType.getInteger(context, "count")))))));*/
     }
 
     private static int execute(ServerCommandSource source, ItemStackArgument item, Collection<ServerPlayerEntity> targets, int count) throws CommandSyntaxException {

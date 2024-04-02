@@ -11,15 +11,22 @@ import java.util.*;
 
 public class CardSet {
     public Map<String, Identifier> textures;
-    private CardGame cardGame = new CardGame();
+    private CardGame cardGame;
     private String setId= "missing";
     private Map<String, CardData> cards = new HashMap<>();
+
+    public CardSet() {
+        cards.put("charizard", charizard);
+        cards.put("hooh_top", hoohTop);
+        cards.put("hooh_bottom", hoohBottom);
+    }
+
     public CardGame getCardGame() {
-        return cardGame;
+        return new CardGame();//cardGame;
     }
 
     public String getSetIdentifier() {
-        return cardGame.getGameIdentifier() + "_" + setId;
+        return getCardGame().getGameIdentifier() + "_" + setId;
     }
 
     public Map<String, CardData> getCards() {
@@ -27,10 +34,12 @@ public class CardSet {
     }
 
     public static CardData charizard = new CardData("charizard");
+    public static CardData hoohTop = new CardData("hooh_top");
+    public static CardData hoohBottom = new CardData("hooh_bottom");
     public CardData getCardData(String cardId){
-        if(cardId.equals("charizard")){
-            return charizard;
-        }
+        if(cards.containsKey(cardId)){
+            return cards.get(cardId);
+        } else
         return CardGameRegistry.MISSING_CARD_DATA;
     }
 

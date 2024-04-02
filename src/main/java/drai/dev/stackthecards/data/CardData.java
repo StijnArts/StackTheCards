@@ -1,9 +1,11 @@
 package drai.dev.stackthecards.data;
 
 import drai.dev.stackthecards.client.*;
+import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.renderers.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
+import org.jetbrains.annotations.*;
 
 import java.util.*;
 
@@ -11,8 +13,8 @@ public class CardData {
     private static CardSet TEST_CARD_SET = new CardSet();
     private CardSet cardSet;
     private String cardId = "missing";
-//    private NativeImage cardImage = ;
-
+    @Nullable
+    private CardGame cardGame;
 
     public CardData(String cardId) {
 //        this.cardSet = cardSet;
@@ -36,8 +38,10 @@ public class CardData {
         return cardId;
     }
 
-    public Identifier getIdentifier() {
-        return new Identifier("stack_the_cards",getCardId().replaceAll("_", "/"));
+    public CardIdentifier getCardIdentifier() {
+        //TODO
+        return new CardIdentifier("pokemon_tcg","base", cardId);
+//        return new CardIdentifier(cardId, getCardSet().getSetIdentifier(), getCardGame().getGameId());
     }
 
     public String getCardName() {
@@ -135,5 +139,13 @@ public class CardData {
 
     public boolean hasRoundedCorners() {
         return true;
+    }
+
+    public CardGame getCardGame() {
+        if(cardGame != null){
+            return cardGame;
+        } else {
+            return getCardSet().getCardGame();
+        }
     }
 }

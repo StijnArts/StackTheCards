@@ -37,7 +37,7 @@ public abstract class ItemStackMixin {
                 tooltip.addAll(Card.getCardData(self).getLoreToolTips());
             } else {
                 tooltip.addAll(Card.getCardData(self).getTooltipsDescriptors());
-                StackTheCardsClient.modifyStackTooltip(self, tooltip::addAll);
+                StackTheCardsClient.modifyStackTooltip(tooltip::addAll);
             }
         }
         StackTheCardsClient.checkToolTipForScrolling(self);
