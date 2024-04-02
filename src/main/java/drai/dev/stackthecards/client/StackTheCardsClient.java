@@ -45,20 +45,7 @@ public class StackTheCardsClient implements ClientModInitializer {
     public void onInitializeClient() {
         CARD_RENDERER = new CardRenderer();
         CARD_TOOLTIP_RENDERER = new CardTooltipRenderer(CARD_RENDERER);
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
-            @Override
-            public Identifier getFabricId() {
-                return new Identifier("stack_the_cards", "card_resources");
-            }
 
-            @Override
-            public void reload(ResourceManager manager) {
-                CARD_RENDERER.clearStateTextures();
-/*                for (var resource : manager.findResources("stc_cards/cards", path-> path.getPath().endsWith(".png")).entrySet()){
-
-                }*/
-            }
-        });
         var plugin = new StackTheCardsModelLoadingPlugin();
         PreparableModelLoadingPlugin.register((resourceManager, executor) -> CompletableFuture.completedFuture(resourceManager),
                 plugin::onInitializeModelLoader);

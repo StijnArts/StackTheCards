@@ -11,7 +11,7 @@ import java.util.*;
 
 public class CardSet {
     public Map<String, Identifier> textures;
-    private CardGame cardGame;
+    public String cardGameId;
     private String setId= "missing";
     private Map<String, CardData> cards = new HashMap<>();
 
@@ -22,7 +22,7 @@ public class CardSet {
     }
 
     public CardGame getCardGame() {
-        return new CardGame();//cardGame;
+        return CardGameRegistry.getCardGame(cardGameId);//cardGame;
     }
 
     public String getSetIdentifier() {
