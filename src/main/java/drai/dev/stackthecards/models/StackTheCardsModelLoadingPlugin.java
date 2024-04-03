@@ -6,6 +6,7 @@ import net.minecraft.resource.*;
 import net.minecraft.util.*;
 
 import static drai.dev.stackthecards.client.StackTheCardsClient.CARD_BACK_MODELS;
+import static drai.dev.stackthecards.client.StackTheCardsClient.CARD_PACK_MODELS;
 
 public class StackTheCardsModelLoadingPlugin implements ModelLoadingPlugin {
     @Override
@@ -16,6 +17,12 @@ public class StackTheCardsModelLoadingPlugin implements ModelLoadingPlugin {
         CARD_BACK_MODELS.clear();
         CARD_BACK_MODELS.addAll(manager.findResources("models/stc_cards/backs", path-> path.getPath().endsWith(".json")).keySet());
         for (Identifier identifier : CARD_BACK_MODELS) {
+            var newIdentifier  =new Identifier(identifier.getNamespace(), identifier.getPath().replaceAll("models/", "").replaceAll(".json",""));
+            context.addModels(newIdentifier);
+        }
+        CARD_PACK_MODELS.clear();
+        CARD_PACK_MODELS.addAll(manager.findResources("models/stc_cards/packs", path-> path.getPath().endsWith(".json")).keySet());
+        for (Identifier identifier : CARD_PACK_MODELS) {
             var newIdentifier  =new Identifier(identifier.getNamespace(), identifier.getPath().replaceAll("models/", "").replaceAll(".json",""));
             context.addModels(newIdentifier);
         }

@@ -1,13 +1,7 @@
 package drai.dev.stackthecards.data;
 
 import com.google.gson.stream.*;
-import drai.dev.stackthecards.data.cardData.*;
-import drai.dev.stackthecards.tooltips.parts.*;
-import net.minecraft.util.math.*;
 import org.json.simple.*;
-
-import static drai.dev.stackthecards.data.CardTextFormatting.*;
-import static drai.dev.stackthecards.data.CardTextFormatting.JSON_COLOR_KEY;
 
 public class CardConnectionEntry {
     public static final String JSON_SELF_GAME_ID_KEY = "gameId";

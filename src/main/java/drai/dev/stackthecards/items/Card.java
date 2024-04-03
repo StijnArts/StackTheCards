@@ -1,13 +1,11 @@
 package drai.dev.stackthecards.items;
 
 import drai.dev.stackthecards.data.*;
-import drai.dev.stackthecards.data.cardData.*;
+import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.registry.Items;
-import net.minecraft.client.util.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
-import net.minecraft.util.*;
 
 import java.util.*;
 

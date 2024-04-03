@@ -1,8 +1,8 @@
 package drai.dev.stackthecards;
 
 import drai.dev.stackthecards.data.*;
-import drai.dev.stackthecards.data.cardData.*;
-import drai.dev.stackthecards.items.*;
+import drai.dev.stackthecards.data.carddata.*;
+import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.registry.*;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.resource.*;
@@ -66,10 +66,10 @@ public class StackTheCards implements ModInitializer {
                                 }
                                 for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/"+cardSet.getSetId()+"/packs", path-> path.getPath().endsWith(".json")).entrySet()){
                                     try{
-//                                        JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-//                                        CardPack cardPack = CardPack.parse(jsonObjectCard);
-//                                        cardPack.setSet(cardSet);
-//                                        cardSet.addPack(cardPack);
+                                        JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
+                                        CardPack cardPack = CardPack.parse(jsonObjectCard, cardGame, cardSet);
+                                        cardPack.setSet(cardSet.getSetId());
+                                        cardSet.addPack(cardPack);
                                     } catch (Exception e){
                                         System.out.println("pack json file "+packResource.getKey() + " was invalid: "+e.getMessage());
                                     }
@@ -105,7 +105,7 @@ public class StackTheCards implements ModInitializer {
                         for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/packs", path-> path.getPath().endsWith(".json")).entrySet()){
                             try{
 //                                JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-//                                CardPack cardPack = CardPack.parse(jsonObject);
+//                                CardPack cardPack = CardPack.parse(jsonObject, cardGame);
 //                                cardPack.setGame(cardGame);
 //                                cardGame.addPack(cardPack);
                             } catch (Exception e){
@@ -127,6 +127,9 @@ public class StackTheCards implements ModInitializer {
                     for (var set : game.getCardSets().values() ) {
                         for (var card : set.getCards().keySet() ) {
                             System.out.println("/give @a stack_the_cards:card{CardData:[{card_id:"+card+", set_id:base, game_id:pokemon_tcg}]}");
+                        }
+                        for (var pack : set.getCardPacks().keySet() ) {
+                            System.out.println("/give @a stack_the_cards:card_pack{CardPackData:[{card_id:"+pack+", set_id:base, game_id:pokemon_tcg}]}");
                         }
                     }
                 }

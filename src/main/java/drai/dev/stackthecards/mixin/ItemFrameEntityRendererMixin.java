@@ -25,7 +25,7 @@ public abstract class ItemFrameEntityRendererMixin<T extends ItemFrameEntity> {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isEmpty()Z"), cancellable = true)
     private void renderInterceptForCardItems(T itemFrameEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci){
         ItemStack itemStack = itemFrameEntity.getHeldItemStack();
-        if(!itemStack.isEmpty() && itemStack.isOf(Items.CARD)){
+        if(!itemStack.isEmpty() && (itemStack.isOf(Items.CARD)||itemStack.isOf(Items.CARD_PACK))){
             boolean bl = itemFrameEntity.isInvisible();
             if (bl) {
                 matrixStack.translate(0.0F, 0.0F, 0.5F);
@@ -42,6 +42,10 @@ public abstract class ItemFrameEntityRendererMixin<T extends ItemFrameEntity> {
             matrixStack.scale(0.0078125F, 0.0078125F, 0.0078125F);
             matrixStack.translate(-64.0F, -64.0F, 0.0F);
             matrixStack.translate(0.0F, 0.0F, -1.0F);
+            if(itemStack.isOf(Items.CARD_PACK)) {
+                matrixStack.scale(0.5F,0.5F,0.5F);
+                matrixStack.translate(64F,64F,3F);
+            }
             int k = this.getLight(itemFrameEntity, LightmapTextureManager.MAX_SKY_LIGHT_COORDINATE | 210, i);
             StackTheCardsClient.CARD_RENDERER.draw(matrixStack, vertexConsumerProvider, itemStack, k);
             matrixStack.pop();

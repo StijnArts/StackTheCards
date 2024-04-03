@@ -1,4 +1,4 @@
-package drai.dev.stackthecards.data.cardData;
+package drai.dev.stackthecards.data.carddata;
 
 import drai.dev.stackthecards.data.*;
 

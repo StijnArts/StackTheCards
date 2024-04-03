@@ -6,7 +6,9 @@ import drai.dev.stackthecards.registry.Items;
 import net.minecraft.client.*;
 import net.minecraft.client.network.*;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.*;
 import net.minecraft.client.render.item.*;
+import net.minecraft.client.render.model.json.*;
 import net.minecraft.client.util.math.*;
 import net.minecraft.entity.*;
 import net.minecraft.item.*;
@@ -37,12 +39,12 @@ public abstract class HeldItemRendererMixin {
     private void setCardItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item,
                              float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci){
         if (!player.isUsingSpyglass()) {
-            if (item.isOf(Items.CARD)) {
+            if (item.isOf(Items.CARD) || item.isOf(Items.CARD_PACK)) {
                 boolean bl = hand == Hand.MAIN_HAND;
                 Arm arm = bl ? player.getMainArm() : player.getMainArm().getOpposite();
                 matrices.push();
                 var offhand = this.offHand;
-                if (bl && offhand.isEmpty()) {
+                if (bl && offhand.isEmpty() && item.isOf(Items.CARD)) {
                     this.renderCardInBothHands(matrices, vertexConsumers, light, pitch, equipProgress, swingProgress);
                 } else {
                     this.renderCardInOneHand(matrices, vertexConsumers, light, equipProgress, arm, swingProgress, item);
@@ -53,6 +55,21 @@ public abstract class HeldItemRendererMixin {
         }
     }
 
+    @Inject(method = "renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"), cancellable = true)
+    private void setCardItem(LivingEntity entity, ItemStack item, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci){
+            if (item.isOf(Items.CARD_PACK)) {
+                matrices.push();
+                matrices.translate(0, 0.2f, 0.1F);
+                matrices.scale(1.6f, 1.6f, 1.6f);
+                renderFirstPersonCard(matrices, vertexConsumers, light, item);
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
+                matrices.translate(-128, 0, 0.0F);
+//                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
+                StackTheCardsClient.CARD_RENDERER.draw(matrices, vertexConsumers, item, light);
+                matrices.pop();
+                ci.cancel();
+            }
+    }
     private void renderCardInBothHands(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float pitch, float equipProgress, float swingProgress) {
         float f = MathHelper.sqrt(swingProgress);
         float g = -0.2F * MathHelper.sin(swingProgress * 3.1415927F);

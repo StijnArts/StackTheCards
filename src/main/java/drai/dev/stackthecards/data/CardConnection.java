@@ -1,7 +1,6 @@
 package drai.dev.stackthecards.data;
 
 import com.google.gson.stream.*;
-import drai.dev.stackthecards.data.cardData.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
 import net.minecraft.item.*;
@@ -11,7 +10,6 @@ import org.json.simple.*;
 import java.util.*;
 import java.util.stream.*;
 
-import static drai.dev.stackthecards.data.CardIdentifier.CARD_ID_KEY;
 import static drai.dev.stackthecards.data.CardIdentifier.GAME_ID_KEY;
 
 public class CardConnection {

@@ -1,7 +1,8 @@
 package drai.dev.stackthecards.renderers;
 
 import drai.dev.stackthecards.data.*;
-import drai.dev.stackthecards.data.cardData.*;
+import drai.dev.stackthecards.data.carddata.*;
+import drai.dev.stackthecards.data.cardpacks.*;
 import net.minecraft.client.*;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.*;
@@ -25,14 +26,22 @@ public class CardTexture {
     public CardTexture(CardData cardData) {
         //TODO add option to shift cards into a direction for cards that connect with each other
         this.cardData = cardData;
-        this.texture = createCardTexture(cardData, this);
-        Identifier identifier = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("stc_card/"+this.cardData.getTextureId(), this.texture);
+        var foundTexture = getCardTextureFromData(cardData);
+        this.texture = createTexture(cardData.hasRoundedCorners(), foundTexture, this);
+        Identifier identifier = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("stc_card/"+cardData.getTextureId(), this.texture);
         this.renderLayer = RenderLayer.getText(identifier);
         this.texture.upload();
     }
 
-    private static NativeImageBackedTexture createCardTexture(CardData cardData, CardTexture texture) {
-        var foundTexture = getCardTextureFromData(cardData);
+    public CardTexture(CardPack cardPack){
+        var foundTexture = getPackTextureFromData(cardPack);
+        this.texture = createTexture(false, foundTexture, this);
+        Identifier identifier = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("stc_card/"+cardPack.getTextureId(), this.texture);
+        this.renderLayer = RenderLayer.getText(identifier);
+        this.texture.upload();
+    }
+
+    private static NativeImageBackedTexture createTexture(boolean hasRoundedCorners, NativeImage foundTexture, CardTexture texture) {
         NativeImageBackedTexture nativeImageBackedTexture;/* = new NativeImageBackedTexture(1024, 1024, true);*/
         if(foundTexture == null){
             nativeImageBackedTexture = new NativeImageBackedTexture(16,16, true);
@@ -55,7 +64,7 @@ public class CardTexture {
                     }
                 }
             }
-            if(cardData.hasRoundedCorners()) {
+            if(hasRoundedCorners) {
                 roundCorners(foundTexture, nativeImageBackedTexture, xOffset, yOffset);
             }
         }
@@ -182,6 +191,23 @@ public class CardTexture {
     private static NativeImage getCardTextureFromData(CardData cardData) {
         ResourceManager testResourceManager = MinecraftClient.getInstance().getResourceManager();
         Identifier textureId = new Identifier("stack_the_cards", "stc_cards/cards/"+ cardData.getCardTextureLocation() +".png");
+        NativeImage textureImage = null;
+        try {
+            Optional<Resource> resource = testResourceManager.getResource(textureId);
+            if(resource.isPresent()){
+                InputStream inputStream = resource.get().getInputStream();
+                textureImage = NativeImage.read(inputStream);
+                inputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return textureImage;
+    }
+
+    private NativeImage getPackTextureFromData(CardPack cardPack) {
+        ResourceManager testResourceManager = MinecraftClient.getInstance().getResourceManager();
+        Identifier textureId = new Identifier("stack_the_cards", "stc_cards/packs/"+ cardPack.getPackTextureLocation() +".png");
         NativeImage textureImage = null;
         try {
             Optional<Resource> resource = testResourceManager.getResource(textureId);

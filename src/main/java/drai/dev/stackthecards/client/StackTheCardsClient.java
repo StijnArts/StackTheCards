@@ -1,31 +1,19 @@
 package drai.dev.stackthecards.client;
 
-import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.models.*;
-import drai.dev.stackthecards.registry.Items;
 import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.util.*;
 import net.fabricmc.api.*;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.*;
 import net.fabricmc.fabric.api.client.model.loading.v1.*;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.client.screen.v1.*;
-import net.fabricmc.fabric.api.resource.*;
 import net.minecraft.client.*;
-import net.minecraft.client.gui.screen.*;
-import net.minecraft.client.gui.screen.ingame.*;
-import net.minecraft.client.option.*;
-import net.minecraft.client.render.item.*;
-import net.minecraft.client.texture.*;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.*;
 import net.minecraft.item.*;
-import net.minecraft.resource.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
-import org.lwjgl.glfw.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -35,6 +23,7 @@ public class StackTheCardsClient implements ClientModInitializer {
     public static CardRenderer CARD_RENDERER;
     public static CardTooltipRenderer CARD_TOOLTIP_RENDERER;
     public static List<Identifier> CARD_BACK_MODELS = new ArrayList<>();
+    public static List<Identifier> CARD_PACK_MODELS = new ArrayList<>();
     public static boolean shiftKeyPressed;
     public static boolean ctrlKeyPressed;
     public static int scrollModifier = 0;
@@ -75,10 +64,19 @@ public class StackTheCardsClient implements ClientModInitializer {
         ctrlKeyPressed = isKeyPressed(Key.flipCardKey());
     }
 
-    public static void modifyStackTooltip(Consumer<Collection<Text>> tooltip) {
+    public static void modifyCardStackTooltip(Consumer<Collection<Text>> tooltip) {
         MutableText loreKeyHint = Text.literal("Shift: ");
         loreKeyHint.fillStyle(Style.EMPTY.withColor(Formatting.GOLD));
         loreKeyHint.append(Text.literal("view card lore").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+        tooltip.accept(List.of(loreKeyHint));
+    }
+
+
+
+    public static void modifyPackStackTooltip(Consumer<Collection<Text>> tooltip) {
+        MutableText loreKeyHint = Text.literal("Shift: ");
+        loreKeyHint.fillStyle(Style.EMPTY.withColor(Formatting.GOLD));
+        loreKeyHint.append(Text.literal("view pack details").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
         tooltip.accept(List.of(loreKeyHint));
     }
 

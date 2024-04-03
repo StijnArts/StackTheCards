@@ -1,4 +1,4 @@
-package drai.dev.stackthecards.data.cardData;
+package drai.dev.stackthecards.data.carddata;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.client.*;
@@ -155,7 +155,7 @@ public class CardData {
     }
 
     @NotNull
-    private ArrayList<Text> getTexts(List<CardTooltipSection> sections) {
+    public static ArrayList<Text> getTexts(List<CardTooltipSection> sections) {
         var tooltips = new ArrayList<Text>();
         for (int i = 0; i < sections.size(); i++) {
             var section = sections.get(i);
@@ -234,5 +234,9 @@ public class CardData {
 
     public String getCardTextureLocation() {
         return gameId + "/" + cardSet.getSetId() + "/" + cardId;
+    }
+
+    public Identifier getFallbackModel() {
+        return new Identifier("stack_the_cards", "stc_cards/backs/fallback");
     }
 }
