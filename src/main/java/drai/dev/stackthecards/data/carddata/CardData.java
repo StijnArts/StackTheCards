@@ -15,9 +15,9 @@ import org.json.simple.*;
 import java.util.*;
 
 public class CardData {
-    private static final String JSON_CARD_ID_KEY = "cardId";
-    private static final String JSON_CARD_HOVER_TOOLTIP_KEY = "textSectionsForHoverTooltip";
-    private static final String JSON_CARD_DETAIL_TOOLTIP_KEY = "textSectionsForDetailTooltip";
+    public static final String JSON_CARD_ID_KEY = "cardId";
+    public static final String JSON_CARD_HOVER_TOOLTIP_KEY = "textSectionsForHoverTooltip";
+    public static final String JSON_CARD_DETAIL_TOOLTIP_KEY = "textSectionsForDetailTooltip";
     public static final String JSON_ROUNDED_CORNERS_ID_KEY = "hasRoundedCorners";
     public static final String JSON_DETAIL_HEADER_KEY = "detailHeader";
     public static final String JSON_NAME_HEADER_KEY = "name";

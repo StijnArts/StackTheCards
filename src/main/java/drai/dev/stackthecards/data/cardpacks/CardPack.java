@@ -13,8 +13,7 @@ import org.json.simple.*;
 
 import java.util.*;
 
-import static drai.dev.stackthecards.data.carddata.CardData.JSON_NAME_HEADER_KEY;
-import static drai.dev.stackthecards.data.carddata.CardData.getTexts;
+import static drai.dev.stackthecards.data.carddata.CardData.*;
 import static drai.dev.stackthecards.items.Card.getCardDataNBT;
 
 public class CardPack {
@@ -53,6 +52,41 @@ public class CardPack {
                 cardPack.packName = (String) json.get(JSON_NAME_HEADER_KEY);
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed");
+            }
+        }
+        if(json.containsKey(JSON_CARD_HOVER_TOOLTIP_KEY)){
+            try{
+                JSONArray contents = (JSONArray) json.get(JSON_CARD_HOVER_TOOLTIP_KEY);
+                for (var section : contents) {
+                    cardPack.hoverTooltipSections.add(CardTooltipSection.parse((JSONObject) section, game));
+                }
+            } catch (Exception e){
+                throw new MalformedJsonException("Card hover tooltip value was malformed");
+            }
+        }
+        if(json.containsKey(JSON_CARD_DETAIL_TOOLTIP_KEY)){
+            try{
+                JSONArray contents = (JSONArray) json.get(JSON_CARD_DETAIL_TOOLTIP_KEY);
+                for (var section : contents) {
+                    cardPack.detailTooltipSections.add(CardTooltipSection.parse((JSONObject) section, game));
+                }
+            } catch (Exception e){
+                throw new MalformedJsonException("Card detail tooltip value was malformed");
+            }
+        }
+        if(json.containsKey(JSON_DETAIL_HEADER_KEY)){
+            try{
+                cardPack.detailHeader = new CardTooltipLine();
+                var textContents = json.get(JSON_DETAIL_HEADER_KEY);
+                if(textContents instanceof String contentsAsString){
+                    cardPack.detailHeader.text = contentsAsString;
+                } else if(textContents instanceof JSONArray contentsAsJsonArray){
+                    for (var textSegment: contentsAsJsonArray) {
+                        cardPack.detailHeader.lineSegments.add(CardTooltipLine.parse((JSONObject) textSegment, game));
+                    }
+                }
+            } catch (Exception e){
+                throw new MalformedJsonException("Card detail header value was malformed");
             }
         }
         return cardPack;
