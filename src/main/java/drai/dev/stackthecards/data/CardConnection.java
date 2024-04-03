@@ -1,9 +1,12 @@
 package drai.dev.stackthecards.data;
 
+import com.google.gson.stream.*;
+import drai.dev.stackthecards.data.cardData.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
+import org.json.simple.*;
 
 import java.util.*;
 import java.util.stream.*;
@@ -13,16 +16,51 @@ import static drai.dev.stackthecards.data.CardIdentifier.GAME_ID_KEY;
 
 public class CardConnection {
     public static final String CONNECTION_ID = "connection_id";
+    private static final String JSON_CONNECTION_ID_KEY = "connectionId";
+    private static final String JSON_LAYOUT_KEY = "layout";
     private final String connectionId;
-    private final CardGame cardGame;
-    private final List<List<CardConnectionEntry>> layout;
-    private final List<List<CardConnectionEntry>> layoutByColumn;
+    private String cardGameId;
+    private List<List<CardConnectionEntry>> layout = new ArrayList<>();
+    private List<List<CardConnectionEntry>> layoutByColumn = new ArrayList<>();
 
-    public CardConnection(String connectionId, CardGame cardGame, List<List<CardConnectionEntry>> layout) {
+    public CardConnection(String connectionId, String cardGame, List<List<CardConnectionEntry>> layout) {
         this.connectionId = connectionId;
-        this.cardGame = cardGame;
+        this.cardGameId = cardGame;
         this.layout = layout;
         this.layoutByColumn = transposeLayout(layout);
+    }
+
+    public CardConnection(String connectionId, String cardGameId) {
+        this.connectionId = connectionId;
+        this.cardGameId = cardGameId;
+    }
+
+    public static CardConnection parse(JSONObject json, CardGame game) throws MalformedJsonException {
+        if(json.isEmpty() || !json.containsKey(JSON_CONNECTION_ID_KEY)) throw new MalformedJsonException("Card connection json was empty");
+        CardConnection cardConnection;
+        try{
+            cardConnection = new CardConnection((String) json.get(JSON_CONNECTION_ID_KEY), game.getGameId());
+        } catch (Exception e){
+            throw new MalformedJsonException("Card connection id was malformed");
+        }
+        if(json.containsKey(JSON_LAYOUT_KEY)){
+            try{
+                var layoutJson = (JSONArray) json.get(JSON_LAYOUT_KEY);
+                var layout = new ArrayList<List<CardConnectionEntry>>();
+                for (var rowJson : layoutJson) {
+                    JSONArray row = (JSONArray) ((JSONObject) rowJson).get("row");
+                    var rowList = new ArrayList<CardConnectionEntry>();
+                    for (var entry  : row) {
+                        rowList.add(CardConnectionEntry.parse((JSONObject)entry));
+                    }
+                    layout.add(rowList);
+                }
+                cardConnection.setLayout(layout);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card connection layout was malformed");
+            }
+        }
+        return cardConnection;
     }
 
     public static CardIdentifier removeConnection(ItemStack stack) {
@@ -54,10 +92,6 @@ public class CardConnection {
 
         return maxSize;
     }
-
-//    public static List<List<CardData>> getCardDataFromLayout(List<List<CardConnectionEntry>> layout) {
-//
-//    }
 
     private List<List<CardConnectionEntry>> transposeLayout(List<List<CardConnectionEntry>> layout) {
         // Determine the number of rows and columns
@@ -200,7 +234,7 @@ public class CardConnection {
         var connectionNbt = nbt.getCompound(0);
         if(connectionNbt.contains(CONNECTION_ID)) {
             var connectionId = connectionNbt.getString(CONNECTION_ID);
-            var game = CardGameRegistry.getCardGame(connectionNbt.getString(CARD_ID_KEY));
+            var game = CardGameRegistry.getCardGame(connectionNbt.getString(GAME_ID_KEY));
             if(game.cardConnections.containsKey(connectionId)){
 //                System.out.println("card had a connection: "+connectionId);
                 return game.cardConnections.get(connectionId);
@@ -234,7 +268,7 @@ public class CardConnection {
     private static NbtElement createNbt(CardConnection connection) {
         NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.putString(CardConnection.CONNECTION_ID, String.valueOf(connection.connectionId));
-        nbtCompound.putString(GAME_ID_KEY, String.valueOf(connection.cardGame));
+        nbtCompound.putString(GAME_ID_KEY, String.valueOf(connection.cardGameId));
         return nbtCompound;
     }
 
@@ -264,10 +298,19 @@ public class CardConnection {
     }
 
     public CardGame getCardGame() {
-        return cardGame;
+        return CardGameRegistry.getCardGame(cardGameId);
     }
 
     public List<List<CardConnectionEntry>> getLayout() {
         return layout;
+    }
+
+    public void setGame(CardGame cardGame) {
+        this.cardGameId = cardGame.getGameId();
+    }
+
+    public void setLayout(List<List<CardConnectionEntry>> layout) {
+        this.layout = layout;
+        this.layoutByColumn = transposeLayout(layout);
     }
 }

@@ -1,0 +1,11 @@
+{
+  "connectionId": "hoohConnection",
+  "layout": [
+    {
+      "row": [{"gameId": "pokemon_tcg","setId": "base", "cardId": "hooh_top", "rotated": "LEFT", "connectionDirection":  "BOTTOM"}]
+    },
+    {
+      "row": [{"gameId": "pokemon_tcg","setId": "base", "cardId": "hooh_bottom", "rotated": "LEFT", "connectionDirection":  "TOP"}]
+    }
+  ]
+}

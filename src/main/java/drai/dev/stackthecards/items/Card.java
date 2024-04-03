@@ -1,6 +1,7 @@
 package drai.dev.stackthecards.items;
 
 import drai.dev.stackthecards.data.*;
+import drai.dev.stackthecards.data.cardData.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.registry.Items;
 import net.minecraft.client.util.*;
@@ -119,14 +120,6 @@ public class Card extends Item {
     public static boolean getIsFlipped(ItemStack stack) {
         NbtList nbtList = Card.getCardDataNBT(stack, STORED_CARD_FLIPPED_STATE);
         return nbtList.getCompound(0).getBoolean(FLIPPED_KEY);
-    }
-
-    public ModelIdentifier getModelIdentifier() {
-        return new ModelIdentifier(getIdentifier(),"inventory");
-    }
-
-    public Identifier getIdentifier() {
-        return new Identifier("stack_the_cards", "stc_cards/backs/pokemon_tcg_modern_back");
     }
 
 

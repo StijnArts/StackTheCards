@@ -1,11 +1,12 @@
 package drai.dev.stackthecards.registry;
 
 import drai.dev.stackthecards.data.*;
+import drai.dev.stackthecards.data.cardData.*;
 
 import java.util.*;
 
 public class CardGameRegistry {
-    public static CardData MISSING_CARD_DATA = new CardData();
+    public static CardData MISSING_CARD_DATA = new CardData("missing");
     public static Map<String, CardGame> cardGames = new HashMap<>();
 
     public static Map<String, CardGame> getCardGames() {
@@ -13,7 +14,8 @@ public class CardGameRegistry {
     }
 
     public static CardGame getCardGame(String cardGameId){
-        return new CardGame();
+        if(cardGameId == null || !cardGames.containsKey(cardGameId)) return new CardGame("missing");
+        return cardGames.get(cardGameId);
     }
 
     public static CardData getCardData(CardIdentifier cardIdentifier) {
@@ -26,5 +28,13 @@ public class CardGameRegistry {
         var cardSet = cardGame.getCardSet(cardIdentifier.setId);
 
         return cardSet.getCardData(cardIdentifier.cardId);
+    }
+
+    public static void clear() {
+        cardGames.clear();
+    }
+
+    public static void registerGame(CardGame cardGame) {
+        cardGames.put(cardGame.getGameId(), cardGame);
     }
 }

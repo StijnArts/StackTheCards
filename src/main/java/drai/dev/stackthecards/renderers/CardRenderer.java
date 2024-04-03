@@ -2,9 +2,8 @@ package drai.dev.stackthecards.renderers;
 
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
+import drai.dev.stackthecards.data.cardData.*;
 import drai.dev.stackthecards.items.*;
-import drai.dev.stackthecards.registry.*;
-import it.unimi.dsi.fastutil.*;
 import net.fabricmc.api.*;
 import net.minecraft.client.*;
 import net.minecraft.client.render.*;
@@ -21,14 +20,6 @@ public class CardRenderer {
     private final HashMap<CardData, CardTexture> cardTextures = new HashMap<>();
     private final HashMap<String, CardConnectionRenderAsset> connectionTextures = new HashMap<>();
 
-    public static CardTexture getCardTextureFromMap(CardData cardData) {
-        var renderer = StackTheCardsClient.CARD_RENDERER;
-        if(renderer.cardTextures.containsKey(cardData)){
-            return renderer.cardTextures.get(cardData);
-        }
-        return null;
-    }
-
     public void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack, int light){
         var cardData = Card.getCardData(stack);
         var cardGame = cardData.getCardSet().getCardGame();
@@ -41,7 +32,7 @@ public class CardRenderer {
             var connectionAsset = getConnectionTexture(connection, containedCards, isFlipped);
             for (var card: connectionAsset.getCards()) {
                 CardTexture.drawConnectedCard(matrices, vertexConsumers, light, card.cardTexture.getRenderLayer(), 0,
-                        Card.getAttachedCards(stack).size()*-1, cardGame, card.xOffset, card.yOffset,card.connectionEntry.rotation);
+                        (int) (Card.getAttachedCards(stack).size()*-1+ card.layer*0.1), cardGame, card.xOffset, card.yOffset,card.connectionEntry.rotation);
 
             }
             double attachedCardsXOffset = cardGame.cardStackingDirection.xMod == 0 ? 0 : (cardGame.cardStackingDirection.xMod <0 ? connectionAsset.maxOffsetX : connectionAsset.minOffsetX);
@@ -81,7 +72,7 @@ public class CardRenderer {
 
     public static CardTexture getCardTexture(CardData cardData, boolean isFlipped) {
         if(isFlipped){
-            cardData = cardData.getCardSet().getCardBackData();
+            cardData = cardData.getCardBackData();
         }
         var renderer = StackTheCardsClient.CARD_RENDERER;
         return renderer.cardTextures.compute(cardData, ((cardData1, texture) -> Objects.requireNonNullElseGet(texture, () -> new CardTexture(cardData1))));

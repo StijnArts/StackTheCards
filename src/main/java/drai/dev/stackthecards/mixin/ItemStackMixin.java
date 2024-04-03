@@ -34,7 +34,7 @@ public abstract class ItemStackMixin {
         if(self.isOf(Items.CARD)){
             var tooltip = ci.getReturnValue();
             if(StackTheCardsClient.shiftKeyPressed){
-                tooltip.addAll(Card.getCardData(self).getLoreToolTips());
+                tooltip.addAll(Card.getCardData(self).getDetailToolTips());
             } else {
                 tooltip.addAll(Card.getCardData(self).getTooltipsDescriptors());
                 StackTheCardsClient.modifyStackTooltip(tooltip::addAll);
