@@ -84,8 +84,7 @@ public class CardRenderer {
     }
 
     public void clearStateTextures() {
-        for (CardTexture cardTexture :
-                cardTextures.values()) {
+        for (CardTexture cardTexture : cardTextures.values()) {
             cardTexture.close();
         }
         cardTextures.clear();
