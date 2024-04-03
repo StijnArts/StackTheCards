@@ -1,0 +1,205 @@
+{
+  "cardId": "charizard_4",
+  "name": "Charizard",
+  "detailHeader": [
+    {
+      "text": "Charizard",
+      "formatting": "common",
+      "bold": true
+    },
+    {
+      "text": " - ",
+      "formatting": "seperator"
+    },
+    {
+      "text": "120 HP",
+      "bold": true
+    }
+
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Rare Holo",
+          "formatting": "rareHolo"
+        }
+      ],
+      "noNewLine":true
+    },
+    {
+      "parts": [
+        {
+          "text": "Stage 2 - Evolves from Charmeleon",
+          "formatting": "seperator"
+        }
+      ],
+      "noNewLine":true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text":"Base Set - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "4 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Spits fire that is hot enough to melt boulders. Known to unintentionally cause forest fires.",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Rare Holo",
+          "formatting": "rareHolo"
+        }
+      ],
+      "noNewLine":true
+    },
+    {
+      "parts": [
+        {
+          "text": "Stage 2 - Evolves from Charmeleon",
+          "formatting": "seperator"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Pokemon Power: Energy Burn",
+          "formatting": "pokemonPower"
+        },
+        {
+          "text": "As often as you like during your turn (before your attack), you may turn all Energy attached to Charizard into Fire Energy for the rest of the turn. This power can’t be used if Charizard is Asleep, Confused, or Paralyzed.",
+          "formatting": "seperator"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Fire Spin"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "100",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "Discard 2 Energy cards attached to Charizard in order to use this attack.",
+          "formatting": "seperator"
+        },
+        {
+          "text": [
+            {
+              "text": "Cost: "
+            },
+            {
+              "text": "Fire ",
+              "formatting": "fire"
+            },
+            {
+              "text": "x4",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Weakness: ",
+              "formatting": "weakness"
+            },
+            {
+              "text": "Water",
+              "formatting": "water"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Resistance: ",
+              "formatting": "resistance"
+            },
+            {
+              "text": "Fighting",
+              "formatting": "fighting"
+            },
+            {
+              "text": " -30",
+              "formatting": "seperator"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Retreat Cost: ",
+              "formatting": "retreatCost"
+            },
+            {
+              "text": "Energy ",
+              "formatting": "normal"
+            },
+            {
+              "text": "x3",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Spits fire that is hot enough to melt boulders. Known to unintentionally cause forest fires.",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text":"Base Set - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "4 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

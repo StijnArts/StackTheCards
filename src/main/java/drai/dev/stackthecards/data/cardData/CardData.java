@@ -6,6 +6,7 @@ import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.*;
+import drai.dev.stackthecards.tooltips.parts.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
@@ -18,6 +19,8 @@ public class CardData {
     private static final String JSON_CARD_HOVER_TOOLTIP_KEY = "textSectionsForHoverTooltip";
     private static final String JSON_CARD_DETAIL_TOOLTIP_KEY = "textSectionsForDetailTooltip";
     public static final String JSON_ROUNDED_CORNERS_ID_KEY = "hasRoundedCorners";
+    public static final String JSON_DETAIL_HEADER_KEY = "detailHeader";
+    public static final String JSON_NAME_HEADER_KEY = "name";
     //    private static CardSet TEST_CARD_SET = new CardSet();
     protected CardSet cardSet = new CardSet("missing");
     protected String cardId;
@@ -25,6 +28,8 @@ public class CardData {
     private Optional<Boolean> hasRoundedCorners = Optional.empty();
     private final List<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
     private final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
+    private CardTooltipLine detailHeader;
+    public String cardName = "Missing Card Data";
 
     public CardData(String cardId) {
 //        this.cardSet = cardSet;
@@ -38,6 +43,13 @@ public class CardData {
             cardData = new CardData((String) json.get(JSON_CARD_ID_KEY));
         } catch (Exception e){
             throw new MalformedJsonException("Card game id was malformed");
+        }
+        if(json.containsKey(JSON_NAME_HEADER_KEY)){
+            try{
+                cardData.cardName = (String) json.get(JSON_NAME_HEADER_KEY);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card has rounded corners value was malformed");
+            }
         }
         if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
             try{
@@ -64,6 +76,21 @@ public class CardData {
                 }
             } catch (Exception e){
                 throw new MalformedJsonException("Card detail tooltip value was malformed");
+            }
+        }
+        if(json.containsKey(JSON_DETAIL_HEADER_KEY)){
+            try{
+                cardData.detailHeader = new CardTooltipLine();
+                var textContents = json.get(JSON_DETAIL_HEADER_KEY);
+                if(textContents instanceof String contentsAsString){
+                    cardData.detailHeader.text = contentsAsString;
+                } else if(textContents instanceof JSONArray contentsAsJsonArray){
+                    for (var textSegment: contentsAsJsonArray) {
+                        cardData.detailHeader.lineSegments.add(CardTooltipLine.parse((JSONObject) textSegment, game));
+                    }
+                }
+            } catch (Exception e){
+                throw new MalformedJsonException("Card detail header value was malformed");
             }
         }
 //        if(json.containsKey(JSON_GAME_CARD_BACK_CARD_KEY)){
@@ -98,7 +125,7 @@ public class CardData {
     }
 
     public String getCardName() {
-        return "Charizard";
+        return cardName;
     }
 
     public int getMaxSide() {
@@ -130,9 +157,12 @@ public class CardData {
     @NotNull
     private ArrayList<Text> getTexts(List<CardTooltipSection> sections) {
         var tooltips = new ArrayList<Text>();
-        for (var section : sections) {
+        for (int i = 0; i < sections.size(); i++) {
+            var section = sections.get(i);
             tooltips.addAll(section.getText());
-            tooltips.add(NEW_LINE);
+            if(i < sections.size()-1 && !section.noLineBreak){
+                tooltips.add(NEW_LINE);
+            }
         }
 
         return tooltips;
@@ -142,9 +172,8 @@ public class CardData {
         if(!StackTheCardsClient.shiftKeyPressed){
             return Text.literal(getCardName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
         } else {
-            return Text.literal(getCardName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE).withBold(true))
-                    .append(Text.literal(" - ").fillStyle(Style.EMPTY.withColor(Formatting.GRAY)))
-                    .append(Text.literal("120 HP").fillStyle(Style.EMPTY.withColor(Formatting.WHITE).withBold(StackTheCardsClient.shiftKeyPressed)));
+            if(detailHeader == null) return Text.literal(getCardName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
+            return detailHeader.getTextComponent();
         }
     }
 

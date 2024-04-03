@@ -92,10 +92,10 @@ public class StackTheCards implements ModInitializer {
 
                         for (var connectionsResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/connections", path-> path.getPath().endsWith(".json")).entrySet()){
                             try{
-//                                JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(connectionsResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-//                                CardConnection connection = CardConnection.parse(jsonObjectCard);
-//                                connection.setGame(cardGame);
-//                                cardGame.addConnection(connection);
+                                JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(connectionsResource.getValue().getInputStream(), StandardCharsets.UTF_8));
+                                CardConnection connection = CardConnection.parse(jsonObjectCard, cardGame);
+                                connection.setGame(cardGame);
+                                cardGame.addConnection(connection);
                             } catch (Exception e){
                                 System.out.println("connection json file "+connectionsResource.getKey() + " was invalid: "+e.getMessage());
                             }

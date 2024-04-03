@@ -1,0 +1,67 @@
+{
+  "cardId": "fire_energy_98",
+  "name": "Fire Energy",
+  "detailHeader": [
+    {
+      "text": "Fire Energy",
+      "formatting": "fire",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Energy",
+          "formatting": "energy"
+        }
+      ],
+      "noNewLine":true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text":"Base Set - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "98 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine":true
+    }
+    ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Energy",
+          "formatting": "energy"
+        }
+      ],
+      "noNewLine":true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text":"Base Set - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "98 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine":true
+    }
+  ]
+}

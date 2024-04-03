@@ -1,6 +1,6 @@
 {
-  "cardStackingDirection": "TOP",
-  "cardStackingDistance": 18.0,
+  "cardStackingDirection": "TOP_RIGHT",
+  "cardStackingDistance": 25.0,
   "gameId": "pokemon_tcg",
   "cardBackModel": "stack_the_cards:stc_cards/backs/pokemon_tcg_modern_back",
   "cardBackTextureName": "high_res_modern_card_back",
