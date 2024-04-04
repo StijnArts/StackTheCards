@@ -3,6 +3,7 @@ package drai.dev.stackthecards;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
+import drai.dev.stackthecards.events.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.registry.Items;
 import net.fabricmc.api.*;
@@ -177,5 +178,8 @@ public class StackTheCards implements ModInitializer {
                 tableBuilder.pool(poolBuilder);
             }
         });*/
+        UseItemCallback.EVENT.register((player, level, hand) -> {
+            return OpenItemMenuEvent.onItemClick(player, level, hand);
+        });
     }
 }

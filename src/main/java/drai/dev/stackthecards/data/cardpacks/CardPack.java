@@ -8,6 +8,7 @@ import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.registry.Items;
 import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.tooltips.parts.*;
+import net.minecraft.block.*;
 import net.minecraft.entity.*;
 import net.minecraft.item.*;
 import net.minecraft.loot.context.*;

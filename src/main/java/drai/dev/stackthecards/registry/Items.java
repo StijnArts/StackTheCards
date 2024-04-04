@@ -9,6 +9,7 @@ import net.minecraft.util.*;
 public class Items {
     public static final Card CARD = registerItem(new Card(new FabricItemSettings()),"card");
     public static final CardPackItem CARD_PACK = registerItem(new CardPackItem(new FabricItemSettings()), "card_pack");
+    public static final CardBinder CARD_BINDER = registerItem(new CardBinder(new FabricItemSettings()), "card_binder");
 
     public static <T extends Item> T registerItem(T item, String name){
         Registry.register(Registries.ITEM, new Identifier("stack_the_cards", name), item);
