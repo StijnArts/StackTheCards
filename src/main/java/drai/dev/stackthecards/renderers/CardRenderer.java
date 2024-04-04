@@ -36,7 +36,7 @@ public class CardRenderer {
             if(CardConnection.hasConnectedCards(stack)){
                 var connection = CardConnection.getConnection(stack);
                 var containedCards = CardConnection.getConnectedCards(stack);
-                assert connection != null;
+                if(connection==null) return;
                 var connectionAsset = getConnectionTexture(connection, containedCards, isFlipped);
                 for (var card: connectionAsset.getCards()) {
                     CardTexture.drawConnectedCard(matrices, vertexConsumers, light, card.cardTexture.getRenderLayer(), 0,

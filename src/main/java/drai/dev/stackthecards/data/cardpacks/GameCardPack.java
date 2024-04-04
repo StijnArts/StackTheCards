@@ -19,13 +19,13 @@ public class GameCardPack extends CardPack{
         try{
             cardPack = new GameCardPack(game.getGameId(), (String) json.get(JSON_PACK_ID_KEY));
         } catch (Exception e){
-            throw new MalformedJsonException("Card pack id was malformed");
+            throw new MalformedJsonException("Card pack id was malformed: "+e.getMessage());
         }
         if(json.containsKey(JSON_NAME_HEADER_KEY)){
             try{
                 cardPack.packName = (String) json.get(JSON_NAME_HEADER_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Card has rounded corners value was malformed");
+                throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_CARD_HOVER_TOOLTIP_KEY)){
@@ -35,7 +35,7 @@ public class GameCardPack extends CardPack{
                     cardPack.hoverTooltipSections.add(CardTooltipSection.parse((JSONObject) section, game));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card hover tooltip value was malformed");
+                throw new MalformedJsonException("Card hover tooltip value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_CARD_DETAIL_TOOLTIP_KEY)){
@@ -45,7 +45,7 @@ public class GameCardPack extends CardPack{
                     cardPack.detailTooltipSections.add(CardTooltipSection.parse((JSONObject) section, game));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card detail tooltip value was malformed");
+                throw new MalformedJsonException("Card detail tooltip value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_DETAIL_HEADER_KEY)){
@@ -60,7 +60,7 @@ public class GameCardPack extends CardPack{
                     }
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card detail header value was malformed");
+                throw new MalformedJsonException("Card detail header value was malformed: "+e.getMessage());
             }
         }
         return cardPack;

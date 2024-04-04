@@ -41,20 +41,20 @@ public class CardGame {
         try{
             game = new CardGame((String) json.get(JSON_GAME_ID_KEY));
         } catch (Exception e){
-            throw new MalformedJsonException("Card game id was malformed");
+            throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
         }
         if(json.containsKey(JSON_CARD_STACKING_KEY)){
             try{
                 game.setCardStackingDirection(CardStackingDirection.valueOf((String) json.get(JSON_CARD_STACKING_KEY)));
             } catch (Exception e){
-                throw new MalformedJsonException("Card game stacking direction was malformed");
+                throw new MalformedJsonException("Card game stacking direction was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_CARD_STACKING_DISTANCE_KEY)){
             try{
                 game.setCardStackingDistance((float) (double) json.get(JSON_CARD_STACKING_DISTANCE_KEY));
             } catch (Exception e){
-                throw new MalformedJsonException("Card game id was malformed");
+                throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)){
@@ -62,14 +62,14 @@ public class CardGame {
                 var identifierArray = ((String) json.get(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)).split(":");
                 game.setCardBackModel(new Identifier(identifierArray[0], identifierArray[1]));
             } catch (Exception e){
-                throw new MalformedJsonException("Card back identifier was malformed");
+                throw new MalformedJsonException("Card back identifier was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_GAME_CARD_BACK_CARD_KEY)){
             try{
                 game.setCardBackTextureName((String) json.get(JSON_GAME_CARD_BACK_CARD_KEY));
             } catch (Exception e){
-                throw new MalformedJsonException("Card back cardId was malformed");
+                throw new MalformedJsonException("Card back cardId was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_GAME_CARD_PACK_ITEM_MODEL_KEY)){
@@ -77,21 +77,21 @@ public class CardGame {
                 var identifierArray = ((String) json.get(JSON_GAME_CARD_PACK_ITEM_MODEL_KEY)).split(":");
                 game.setCardPackItemModel(new Identifier(identifierArray[0], identifierArray[1]));
             } catch (Exception e){
-                throw new MalformedJsonException("Card pack identifier was malformed");
+                throw new MalformedJsonException("Card pack identifier was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_GAME_CARD_PACK_IMAGE_KEY)){
             try{
                 game.setCardPackTextureName((String) json.get(JSON_GAME_CARD_PACK_IMAGE_KEY));
             } catch (Exception e){
-                throw new MalformedJsonException("Card pack image string was malformed");
+                throw new MalformedJsonException("Card pack image string was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
             try{
                 game.hasRoundedCorners = Optional.of((boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY));
             } catch (Exception e){
-                throw new MalformedJsonException("Card has rounded corners value was malformed");
+                throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }
         }
         return game;

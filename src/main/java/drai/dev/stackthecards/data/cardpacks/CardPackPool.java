@@ -34,25 +34,25 @@ public class CardPackPool {
                 (!json.containsKey(JSON_POOL_CARDS_KEY) && !json.containsKey(JSON_POOL_RARITIES_KEY) && !json.containsKey(JSON_POOL_ITEMS_KEY) /*&& !json.containsKey(JSON_POOL_TAGS_KEY)*/)) throw new MalformedJsonException("Card pack Json was empty");
         CardPackPool pool;
         try{
-            pool = new CardPackPool(Integer.parseInt((String) json.get(JSON_POOL_MINIMUM_AMOUNT_KEY)));
+            pool = new CardPackPool((int) (long) json.get(JSON_POOL_MINIMUM_AMOUNT_KEY));
         } catch (Exception e){
-            throw new MalformedJsonException("Card pack id was malformed");
+            throw new MalformedJsonException("Card minimum value was malformed: "+e.getMessage());
         }
         if(json.containsKey(JSON_POOL_MAXIMUM_AMOUNT_KEY)){
             try{
-                var max = Integer.parseInt((String)json.get(JSON_POOL_MAXIMUM_AMOUNT_KEY));
+                var max = (int) (long) json.get(JSON_POOL_MAXIMUM_AMOUNT_KEY);
                 if(max > pool.minimumAmountOfCardsFromPool){
                     pool.maximumAmountOfCardsFromPool = max;
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card has rounded corners value was malformed");
+                throw new MalformedJsonException("Card pack maximum value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_POOL_PULL_CHANCE_KEY)){
             try{
-                pool.poolPullChancePercent = Integer.parseInt((String)json.get(JSON_POOL_PULL_CHANCE_KEY));
+                pool.poolPullChancePercent = (int) (long) json.get(JSON_POOL_PULL_CHANCE_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Card has rounded corners value was malformed");
+                throw new MalformedJsonException("Card pack pull chance value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_POOL_CARDS_KEY)){
@@ -62,10 +62,10 @@ public class CardPackPool {
                     var sectionAsObject = (JSONObject)section;
                     pool.cardsInPool.put(new CardIdentifier((String) sectionAsObject.get(JSON_SELF_GAME_ID_KEY),
                             (String) sectionAsObject.get(JSON_SELF_SET_ID_KEY),(String) sectionAsObject.get(JSON_SELF_CARD_ID_KEY)),
-                            Integer.valueOf((String) sectionAsObject.get("weight")));
+                            (int) (long)sectionAsObject.get("weight"));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card hover tooltip value was malformed");
+                throw new MalformedJsonException("Card pool cards value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_POOL_RARITIES_KEY)){
@@ -74,10 +74,10 @@ public class CardPackPool {
                 for (var rarity : contents) {
                     var rarityAsObject = (JSONObject)rarity;
                     pool.raritiesInPool.put(game.getRarity((String) ((JSONObject) rarity).get("rarityId")),
-                            Integer.valueOf((String) rarityAsObject.get("weight")));
+                            (int) (long)rarityAsObject.get("weight"));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card hover tooltip value was malformed");
+                throw new MalformedJsonException("Card pool rarities value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_POOL_ITEMS_KEY)){
@@ -87,10 +87,10 @@ public class CardPackPool {
                     var identifierAsObject = (JSONObject)identifier;
                     var identifierSplit = ((String)identifierAsObject.get("itemId")).split(":");
                     pool.itemsInPool.put(new Identifier(identifierSplit[0], identifierSplit[1]),
-                            Integer.valueOf((String) identifierAsObject.get("weight")));
+                            (int) (long)identifierAsObject.get("weight"));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card hover tooltip value was malformed");
+                throw new MalformedJsonException("Card items pools value was malformed: "+e.getMessage());
             }
         }
 //        if(json.containsKey(JSON_POOL_TAGS_KEY)){
@@ -100,10 +100,10 @@ public class CardPackPool {
 //                    var identifierAsObject = (JSONObject)identifier;
 //                    var identifierSplit = ((String)identifierAsObject.get("itemId")).split(":");
 //                    pool.tagsInPool.put(new Identifier(identifierSplit[0], identifierSplit[1]),
-//                            Integer.valueOf((String) identifierAsObject.get("weight")));
+//                            (int) (long)identifierAsObject.get("weight")));
 //                }
 //            } catch (Exception e){
-//                throw new MalformedJsonException("Card hover tooltip value was malformed");
+//                throw new MalformedJsonException("Card hover tooltip value was malformed: "+e.getMessage());
 //            }
 //        }
 

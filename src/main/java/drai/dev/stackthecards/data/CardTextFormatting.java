@@ -32,20 +32,20 @@ public class CardTextFormatting {
         try{
             format = new CardTextFormatting((String) json.get(JSON_FORMAT_ID_KEY));
         } catch (Exception e){
-            throw new MalformedJsonException("Text format id was malformed");
+            throw new MalformedJsonException("Text format id was malformed: "+e.getMessage());
         }
         if(json.containsKey(JSON_IS_BOLD_KEY)){
             try{
                 format.isBold = (Boolean) json.get(JSON_IS_BOLD_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isBold was malformed");
+                throw new MalformedJsonException("Text format isBold was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_IS_ITALIC_KEY)){
             try{
                 format.isItalic = (Boolean) json.get(JSON_IS_ITALIC_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isItalic was malformed");
+                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_COLOR_KEY)){

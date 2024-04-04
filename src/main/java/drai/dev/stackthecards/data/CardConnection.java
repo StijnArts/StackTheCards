@@ -39,7 +39,7 @@ public class CardConnection {
         try{
             cardConnection = new CardConnection((String) json.get(JSON_CONNECTION_ID_KEY), game.getGameId());
         } catch (Exception e){
-            throw new MalformedJsonException("Card connection id was malformed");
+            throw new MalformedJsonException("Card connection id was malformed: "+e.getMessage());
         }
         if(json.containsKey(JSON_LAYOUT_KEY)){
             try{
@@ -55,7 +55,7 @@ public class CardConnection {
                 }
                 cardConnection.setLayout(layout);
             } catch (Exception e){
-                throw new MalformedJsonException("Card connection layout was malformed");
+                throw new MalformedJsonException("Card connection layout was malformed: "+e.getMessage());
             }
         }
         return cardConnection;

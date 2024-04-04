@@ -75,13 +75,13 @@ public class CardPack {
         try{
             cardPack = new CardPack(game.getGameId(), cardSet.getSetId(), (String) json.get(JSON_PACK_ID_KEY));
         } catch (Exception e){
-            throw new MalformedJsonException("Card pack id was malformed");
+            throw new MalformedJsonException("Card pack id was malformed: "+e.getMessage());
         }
         if(json.containsKey(JSON_NAME_HEADER_KEY)){
             try{
                 cardPack.packName = (String) json.get(JSON_NAME_HEADER_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Card has rounded corners value was malformed");
+                throw new MalformedJsonException("Card pack name value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_CARD_HOVER_TOOLTIP_KEY)){
@@ -91,7 +91,7 @@ public class CardPack {
                     cardPack.hoverTooltipSections.add(CardTooltipSection.parse((JSONObject) section, game));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card hover tooltip value was malformed");
+                throw new MalformedJsonException("Card hover tooltip value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_CARD_DETAIL_TOOLTIP_KEY)){
@@ -101,7 +101,7 @@ public class CardPack {
                     cardPack.detailTooltipSections.add(CardTooltipSection.parse((JSONObject) section, game));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card detail tooltip value was malformed");
+                throw new MalformedJsonException("Card detail tooltip value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_DETAIL_HEADER_KEY)){
@@ -116,7 +116,7 @@ public class CardPack {
                     }
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card detail header value was malformed");
+                throw new MalformedJsonException("Card detail header value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_PACK_POOLS_KEY)){
@@ -127,12 +127,12 @@ public class CardPack {
                     try{
                         cardPack.pools.add(CardPackPool.parse((JSONObject)pool, game));
                     } catch(Exception e){
-                        throw new MalformedJsonException("Card Pack pool entry was malformed");
+                        throw new MalformedJsonException("Card Pack pool entry was malformed: "+e.getMessage());
                     }
                 }
 
             } catch (Exception e){
-                throw new MalformedJsonException("Card detail header value was malformed");
+                throw new MalformedJsonException("Card pools value was malformed: "+e.getMessage());
             }
         }
 
@@ -143,10 +143,10 @@ public class CardPack {
                     var sectionAsObject = (JSONObject)section;
                     cardPack.guaranteedCards.put(new CardIdentifier((String) sectionAsObject.get(JSON_SELF_GAME_ID_KEY),
                                     (String) sectionAsObject.get(JSON_SELF_SET_ID_KEY),(String) sectionAsObject.get(JSON_SELF_CARD_ID_KEY)),
-                            Integer.valueOf((String) sectionAsObject.get("amount")));
+                            (int) (long)sectionAsObject.get("amount"));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card hover tooltip value was malformed");
+                throw new MalformedJsonException("Card pack guarnteed cards value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_GUARANTEED_ITEMS_KEY)){
@@ -156,10 +156,10 @@ public class CardPack {
                     var identifierAsObject = (JSONObject)identifier;
                     var identifierSplit = ((String)identifierAsObject.get("itemId")).split(":");
                     cardPack.guaranteedItems.put(new Identifier(identifierSplit[0], identifierSplit[1]),
-                            Integer.valueOf((String) identifierAsObject.get("weight")));
+                            (int) (long)identifierAsObject.get("amount"));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card hover tooltip value was malformed");
+                throw new MalformedJsonException("Card guaranteed items was malformed: "+e.getMessage());
             }
         }
         return cardPack;
@@ -270,13 +270,23 @@ public class CardPack {
                 pull(pullresult, randomCollection);
             }
         }
+        for (var guaranteedCardEntry : guaranteedCards.entrySet()) {
+            for (int i = 0; i < guaranteedCardEntry.getValue(); i++) {
+                pullresult.pulledCards.add(guaranteedCardEntry.getKey());
+            }
+        }
+        for (var guaranteedCardEntry : guaranteedItems.entrySet()) {
+            for (int i = 0; i < guaranteedCardEntry.getValue(); i++) {
+                pullresult.pulledItems.add(guaranteedCardEntry.getKey());
+            }
+        }
         return pullresult;
     }
 
     private CardIdentifier getCardsFromRarity(CardRarity rarity) {
         var cardsInRarity = getCardGame().getCardSet(setId).getCards().values().stream().filter(cardData -> cardData.cardRarityId.equals(rarity.rarityId)).toList();
         if(cardsInRarity.size()<1) return null;
-        var roll = ThreadLocalRandom.current().nextInt(0,cardsInRarity.size()+1);
+        var roll = ThreadLocalRandom.current().nextInt(0,cardsInRarity.size());
         return cardsInRarity.get(roll).getCardIdentifier();
     }
 
@@ -292,7 +302,7 @@ public class CardPack {
                 pullResult.pulledCards.add(card);
             }
         } else if(pulledObject instanceof Identifier identifier){
-
+            pullResult.pulledItems.add(identifier);
         }
     }
 }
