@@ -2,6 +2,7 @@
   "packId": "normal",
   "name": "Pokemon TCG Pack",
   "droppedByMobs": true,
+  "weightInLootPool": 20,
   "pools": [
     {
       "minimumCardsFromPool": 2,

@@ -23,10 +23,10 @@ public class CardPackItem extends Item {
         var cardsToDrop = pullResult.getPulledCards();
         var itemsToDrop = pullResult.getPulledItems();
         for (var card : cardsToDrop) {
-            user.dropStack(Card.getAsItemStack(card), 0.5F);
+            user.dropStack(Card.getAsItemStack(card), 1F);
         }
         for (var item : itemsToDrop) {
-            user.dropStack(new ItemStack(Registries.ITEM.get(item)), 0.5F);
+            user.dropStack(new ItemStack(Registries.ITEM.get(item)), 1F);
         }
         if (!user.getAbilities().creativeMode) {
             itemStack.decrement(1);

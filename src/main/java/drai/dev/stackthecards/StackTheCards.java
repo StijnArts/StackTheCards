@@ -8,13 +8,16 @@ import drai.dev.stackthecards.registry.Items;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.loot.v2.*;
 import net.fabricmc.fabric.api.resource.*;
+import net.fabricmc.fabric.mixin.resource.conditions.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.mob.*;
 import net.minecraft.item.*;
 import net.minecraft.loot.*;
 import net.minecraft.loot.entry.*;
+import net.minecraft.loot.function.*;
 import net.minecraft.registry.*;
 import net.minecraft.resource.*;
+import net.minecraft.server.dedicated.*;
 import net.minecraft.util.*;
 import org.json.simple.*;
 import org.json.simple.parser.*;
@@ -157,19 +160,22 @@ public class StackTheCards implements ModInitializer {
         });
         Items.register();
 
-        LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
-            List<Identifier> entityIdentifiers = Registries.ENTITY_TYPE.stream().filter(entityType ->
-                    HostileEntity.class.isAssignableFrom(entityType.getBaseClass()))
+   /*     LootTableEvents.ALL_LOADED.register((resourceManager, lootManager) -> {
+            List<Identifier> entityIdentifiers = Registries.ENTITY_TYPE.stream().filter(entityType -> {
+                var spawnGroup = entityType.getSpawnGroup();
+                boolean isCreature =  spawnGroup == SpawnGroup.CREATURE;
+                return isCreature || !spawnGroup.isPeaceful();
+                    })
                     .map(EntityType::getLootTableId)
                     .filter(identifier -> identifier.getPath() != null && !identifier.getPath().contains("boat"))
                     .toList();
-
-            if(source.isBuiltin() && entityIdentifiers.stream().anyMatch(identifier -> identifier.getPath().equalsIgnoreCase(id.getPath()) && identifier.getNamespace().equalsIgnoreCase(id.getNamespace()))){
+            if(!cardsLoaded )
+            if(entityIdentifiers.stream().anyMatch(identifier -> identifier.getPath().equalsIgnoreCase(id.getPath()) && identifier.getNamespace().equalsIgnoreCase(id.getNamespace()))){
                 LootPool.Builder poolBuilder = LootPool.builder()
-                        .with(ItemEntry.builder(Items.CARD_PACK).apply());
+                        .with(ItemEntry.builder(Items.CARD_PACK).weight(2).apply(SetNbtLootFunction.builder(CardPack.getRandomCardPack(true))));
 
                 tableBuilder.pool(poolBuilder);
             }
-        });
+        });*/
     }
 }
