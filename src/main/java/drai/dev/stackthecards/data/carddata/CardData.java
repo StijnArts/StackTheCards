@@ -32,7 +32,7 @@ public class CardData {
     private final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
     private CardTooltipLine detailHeader;
     public String cardName = "Missing Card Data";
-    private String cardRarityId;
+    public String cardRarityId;
 
     public CardData(String cardId) {
 //        this.cardSet = cardSet;

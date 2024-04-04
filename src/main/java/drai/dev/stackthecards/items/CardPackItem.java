@@ -4,6 +4,7 @@ import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.registry.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
+import net.minecraft.registry.*;
 import net.minecraft.sound.*;
 import net.minecraft.util.*;
 import net.minecraft.world.*;
@@ -17,12 +18,15 @@ public class CardPackItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-//        var cardPack = CardPack.getCardPack(itemStack);
-        var set = CardGameRegistry.getCardGame(cardPack.getGameId()).getCardSet(cardPack.getSetId());
-//        this.playSound(user, this.getAddItemSound(), 1.0f, 1.0f); //TODO play pack opening sound
-        var cardsToDrop = set.getDroppedCards();
+        var cardPack = CardPack.getCardPack(itemStack);
+        var pullResult = cardPack.pull();
+        var cardsToDrop = pullResult.getPulledCards();
+        var itemsToDrop = pullResult.getPulledItems();
         for (var card : cardsToDrop) {
-            user.dropStack(Card.getAsItemStack(card.getCardIdentifier()), 0.5F);
+            user.dropStack(Card.getAsItemStack(card), 0.5F);
+        }
+        for (var item : itemsToDrop) {
+            user.dropStack(new ItemStack(Registries.ITEM.get(item)), 0.5F);
         }
         if (!user.getAbilities().creativeMode) {
             itemStack.decrement(1);

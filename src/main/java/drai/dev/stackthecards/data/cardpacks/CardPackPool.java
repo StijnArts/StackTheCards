@@ -17,16 +17,12 @@ public class CardPackPool {
     private static final String JSON_POOL_RARITIES_KEY = "rarities";
     private static final String JSON_POOL_ITEMS_KEY = "items";
     private static final String JSON_POOL_TAGS_KEY = "tags";
-    private static final String JSON_GUARANTEED_CARDS_KEY = "guaranteedCards";
-    private static final String JSON_GUARANTEED_ITEMS_KEY = "guaranteedItems";
     public int minimumAmountOfCardsFromPool = 0;
     public int maximumAmountOfCardsFromPool = 0;
     public int poolPullChancePercent = 100;
     public Map<CardIdentifier, Integer> cardsInPool = new HashMap<>();
-    public Map<CardIdentifier, Integer> guaranteedCards = new HashMap<>();
     public Map<CardRarity, Integer> raritiesInPool = new HashMap<>();
     public Map<Identifier, Integer> itemsInPool = new HashMap<>();
-    public Map<Identifier, Integer> guaranteedItems = new HashMap<>();
 //    public Map<Identifier, Integer> tagsInPool = new HashMap<>();
 
     public CardPackPool(int minimumAmountOfCardsFromPool){
@@ -110,32 +106,6 @@ public class CardPackPool {
 //                throw new MalformedJsonException("Card hover tooltip value was malformed");
 //            }
 //        }
-        if(json.containsKey(JSON_GUARANTEED_CARDS_KEY)){
-            try{
-                JSONArray contents = (JSONArray) json.get(JSON_GUARANTEED_CARDS_KEY);
-                for (var section : contents) {
-                    var sectionAsObject = (JSONObject)section;
-                    pool.guaranteedCards.put(new CardIdentifier((String) sectionAsObject.get(JSON_SELF_GAME_ID_KEY),
-                                    (String) sectionAsObject.get(JSON_SELF_SET_ID_KEY),(String) sectionAsObject.get(JSON_SELF_CARD_ID_KEY)),
-                            Integer.valueOf((String) sectionAsObject.get("amount")));
-                }
-            } catch (Exception e){
-                throw new MalformedJsonException("Card hover tooltip value was malformed");
-            }
-        }
-        if(json.containsKey(JSON_GUARANTEED_ITEMS_KEY)){
-            try{
-                var identifierArray = ((JSONArray) json.get(JSON_GUARANTEED_ITEMS_KEY));
-                for (var identifier : identifierArray) {
-                    var identifierAsObject = (JSONObject)identifier;
-                    var identifierSplit = ((String)identifierAsObject.get("itemId")).split(":");
-                    pool.guaranteedItems.put(new Identifier(identifierSplit[0], identifierSplit[1]),
-                            Integer.valueOf((String) identifierAsObject.get("weight")));
-                }
-            } catch (Exception e){
-                throw new MalformedJsonException("Card hover tooltip value was malformed");
-            }
-        }
 
         return pool;
     }

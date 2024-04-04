@@ -14,15 +14,17 @@ import net.minecraft.util.*;
 import org.json.simple.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 
+import static drai.dev.stackthecards.data.CardConnectionEntry.*;
 import static drai.dev.stackthecards.data.carddata.CardData.*;
 import static drai.dev.stackthecards.items.Card.getCardDataNBT;
 
 public class CardPack {
     protected static final String JSON_PACK_ID_KEY = "packId";
     protected static final String JSON_PACK_POOLS_KEY = "pools";
-    protected static final String JSON_PACK_GUARANTEED_ITEMS_KEY = "guaranteedCards";
-    protected static final String JSON_PACK_GUARANTEED_CARDS_KEY = "guaranteedItems";
+    protected static final String JSON_GUARANTEED_CARDS_KEY = "guaranteedCards";
+    protected static final String JSON_GUARANTEED_ITEMS_KEY = "guaranteedItems";
     protected static final String STORED_CARD_PACK_DATA_KEY = "CardPackData";
     protected String packId;
     protected String gameId;
@@ -133,6 +135,33 @@ public class CardPack {
                 throw new MalformedJsonException("Card detail header value was malformed");
             }
         }
+
+        if(json.containsKey(JSON_GUARANTEED_CARDS_KEY)){
+            try{
+                JSONArray contents = (JSONArray) json.get(JSON_GUARANTEED_CARDS_KEY);
+                for (var section : contents) {
+                    var sectionAsObject = (JSONObject)section;
+                    cardPack.guaranteedCards.put(new CardIdentifier((String) sectionAsObject.get(JSON_SELF_GAME_ID_KEY),
+                                    (String) sectionAsObject.get(JSON_SELF_SET_ID_KEY),(String) sectionAsObject.get(JSON_SELF_CARD_ID_KEY)),
+                            Integer.valueOf((String) sectionAsObject.get("amount")));
+                }
+            } catch (Exception e){
+                throw new MalformedJsonException("Card hover tooltip value was malformed");
+            }
+        }
+        if(json.containsKey(JSON_GUARANTEED_ITEMS_KEY)){
+            try{
+                var identifierArray = ((JSONArray) json.get(JSON_GUARANTEED_ITEMS_KEY));
+                for (var identifier : identifierArray) {
+                    var identifierAsObject = (JSONObject)identifier;
+                    var identifierSplit = ((String)identifierAsObject.get("itemId")).split(":");
+                    cardPack.guaranteedItems.put(new Identifier(identifierSplit[0], identifierSplit[1]),
+                            Integer.valueOf((String) identifierAsObject.get("weight")));
+                }
+            } catch (Exception e){
+                throw new MalformedJsonException("Card hover tooltip value was malformed");
+            }
+        }
         return cardPack;
     }
 
@@ -226,5 +255,44 @@ public class CardPack {
 
     private String getPackName() {
         return packName;
+    }
+
+    public PullResult pull() {
+        var pullresult = new PullResult();
+        for (var pool : pools) {
+            var randomCollection = new RandomCollection<Object>();
+            pool.cardsInPool.forEach((cardIdentifier, integer) -> randomCollection.add(integer, cardIdentifier));
+            pool.raritiesInPool.forEach((rarity, integer) -> randomCollection.add(integer, rarity));
+            pool.itemsInPool.forEach((items, integer) -> randomCollection.add(integer, items));
+//            pool.tagsInPool.forEach((cardIdentifier, integer) -> randomCollection.add(integer, cardIdentifier));
+            var amountOfPulls = ThreadLocalRandom.current().nextInt(pool.minimumAmountOfCardsFromPool, pool.maximumAmountOfCardsFromPool+1);
+            for (int i = 0; i < amountOfPulls; i++) {
+                pull(pullresult, randomCollection);
+            }
+        }
+        return pullresult;
+    }
+
+    private CardIdentifier getCardsFromRarity(CardRarity rarity) {
+        var cardsInRarity = getCardGame().getCardSet(setId).getCards().values().stream().filter(cardData -> cardData.cardRarityId.equals(rarity.rarityId)).toList();
+        if(cardsInRarity.size()<1) return null;
+        var roll = ThreadLocalRandom.current().nextInt(0,cardsInRarity.size()+1);
+        return cardsInRarity.get(roll).getCardIdentifier();
+    }
+
+    public void pull(PullResult pullResult, RandomCollection collection) {
+        var pulledObject = collection.next();
+        if(pulledObject instanceof CardIdentifier cardIdentifier){
+            pullResult.pulledCards.add(cardIdentifier);
+        } else if(pulledObject instanceof CardRarity rarity){
+            var card = getCardsFromRarity(rarity);
+            if(card == null){
+                pull(pullResult, collection);
+            } else {
+                pullResult.pulledCards.add(card);
+            }
+        } else if(pulledObject instanceof Identifier identifier){
+
+        }
     }
 }
