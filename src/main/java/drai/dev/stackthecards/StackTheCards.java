@@ -4,8 +4,16 @@ import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.registry.*;
+import drai.dev.stackthecards.registry.Items;
 import net.fabricmc.api.*;
+import net.fabricmc.fabric.api.loot.v2.*;
 import net.fabricmc.fabric.api.resource.*;
+import net.minecraft.entity.*;
+import net.minecraft.entity.mob.*;
+import net.minecraft.item.*;
+import net.minecraft.loot.*;
+import net.minecraft.loot.entry.*;
+import net.minecraft.registry.*;
 import net.minecraft.resource.*;
 import net.minecraft.util.*;
 import org.json.simple.*;
@@ -13,6 +21,7 @@ import org.json.simple.parser.*;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.util.*;
 
 public class StackTheCards implements ModInitializer {
 
@@ -91,6 +100,7 @@ public class StackTheCards implements ModInitializer {
 
                         for (var cardResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/cards", path-> path.getPath().endsWith(".json")).entrySet()){
                             try{
+                                //TODO do this last
 //                                JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(cardResource.getValue().getInputStream(), StandardCharsets.UTF_8));
 //                                GameCardData cardData = GameCardData.parse(jsonObjectCard);
 //                                cardData.setGame(cardGame);
@@ -146,5 +156,20 @@ public class StackTheCards implements ModInitializer {
             }
         });
         Items.register();
+
+        LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+            List<Identifier> entityIdentifiers = Registries.ENTITY_TYPE.stream().filter(entityType ->
+                    HostileEntity.class.isAssignableFrom(entityType.getBaseClass()))
+                    .map(EntityType::getLootTableId)
+                    .filter(identifier -> identifier.getPath() != null && !identifier.getPath().contains("boat"))
+                    .toList();
+
+            if(source.isBuiltin() && entityIdentifiers.stream().anyMatch(identifier -> identifier.getPath().equalsIgnoreCase(id.getPath()) && identifier.getNamespace().equalsIgnoreCase(id.getNamespace()))){
+                LootPool.Builder poolBuilder = LootPool.builder()
+                        .with(ItemEntry.builder(Items.CARD_PACK).apply());
+
+                tableBuilder.pool(poolBuilder);
+            }
+        });
     }
 }

@@ -287,7 +287,8 @@ public class CardConnection {
     }
 
     public List<CardIdentifier> getCardIdentifiers() {
-        var identifiers = layout.stream().flatMap(List::stream).map(cardConnectionEntry -> cardConnectionEntry.self).collect(Collectors.toList());
+        var identifiers = layout.stream().flatMap(List::stream)
+                .map(cardConnectionEntry -> cardConnectionEntry.self).collect(Collectors.toList());
         return identifiers;
     }
 
