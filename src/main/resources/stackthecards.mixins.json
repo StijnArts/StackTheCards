@@ -6,6 +6,7 @@
   "mixins": [
     "ItemFrameEntityMixin",
     "ItemStackMixin",
+    "LootPoolMixin",
     "ScreenHandlerMixin"
   ],
   "client": [

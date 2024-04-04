@@ -3,6 +3,7 @@ package drai.dev.stackthecards.data;
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
+import drai.dev.stackthecards.registry.*;
 import net.minecraft.util.*;
 import org.json.simple.*;
 
@@ -123,7 +124,9 @@ public class CardGame {
     }
 
     public CardSet getCardSet(String setId){
-        return cardSets.get(setId);
+        var foundSet = cardSets.get(setId);
+        if(foundSet == null) return CardGameRegistry.MISSING_CARD_SET;
+        return foundSet;
     }
 
 

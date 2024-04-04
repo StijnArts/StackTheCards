@@ -7,8 +7,10 @@ import drai.dev.stackthecards.data.cardpacks.*;
 import java.util.*;
 
 public class CardGameRegistry {
+    public static final CardSet MISSING_CARD_SET = new CardSet("missing");
     public static CardData MISSING_CARD_DATA = new CardData("missing");
     public static CardPack MISSING_CARD_PACK = new CardPack("missing", "missing","missing");
+    public static CardGame MISSING_CARD_GAME = new CardGame("missing");
     public static Map<String, CardGame> cardGames = new HashMap<>();
 
     public static Map<String, CardGame> getCardGames() {
@@ -16,7 +18,7 @@ public class CardGameRegistry {
     }
 
     public static CardGame getCardGame(String cardGameId){
-        if(cardGameId == null || !cardGames.containsKey(cardGameId)) return new CardGame("missing");
+        if(cardGameId == null || !cardGames.containsKey(cardGameId)) return MISSING_CARD_GAME;
         return cardGames.get(cardGameId);
     }
 

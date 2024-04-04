@@ -5,9 +5,12 @@ import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
+import drai.dev.stackthecards.registry.Items;
 import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.tooltips.parts.*;
+import net.minecraft.entity.*;
 import net.minecraft.item.*;
+import net.minecraft.loot.context.*;
 import net.minecraft.nbt.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
@@ -15,8 +18,10 @@ import org.json.simple.*;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.*;
 
 import static drai.dev.stackthecards.data.CardConnectionEntry.*;
+import static drai.dev.stackthecards.data.CardIdentifier.*;
 import static drai.dev.stackthecards.data.carddata.CardData.*;
 import static drai.dev.stackthecards.items.Card.getCardDataNBT;
 
@@ -26,6 +31,8 @@ public class CardPack {
     protected static final String JSON_GUARANTEED_CARDS_KEY = "guaranteedCards";
     protected static final String JSON_GUARANTEED_ITEMS_KEY = "guaranteedItems";
     protected static final String STORED_CARD_PACK_DATA_KEY = "CardPackData";
+    private static final String JSON_WEIGHT_IN_LOOT_POOL_KEY = "weightInLootPool";
+    private static final String JSON_DROPPED_BY_MOBS_KEY = "droppedByMobs";
     protected String packId;
     protected String gameId;
     protected String setId;
@@ -36,6 +43,9 @@ public class CardPack {
     private final Map<Identifier, Integer> guaranteedItems = new HashMap<>();
     private final Map<CardIdentifier, Integer> guaranteedCards = new HashMap<>();
     protected String packName;
+    private double weight = 1;
+    private boolean droppedByMobs = true;
+
     protected CardPack(String gameId, String packId){
         this.gameId = gameId;
         this.packId = packId;
@@ -53,7 +63,7 @@ public class CardPack {
         return CardGameRegistry.getPackData(cardIdentifier);
     }
 
-    public static void addCardIdentifier(ItemStack stack, CardIdentifier cardIdentifier) {
+    public static void addCardPackIdentifier(ItemStack stack, CardIdentifier cardIdentifier) {
         NbtList nbtList = Card.getCardDataNBT(stack, STORED_CARD_PACK_DATA_KEY);
         boolean cardHasId = false;
         for(int i = 0; i < nbtList.size(); ++i) {
@@ -162,8 +172,69 @@ public class CardPack {
                 throw new MalformedJsonException("Card guaranteed items was malformed: "+e.getMessage());
             }
         }
+        if(json.containsKey(JSON_WEIGHT_IN_LOOT_POOL_KEY)){
+            try{
+                cardPack.weight = (int) (long) json.get(JSON_WEIGHT_IN_LOOT_POOL_KEY);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card guaranteed items was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey(JSON_DROPPED_BY_MOBS_KEY)){
+            try{
+                cardPack.droppedByMobs = (boolean) json.get(JSON_DROPPED_BY_MOBS_KEY);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card guaranteed items was malformed: "+e.getMessage());
+            }
+        }
         return cardPack;
     }
+
+    public static CardPack getRandomCardPack(boolean forMobDrops) {
+        List<CardPack> gameCardPacks = CardGameRegistry.getCardGames().values().stream().map(game -> game.getCardPacks().values()).flatMap(Collection::stream).toList();
+        List<CardPack> setCardPacks = CardGameRegistry.getCardGames().values().stream()
+                .map(game -> game.cardSets.values()).flatMap(Collection::stream).map(cardSet -> cardSet.getCardPacks().values()).flatMap(Collection::stream).toList();
+        List<CardPack> packs = new ArrayList<>();
+        packs.addAll(gameCardPacks);
+        packs.addAll(setCardPacks);
+        var weightedRandom = new RandomCollection<CardPack>();
+        for (CardPack pack : packs) {
+            if(pack.droppedByMobs || !forMobDrops){
+                weightedRandom.add(pack.weight,pack);
+            }
+        }
+        var cardPack = weightedRandom.next();
+        return cardPack;
+    }
+    public static void lootPoolCardPackInjection(LootContext context, Consumer<ItemStack> consumer, int i) {
+        if(context.hasParameter(LootContextParameters.THIS_ENTITY)){
+            var thisEntity = context.get(LootContextParameters.THIS_ENTITY);
+            var spawnGroup = thisEntity.getType().getSpawnGroup();
+            if(spawnGroup == SpawnGroup.CREATURE || !spawnGroup.isPeaceful()){
+                for (int k = 0; k < i; k++) {
+                    int roll = ThreadLocalRandom.current().nextInt(0, 4);
+                    if(roll==1){
+                        var itemStack = new ItemStack(Items.CARD_PACK);
+                        CardPack.addCardPackIdentifier(itemStack, CardPack.getRandomCardPack(true).getCardIdentifier());
+                        consumer.accept(itemStack);
+                    }
+                }
+            }
+        }
+    }
+
+    private CardIdentifier getCardIdentifier() {
+        return new CardIdentifier(gameId, setId, packId);
+    }
+
+/*    public static NbtList createNbt(CardPack cardIdentifier) {
+        NbtCompound nbtCompound = new NbtCompound();
+        nbtCompound.putString(CARD_ID_KEY, String.valueOf(cardIdentifier.packId));
+        nbtCompound.putString(SET_ID_KEY, String.valueOf(cardIdentifier.setId));
+        nbtCompound.putString(GAME_ID_KEY, String.valueOf(cardIdentifier.gameId));
+        var nbtList = new NbtList();
+        nbtList
+        return nbtCompound;
+    }*/
 
     public String getPackId() {
         return packId;
