@@ -30,7 +30,7 @@ public class CardTooltipSection {
             try{
                 section.noLineBreak = (boolean) json.get(JSON_NO_NEW_LINE_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text no new line break was malformed");
+                throw new MalformedJsonException("Text no new line break was malformed: "+e.getMessage());
             }
         }
         return section;

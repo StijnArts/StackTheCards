@@ -1,0 +1,47 @@
+{
+  "packId": "normal",
+  "name": "Pokemon TCG Pack",
+  "pools": [
+    {
+      "minimumCardsFromPool": 2,
+      "maximumCardsFromPool": 2,
+      "poolPullChancePercent": 100,
+      "cards": [
+        {
+          "cardId": "charizard_4",
+          "setId": "base",
+          "gameId": "pokemon_tcg",
+          "weight": 1
+        }
+      ],
+      "rarities": [
+        {
+          "rarityId": "commonEnergy",
+          "weight": 20
+        }
+      ],
+      "items": [],
+      "tags":[]
+    }
+  ],
+  "guaranteedCards":[
+    {
+      "cardId": "hooh_bottom",
+      "setId": "base",
+      "gameId": "pokemon_tcg",
+      "amount": 1
+    },
+    {
+      "cardId": "hooh_top",
+      "setId": "base",
+      "gameId": "pokemon_tcg",
+      "amount": 1
+    }
+  ],
+  "guaranteedItems": [
+    {
+      "itemId": "minecraft:diamond",
+      "amount": 6
+    }
+  ]
+}

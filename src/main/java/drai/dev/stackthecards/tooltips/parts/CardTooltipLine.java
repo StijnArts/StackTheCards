@@ -44,7 +44,7 @@ public class CardTooltipLine {
                     part.cardTextFormatting = new CardTextFormatting();
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Text formatting id was malformed");
+                throw new MalformedJsonException("Text formatting id was malformed: "+e.getMessage());
             }
         } else {
             part.cardTextFormatting = new CardTextFormatting();
@@ -53,21 +53,21 @@ public class CardTooltipLine {
             try{
                 part.cardTextFormatting.isBold = (Boolean) json.get(JSON_IS_BOLD_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isBold was malformed");
+                throw new MalformedJsonException("Text format isBold was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_IS_ITALIC_KEY)){
             try{
                 part.cardTextFormatting.isItalic = (Boolean) json.get(JSON_IS_ITALIC_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isItalic was malformed");
+                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_COLOR_KEY)){
             try{
                 part.cardTextFormatting.argbColorValue = (Integer) json.get(JSON_COLOR_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isItalic was malformed");
+                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
             }
         }
 

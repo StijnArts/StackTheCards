@@ -1,6 +1,7 @@
 package drai.dev.stackthecards.mixin;
 
 import drai.dev.stackthecards.client.*;
+import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.Items;
 import drai.dev.stackthecards.tooltips.*;
@@ -22,7 +23,7 @@ public abstract class ItemStackMixin {
     @Inject(at = @At("HEAD"), method = "getTooltipData()Ljava/util/Optional;", cancellable = true)
     private void onGetTooltipData(CallbackInfoReturnable<Optional<TooltipData>> ci) {
         ItemStack self = (ItemStack) (Object) this;
-        if (self.isOf(Items.CARD))
+        if (self.isOf(Items.CARD) || self.isOf(Items.CARD_PACK))
             ci.setReturnValue(Optional.of(
                     CardTooltipData.of(self)));
     }
@@ -37,7 +38,16 @@ public abstract class ItemStackMixin {
                 tooltip.addAll(Card.getCardData(self).getDetailToolTips());
             } else {
                 tooltip.addAll(Card.getCardData(self).getTooltipsDescriptors());
-                StackTheCardsClient.modifyStackTooltip(tooltip::addAll);
+                StackTheCardsClient.modifyCardStackTooltip(tooltip::addAll);
+            }
+        }
+        if(self.isOf(Items.CARD_PACK)){
+            var tooltip = ci.getReturnValue();
+            if(StackTheCardsClient.shiftKeyPressed){
+                tooltip.addAll(CardPack.getCardPack(self).getDetailToolTips());
+            } else {
+                tooltip.addAll(CardPack.getCardPack(self).getTooltipsDescriptors());
+                StackTheCardsClient.modifyPackStackTooltip(tooltip::addAll);
             }
         }
         StackTheCardsClient.checkToolTipForScrolling(self);
@@ -49,6 +59,8 @@ public abstract class ItemStackMixin {
         var self  =(ItemStack) (Object) this;
         if(self.isOf(Items.CARD)){
             cir.setReturnValue(Card.getCardData(self).getCardNameLabel());
+        } else if (self.isOf(Items.CARD_PACK)){
+            cir.setReturnValue(CardPack.getCardPack(self).getPackNameLabel());
         }
     }
 }

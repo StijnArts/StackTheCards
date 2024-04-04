@@ -1,7 +1,8 @@
 package drai.dev.stackthecards.data;
 
 import com.google.gson.stream.*;
-import drai.dev.stackthecards.data.cardData.*;
+import drai.dev.stackthecards.data.carddata.*;
+import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.registry.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
@@ -11,7 +12,7 @@ import java.util.*;
 
 import static drai.dev.stackthecards.data.CardGame.JSON_GAME_CARD_BACK_CARD_KEY;
 import static drai.dev.stackthecards.data.CardGame.JSON_GAME_CARD_BACK_ITEM_MODEL_KEY;
-import static drai.dev.stackthecards.data.cardData.CardData.JSON_ROUNDED_CORNERS_ID_KEY;
+import static drai.dev.stackthecards.data.carddata.CardData.JSON_ROUNDED_CORNERS_ID_KEY;
 
 public class CardSet {
     private static final String JSON_SET_ID_KEY = "setId";
@@ -37,28 +38,28 @@ public class CardSet {
         try{
             cardSet = new CardSet((String) json.get(JSON_SET_ID_KEY));
         } catch (Exception e){
-            throw new MalformedJsonException("Card game id was malformed");
+            throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
         }
         if(json.containsKey(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)){
             try{
                 var identifierArray = ((String) json.get(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)).split(":");
                 cardSet.setCardBackModel(new Identifier(identifierArray[0], identifierArray[1]));
             } catch (Exception e){
-                throw new MalformedJsonException("Card back identifier was malformed");
+                throw new MalformedJsonException("Card back identifier was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_GAME_CARD_BACK_CARD_KEY)){
             try{
                 cardSet.setCardBackTextureName((String) json.get(JSON_GAME_CARD_BACK_CARD_KEY));
             } catch (Exception e){
-                throw new MalformedJsonException("Card back cardId was malformed");
+                throw new MalformedJsonException("Card back cardId was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
             try{
                 cardSet.hasRoundedCorners = Optional.of((boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY));
             } catch (Exception e){
-                throw new MalformedJsonException("Card has rounded corners value was malformed");
+                throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }
         }
         return cardSet;
@@ -84,15 +85,13 @@ public class CardSet {
         return cards;
     }
 
-    public static CardData charizard = new CardData("charizard");
-    public static CardData hoohTop = new CardData("hooh_top");
-    public static CardData hoohBottom = new CardData("hooh_bottom");
     public CardData getCardData(String cardId){
         if(cards.containsKey(cardId)){
             return cards.get(cardId);
         } else
         return CardGameRegistry.MISSING_CARD_DATA;
     }
+
     @Nullable
     public CardData getCardBackTextureName() {
         if(cardBackTextureName==null) return null;
@@ -120,5 +119,20 @@ public class CardSet {
 
     public void setGame(CardGame cardGame) {
         this.gameId = cardGame.getGameId();
+    }
+
+    public List<CardData> getDroppedCards() {
+        return cards.values().stream().toList();
+    }
+
+    public CardPack getCardPack(String packId) {
+        if(cardPacks.containsKey(packId)){
+            return cardPacks.get(packId);
+        } else
+            return CardGameRegistry.MISSING_CARD_PACK;
+    }
+
+    public Map<String, CardPack> getCardPacks() {
+        return cardPacks;
     }
 }

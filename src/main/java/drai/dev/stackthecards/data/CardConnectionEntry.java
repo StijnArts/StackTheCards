@@ -1,13 +1,7 @@
 package drai.dev.stackthecards.data;
 
 import com.google.gson.stream.*;
-import drai.dev.stackthecards.data.cardData.*;
-import drai.dev.stackthecards.tooltips.parts.*;
-import net.minecraft.util.math.*;
 import org.json.simple.*;
-
-import static drai.dev.stackthecards.data.CardTextFormatting.*;
-import static drai.dev.stackthecards.data.CardTextFormatting.JSON_COLOR_KEY;
 
 public class CardConnectionEntry {
     public static final String JSON_SELF_GAME_ID_KEY = "gameId";
@@ -56,42 +50,42 @@ public class CardConnectionEntry {
             connectionEntry = new CardConnectionEntry(new CardIdentifier((String) json.get(JSON_SELF_GAME_ID_KEY),
                     (String) json.get(JSON_SELF_SET_ID_KEY),(String) json.get(JSON_SELF_CARD_ID_KEY)));
         } catch (Exception e){
-            throw new MalformedJsonException("Card identifier was malformed");
+            throw new MalformedJsonException("Card identifier was malformed: "+e.getMessage());
         }
 
         if(json.containsKey(JSON_ROTATION_KEY)){
             try{
                 connectionEntry.rotation = CardRotation.valueOf((String) json.get(JSON_ROTATION_KEY));
             } catch (Exception e){
-                throw new MalformedJsonException("Card rotation was malformed");
+                throw new MalformedJsonException("Card rotation was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_CONNECTION_DIRECTION_KEY)){
             try{
                 connectionEntry.connectingDirection = CardConnectingDirection.valueOf((String) json.get(JSON_CONNECTION_DIRECTION_KEY));
             } catch (Exception e){
-                throw new MalformedJsonException("Card connecting direction was malformed");
+                throw new MalformedJsonException("Card connecting direction was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_X_MODIFIER_KEY)){
             try{
                 connectionEntry.xModifier = (float)(double) json.get(JSON_X_MODIFIER_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isItalic was malformed");
+                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_Y_MODIFIER_KEY)){
             try{
                 connectionEntry.yModifier = (float)(double) json.get(JSON_Y_MODIFIER_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isItalic was malformed");
+                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_LAYER_KEY)) {
             try {
                 connectionEntry.layer = (int) json.get(JSON_LAYER_KEY);
             } catch (Exception e) {
-                throw new MalformedJsonException("Text format isItalic was malformed");
+                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
             }
         }
         return connectionEntry;

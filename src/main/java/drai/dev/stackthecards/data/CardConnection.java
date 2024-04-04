@@ -1,7 +1,6 @@
 package drai.dev.stackthecards.data;
 
 import com.google.gson.stream.*;
-import drai.dev.stackthecards.data.cardData.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
 import net.minecraft.item.*;
@@ -11,7 +10,6 @@ import org.json.simple.*;
 import java.util.*;
 import java.util.stream.*;
 
-import static drai.dev.stackthecards.data.CardIdentifier.CARD_ID_KEY;
 import static drai.dev.stackthecards.data.CardIdentifier.GAME_ID_KEY;
 
 public class CardConnection {
@@ -41,7 +39,7 @@ public class CardConnection {
         try{
             cardConnection = new CardConnection((String) json.get(JSON_CONNECTION_ID_KEY), game.getGameId());
         } catch (Exception e){
-            throw new MalformedJsonException("Card connection id was malformed");
+            throw new MalformedJsonException("Card connection id was malformed: "+e.getMessage());
         }
         if(json.containsKey(JSON_LAYOUT_KEY)){
             try{
@@ -57,7 +55,7 @@ public class CardConnection {
                 }
                 cardConnection.setLayout(layout);
             } catch (Exception e){
-                throw new MalformedJsonException("Card connection layout was malformed");
+                throw new MalformedJsonException("Card connection layout was malformed: "+e.getMessage());
             }
         }
         return cardConnection;

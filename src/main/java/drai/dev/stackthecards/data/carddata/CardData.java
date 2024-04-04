@@ -1,4 +1,4 @@
-package drai.dev.stackthecards.data.cardData;
+package drai.dev.stackthecards.data.carddata;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.client.*;
@@ -14,10 +14,12 @@ import org.json.simple.*;
 
 import java.util.*;
 
+import static drai.dev.stackthecards.data.CardRarity.JSON_RARITY_ID_KEY;
+
 public class CardData {
-    private static final String JSON_CARD_ID_KEY = "cardId";
-    private static final String JSON_CARD_HOVER_TOOLTIP_KEY = "textSectionsForHoverTooltip";
-    private static final String JSON_CARD_DETAIL_TOOLTIP_KEY = "textSectionsForDetailTooltip";
+    public static final String JSON_CARD_ID_KEY = "cardId";
+    public static final String JSON_CARD_HOVER_TOOLTIP_KEY = "textSectionsForHoverTooltip";
+    public static final String JSON_CARD_DETAIL_TOOLTIP_KEY = "textSectionsForDetailTooltip";
     public static final String JSON_ROUNDED_CORNERS_ID_KEY = "hasRoundedCorners";
     public static final String JSON_DETAIL_HEADER_KEY = "detailHeader";
     public static final String JSON_NAME_HEADER_KEY = "name";
@@ -30,6 +32,7 @@ public class CardData {
     private final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
     private CardTooltipLine detailHeader;
     public String cardName = "Missing Card Data";
+    public String cardRarityId;
 
     public CardData(String cardId) {
 //        this.cardSet = cardSet;
@@ -42,20 +45,27 @@ public class CardData {
         try{
             cardData = new CardData((String) json.get(JSON_CARD_ID_KEY));
         } catch (Exception e){
-            throw new MalformedJsonException("Card game id was malformed");
+            throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
         }
         if(json.containsKey(JSON_NAME_HEADER_KEY)){
             try{
                 cardData.cardName = (String) json.get(JSON_NAME_HEADER_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Card has rounded corners value was malformed");
+                throw new MalformedJsonException("Card name header was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey(JSON_RARITY_ID_KEY)){
+            try{
+                cardData.cardRarityId = (String) json.get(JSON_RARITY_ID_KEY);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card rarity id was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
             try{
                 cardData.setHasRoundedCorners((boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY));
             } catch (Exception e){
-                throw new MalformedJsonException("Card has rounded corners value was malformed");
+                throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_CARD_HOVER_TOOLTIP_KEY)){
@@ -65,7 +75,7 @@ public class CardData {
                     cardData.hoverTooltipSections.add(CardTooltipSection.parse((JSONObject) section, game));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card hover tooltip value was malformed");
+                throw new MalformedJsonException("Card hover tooltip value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_CARD_DETAIL_TOOLTIP_KEY)){
@@ -75,7 +85,7 @@ public class CardData {
                     cardData.detailTooltipSections.add(CardTooltipSection.parse((JSONObject) section, game));
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card detail tooltip value was malformed");
+                throw new MalformedJsonException("Card detail tooltip value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_DETAIL_HEADER_KEY)){
@@ -90,14 +100,14 @@ public class CardData {
                     }
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Card detail header value was malformed");
+                throw new MalformedJsonException("Card detail header value was malformed: "+e.getMessage());
             }
         }
 //        if(json.containsKey(JSON_GAME_CARD_BACK_CARD_KEY)){
 //            try{
 //                cardData.setCardBackTextureName((String) json.get(JSON_GAME_CARD_BACK_CARD_KEY));
 //            } catch (Exception e){
-//                throw new MalformedJsonException("Card back cardId was malformed");
+//                throw new MalformedJsonException("Card back cardId was malformed: "+e.getMessage());
 //            }
 //        }
         return cardData;
@@ -155,7 +165,7 @@ public class CardData {
     }
 
     @NotNull
-    private ArrayList<Text> getTexts(List<CardTooltipSection> sections) {
+    public static ArrayList<Text> getTexts(List<CardTooltipSection> sections) {
         var tooltips = new ArrayList<Text>();
         for (int i = 0; i < sections.size(); i++) {
             var section = sections.get(i);
@@ -234,5 +244,9 @@ public class CardData {
 
     public String getCardTextureLocation() {
         return gameId + "/" + cardSet.getSetId() + "/" + cardId;
+    }
+
+    public Identifier getFallbackModel() {
+        return new Identifier("stack_the_cards", "stc_cards/backs/fallback");
     }
 }
