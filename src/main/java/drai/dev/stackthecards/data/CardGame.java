@@ -3,7 +3,6 @@ package drai.dev.stackthecards.data;
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
-import io.netty.util.collection.*;
 import net.minecraft.util.*;
 import org.json.simple.*;
 
@@ -210,5 +209,9 @@ public class CardGame {
 
     public void addRarity(CardRarity rarity) {
         this.rarities.put(rarity.rarityId, rarity);
+    }
+
+    public CardRarity getRarity(String rarityId) {
+        return rarities.get(rarityId);
     }
 }

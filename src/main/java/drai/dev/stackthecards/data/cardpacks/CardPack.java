@@ -123,7 +123,7 @@ public class CardPack {
                 JSONArray pools = (JSONArray) json.get(JSON_PACK_POOLS_KEY);
                 for (var pool: pools) {
                     try{
-                        cardPack.pools.add(CardPackPool.parse((JSONObject)pool));
+                        cardPack.pools.add(CardPackPool.parse((JSONObject)pool, game));
                     } catch(Exception e){
                         throw new MalformedJsonException("Card Pack pool entry was malformed");
                     }
