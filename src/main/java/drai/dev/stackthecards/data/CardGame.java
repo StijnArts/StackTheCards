@@ -3,6 +3,7 @@ package drai.dev.stackthecards.data;
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
+import io.netty.util.collection.*;
 import net.minecraft.util.*;
 import org.json.simple.*;
 
@@ -34,7 +35,7 @@ public class CardGame {
     private Identifier cardPackModel;
     private String cardPackTextureName;
     private GameCardData cardPackData;
-
+    private final Map<String, CardRarity> rarities = new HashMap<>();
     public static CardGame parse(JSONObject json) throws MalformedJsonException {
         if(json.isEmpty() || !json.containsKey(JSON_GAME_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         CardGame game;
@@ -205,5 +206,9 @@ public class CardGame {
 
     public Identifier getCardPackModel() {
         return cardPackModel;
+    }
+
+    public void addRarity(CardRarity rarity) {
+        this.rarities.put(rarity.rarityId, rarity);
     }
 }

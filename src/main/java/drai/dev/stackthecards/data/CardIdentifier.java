@@ -69,7 +69,7 @@ public class CardIdentifier {
     }
 
     private static CardIdentifier tryParse(String gameId, String setId, String cardId) {
-        if(gameId.isEmpty() || gameId.isBlank() || setId.isEmpty() || setId.isBlank() || cardId.isEmpty() || cardId.isBlank()) return null;
+        if(gameId.isEmpty() || gameId.isBlank() || cardId.isEmpty() || cardId.isBlank()) return null;
         return new CardIdentifier(gameId, setId, cardId);
     }
 

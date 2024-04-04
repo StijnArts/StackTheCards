@@ -1,6 +1,7 @@
 {
   "cardId": "fire_energy_98",
   "name": "Fire Energy",
+  "rarityId": "commonEnergy",
   "detailHeader": [
     {
       "text": "Fire Energy",

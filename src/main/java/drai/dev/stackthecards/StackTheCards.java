@@ -47,6 +47,16 @@ public class StackTheCards implements ModInitializer {
                             }
                         }
 
+                        for (var rarityResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/rarities", path-> path.getPath().endsWith(".json")).entrySet()){
+                            try{
+                                JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(rarityResource.getValue().getInputStream(), StandardCharsets.UTF_8));
+                                CardRarity rarity = CardRarity.parse(jsonObjectCard);
+                                cardGame.addRarity(rarity);
+                            } catch (Exception e){
+                                System.out.println("formatting json file "+rarityResource.getKey() + " was invalid: "+e.getMessage());
+                            }
+                        }
+
                         for (var setResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/sets", path-> path.getPath().endsWith(".json")).entrySet()){
                             try{
                                 JSONObject jsonObjectSet = (JSONObject) jsonParser.parse(new InputStreamReader(setResource.getValue().getInputStream(), StandardCharsets.UTF_8));
@@ -104,10 +114,10 @@ public class StackTheCards implements ModInitializer {
                         //packs
                         for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/packs", path-> path.getPath().endsWith(".json")).entrySet()){
                             try{
-//                                JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-//                                CardPack cardPack = CardPack.parse(jsonObject, cardGame);
-//                                cardPack.setGame(cardGame);
-//                                cardGame.addPack(cardPack);
+                                JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
+                                CardPack cardPack = GameCardPack.parse(jsonObject, cardGame);
+                                cardPack.setGame(cardGame);
+                                cardGame.addPack(cardPack);
                             } catch (Exception e){
                                 System.out.println("game pack json file "+packResource.getKey() + " was invalid: "+e.getMessage());
                             }

@@ -14,6 +14,8 @@ import org.json.simple.*;
 
 import java.util.*;
 
+import static drai.dev.stackthecards.data.CardRarity.JSON_RARITY_ID_KEY;
+
 public class CardData {
     public static final String JSON_CARD_ID_KEY = "cardId";
     public static final String JSON_CARD_HOVER_TOOLTIP_KEY = "textSectionsForHoverTooltip";
@@ -30,6 +32,7 @@ public class CardData {
     private final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
     private CardTooltipLine detailHeader;
     public String cardName = "Missing Card Data";
+    private String cardRarityId;
 
     public CardData(String cardId) {
 //        this.cardSet = cardSet;
@@ -48,7 +51,14 @@ public class CardData {
             try{
                 cardData.cardName = (String) json.get(JSON_NAME_HEADER_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Card has rounded corners value was malformed");
+                throw new MalformedJsonException("Card name header was malformed");
+            }
+        }
+        if(json.containsKey(JSON_RARITY_ID_KEY)){
+            try{
+                cardData.cardRarityId = (String) json.get(JSON_RARITY_ID_KEY);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card rarity id was malformed");
             }
         }
         if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){

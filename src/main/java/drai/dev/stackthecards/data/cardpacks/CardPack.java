@@ -3,10 +3,12 @@ package drai.dev.stackthecards.data.cardpacks;
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
+import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.tooltips.parts.*;
 import net.minecraft.item.*;
+import net.minecraft.nbt.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.json.simple.*;
@@ -17,15 +19,25 @@ import static drai.dev.stackthecards.data.carddata.CardData.*;
 import static drai.dev.stackthecards.items.Card.getCardDataNBT;
 
 public class CardPack {
-    private static final String JSON_PACK_ID_KEY = "packId";
-    private static final String STORED_CARD_PACK_DATA_KEY = "CardPackData";
-    private String packId;
-    private String gameId;
-    private String setId;
-    private final List<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
-    private final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
-    private String packName;
-
+    protected static final String JSON_PACK_ID_KEY = "packId";
+    protected static final String JSON_PACK_POOLS_KEY = "pools";
+    protected static final String JSON_PACK_GUARANTEED_ITEMS_KEY = "guaranteedCards";
+    protected static final String JSON_PACK_GUARANTEED_CARDS_KEY = "guaranteedItems";
+    protected static final String STORED_CARD_PACK_DATA_KEY = "CardPackData";
+    protected String packId;
+    protected String gameId;
+    protected String setId;
+    protected CardTooltipLine detailHeader;
+    protected final List<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
+    protected final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
+    private final List<CardPackPool> pools = new ArrayList<>();
+    private final Map<Identifier, Integer> guaranteedItems = new HashMap<>();
+    private final Map<CardIdentifier, Integer> guaranteedCards = new HashMap<>();
+    protected String packName;
+    protected CardPack(String gameId, String packId){
+        this.gameId = gameId;
+        this.packId = packId;
+    }
     public CardPack(String gameId, String setId, String packId) {
         this.packId = packId;
         this.gameId = gameId;
@@ -37,6 +49,22 @@ public class CardPack {
         var cardNBTData = getCardDataNBT(stack, STORED_CARD_PACK_DATA_KEY);
         var cardIdentifier = CardIdentifier.getCardIdentifier(cardNBTData);
         return CardGameRegistry.getPackData(cardIdentifier);
+    }
+
+    public static void addCardIdentifier(ItemStack stack, CardIdentifier cardIdentifier) {
+        NbtList nbtList = Card.getCardDataNBT(stack, STORED_CARD_PACK_DATA_KEY);
+        boolean cardHasId = false;
+        for(int i = 0; i < nbtList.size(); ++i) {
+            NbtCompound nbtCompound = nbtList.getCompound(i);
+            CardIdentifier cardIdentifier2 = CardIdentifier.getCardIdentifier(nbtCompound);
+            if (CardIdentifier.isValid(cardIdentifier2)) continue;
+            cardHasId = true;
+            break;
+        }
+        if (!cardHasId) {
+            nbtList.add(CardIdentifier.createNbt(cardIdentifier));
+        }
+        stack.getOrCreateNbt().put(STORED_CARD_PACK_DATA_KEY, nbtList);
     }
 
     public static CardPack parse(JSONObject json, CardGame game, CardSet cardSet) throws MalformedJsonException {
@@ -85,6 +113,22 @@ public class CardPack {
                         cardPack.detailHeader.lineSegments.add(CardTooltipLine.parse((JSONObject) textSegment, game));
                     }
                 }
+            } catch (Exception e){
+                throw new MalformedJsonException("Card detail header value was malformed");
+            }
+        }
+        if(json.containsKey(JSON_PACK_POOLS_KEY)){
+            try{
+                cardPack.detailHeader = new CardTooltipLine();
+                JSONArray pools = (JSONArray) json.get(JSON_PACK_POOLS_KEY);
+                for (var pool: pools) {
+                    try{
+                        cardPack.pools.add(CardPackPool.parse((JSONObject)pool));
+                    } catch(Exception e){
+                        throw new MalformedJsonException("Card Pack pool entry was malformed");
+                    }
+                }
+
             } catch (Exception e){
                 throw new MalformedJsonException("Card detail header value was malformed");
             }
@@ -171,7 +215,6 @@ public class CardPack {
         return new Identifier("stack_the_cards", "stc_cards/packs/fallback");
     }
 
-    private CardTooltipLine detailHeader;
     public Text getPackNameLabel() {
         if(!StackTheCardsClient.shiftKeyPressed){
             return Text.literal(getPackName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
