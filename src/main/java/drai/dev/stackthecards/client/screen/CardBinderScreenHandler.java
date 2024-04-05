@@ -3,6 +3,7 @@ package drai.dev.stackthecards.client.screen;
 import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.Items;
+import net.fabricmc.fabric.api.item.v1.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
@@ -12,9 +13,9 @@ import org.jetbrains.annotations.*;
 
 public class CardBinderScreenHandler extends ScreenHandler {
     private final Inventory inventory;
-    public CardBinderScreenHandler(int syncId, PlayerInventory playerInventory, CardBinder cardBinder) {
+    public CardBinderScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(StackTheCards.CARD_BINDER_SCREEN_HANDLER, syncId);
-        this.inventory = cardBinder;
+        this.inventory = new CardBinderInventory();
 
         inventory.onOpen(playerInventory.player);
 
@@ -33,10 +34,6 @@ public class CardBinderScreenHandler extends ScreenHandler {
             for (l = 0; l < 9; ++l) {
                 this.addSlot(new Slot(playerInventory, l + m * 9 + 9, 8 + l * 18, 84 + m * 18));
             }
-        }
-        //The player Hotbar
-        for (m = 0; m < 9; ++m) {
-            this.addSlot(new Slot(playerInventory, m, 8 + m * 18, 142));
         }
     }
 

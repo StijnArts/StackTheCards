@@ -27,7 +27,7 @@ public class StackTheCards implements ModInitializer {
     public static final ScreenHandlerType<CardBinderScreenHandler> CARD_BINDER_SCREEN_HANDLER;
     static {
         CARD_BINDER_SCREEN_HANDLER =  Registry.register(Registries.SCREEN_HANDLER, new Identifier("stack_the_cards", "card_binder_screen"),
-                new ScreenHandlerType<>( (syncId, playerInventory) -> new CardBinderScreenHandler(syncId, playerInventory, ), FeatureFlags.VANILLA_FEATURES) );
+                new ScreenHandlerType<>( (syncId, playerInventory) -> new CardBinderScreenHandler(syncId, playerInventory), FeatureFlags.VANILLA_FEATURES) );
     }
     /**
      * Runs the mod initializer.

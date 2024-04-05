@@ -37,7 +37,7 @@ public class StackTheCardsClient implements ClientModInitializer {
     public void onInitializeClient() {
         CARD_RENDERER = new CardRenderer();
         CARD_TOOLTIP_RENDERER = new CardTooltipRenderer(CARD_RENDERER);
-        HandledScreens.register(StackTheCards.CARD_BINDER_SCREEN_HANDLER, );
+        HandledScreens.register(StackTheCards.CARD_BINDER_SCREEN_HANDLER, CardBinderScreen::new);
         var plugin = new StackTheCardsModelLoadingPlugin();
         PreparableModelLoadingPlugin.register((resourceManager, executor) -> CompletableFuture.completedFuture(resourceManager),
                 plugin::onInitializeModelLoader);
@@ -94,6 +94,6 @@ public class StackTheCardsClient implements ClientModInitializer {
         }
     }
     public static int getScrollModifier(){
-        return scrollModifier * 3;
+        return scrollModifier * 5;
     }
 }

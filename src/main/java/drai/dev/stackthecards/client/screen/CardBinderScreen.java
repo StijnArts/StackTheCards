@@ -1,6 +1,8 @@
 package drai.dev.stackthecards.client.screen;
 
+import drai.dev.stackthecards.items.*;
 import net.fabricmc.api.*;
+import net.fabricmc.fabric.api.item.v1.*;
 import net.minecraft.client.font.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.*;
@@ -19,9 +21,9 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
     private final DefaultedList<ItemStack> inventory;
     private static int cardsPerPage = 4;
 
-    public CardBinderScreen(CardBinderScreenHandler handler, PlayerInventory playerInventory, DefaultedList<ItemStack> inventory){
-        super(handler, playerInventory, NarratorManager.EMPTY);
-        this.inventory = inventory;
+    public CardBinderScreen(CardBinderScreenHandler handler, PlayerInventory playerInventory, Text text){
+        super(handler, playerInventory, text);
+        this.inventory = new CardBinderInventory().getInventory();
     }
     public static final Identifier BINDER_TEXTURE = new Identifier("stack_the_cards","textures/gui/binder.png");
     protected static final int MAX_TEXT_WIDTH = 114;
