@@ -1,34 +1,34 @@
 package drai.dev.stackthecards;
 
+import drai.dev.stackthecards.client.screen.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
-import drai.dev.stackthecards.events.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.registry.Items;
 import net.fabricmc.api.*;
-import net.fabricmc.fabric.api.loot.v2.*;
 import net.fabricmc.fabric.api.resource.*;
-import net.fabricmc.fabric.mixin.resource.conditions.*;
-import net.minecraft.entity.*;
-import net.minecraft.entity.mob.*;
-import net.minecraft.item.*;
-import net.minecraft.loot.*;
-import net.minecraft.loot.entry.*;
-import net.minecraft.loot.function.*;
+import net.fabricmc.fabric.api.screenhandler.v1.*;
 import net.minecraft.registry.*;
+import net.minecraft.registry.Registry;
 import net.minecraft.resource.*;
-import net.minecraft.server.dedicated.*;
+import net.minecraft.resource.featuretoggle.*;
+import net.minecraft.screen.*;
+import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
 import java.io.*;
 import java.nio.charset.*;
-import java.util.*;
+import java.rmi.registry.*;
 
 public class StackTheCards implements ModInitializer {
-
+    public static final ScreenHandlerType<CardBinderScreenHandler> CARD_BINDER_SCREEN_HANDLER;
+    static {
+        CARD_BINDER_SCREEN_HANDLER =  Registry.register(Registries.SCREEN_HANDLER, new Identifier("stack_the_cards", "card_binder_screen"),
+                new ScreenHandlerType<>( (syncId, playerInventory) -> new CardBinderScreenHandler(syncId, playerInventory, ), FeatureFlags.VANILLA_FEATURES) );
+    }
     /**
      * Runs the mod initializer.
      */
@@ -178,8 +178,6 @@ public class StackTheCards implements ModInitializer {
                 tableBuilder.pool(poolBuilder);
             }
         });*/
-        UseItemCallback.EVENT.register((player, level, hand) -> {
-            return OpenItemMenuEvent.onItemClick(player, level, hand);
-        });
+//        UseItemCallback.EVENT.register(OpenItemMenuEvent::onItemClick);
     }
 }

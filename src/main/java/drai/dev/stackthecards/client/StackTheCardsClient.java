@@ -1,5 +1,7 @@
 package drai.dev.stackthecards.client;
 
+import drai.dev.stackthecards.*;
+import drai.dev.stackthecards.client.screen.*;
 import drai.dev.stackthecards.models.*;
 import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.*;
@@ -9,6 +11,7 @@ import net.fabricmc.fabric.api.client.model.loading.v1.*;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.client.screen.v1.*;
 import net.minecraft.client.*;
+import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.util.*;
 import net.minecraft.item.*;
 import net.minecraft.text.*;
@@ -34,7 +37,7 @@ public class StackTheCardsClient implements ClientModInitializer {
     public void onInitializeClient() {
         CARD_RENDERER = new CardRenderer();
         CARD_TOOLTIP_RENDERER = new CardTooltipRenderer(CARD_RENDERER);
-
+        HandledScreens.register(StackTheCards.CARD_BINDER_SCREEN_HANDLER, );
         var plugin = new StackTheCardsModelLoadingPlugin();
         PreparableModelLoadingPlugin.register((resourceManager, executor) -> CompletableFuture.completedFuture(resourceManager),
                 plugin::onInitializeModelLoader);

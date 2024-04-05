@@ -9,18 +9,14 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.registry.tag.*;
 import net.minecraft.screen.*;
-import net.minecraft.stat.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import net.minecraft.util.collection.*;
-import net.minecraft.util.hit.*;
-import net.minecraft.util.math.*;
 import net.minecraft.world.*;
-import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-public class CardBinder extends Item implements Inventory, NamedScreenHandlerFactory {
+public class CardBinder extends Item implements Inventory {
     public static final String SLOT_AMOUNT_KEY = "amount_of_slots";
     public static final String CARD_BINDER_DATA_KEY = "CardBinderData";
     private static final String CARD_BINDER_INVENTORY_KEY = "CardBinderInventory";
@@ -60,18 +56,19 @@ public class CardBinder extends Item implements Inventory, NamedScreenHandlerFac
 
     @Override
     public void setStack(int slot, ItemStack stack) {
-        if (stack.isIn(ItemTags.BOOKSHELF_BOOKS)) {
-            this.inventory.set(slot, stack);
-        }
+        this.inventory.set(slot, stack);
     }
     @Override
     public void onOpen(PlayerEntity player) {
         var itemStack = player.getMainHandStack();
-        var nbt = new NbtCompound();
+
         int maxSlots = Card.getCardDataNBT(itemStack, CARD_BINDER_DATA_KEY).getCompound(0).getInt(SLOT_AMOUNT_KEY);
-        size = maxSlots;
+        if(maxSlots != 0){
+            size = maxSlots;
+        }
+        var compound2 = itemStack.getOrCreateNbt().getCompound(CARD_BINDER_INVENTORY_KEY);
         var newInventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
-        Inventories.readNbt(nbt, inventory);
+        Inventories.readNbt(compound2, newInventory);
         inventory = newInventory;
     }
 
@@ -80,6 +77,7 @@ public class CardBinder extends Item implements Inventory, NamedScreenHandlerFac
         var itemStack = player.getMainHandStack();
         var nbt = new NbtCompound();
         Inventories.writeNbt(nbt, inventory, true);
+        itemStack.removeSubNbt(CARD_BINDER_INVENTORY_KEY);
         itemStack.getOrCreateNbt().put(CARD_BINDER_INVENTORY_KEY, nbt);
     }
 
@@ -98,32 +96,10 @@ public class CardBinder extends Item implements Inventory, NamedScreenHandlerFac
         this.inventory.clear();
     }
 
-    @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new CardBinderScreenHandler(syncId, playerInventory, this);
-    }
-
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-        if (!world.isClient) {
-            // Create your custom screen handler
-            NamedScreenHandlerFactory screenHandler = world.getBlockState(player.getBlockPos()).createScreenHandlerFactory(world, player.getBlockPos());
-
-            // Create a SimpleNamedScreenHandlerFactory for your screen handler
-            SimpleNamedScreenHandlerFactory factory = new SimpleNamedScreenHandlerFactory(
-                    (syncId, playerInventory, playerEntity) -> screenHandler,
-                    Text.of("Your Screen Title")
-            );
-
-            // Open the screen for the player
-            player.openHandledScreen(factory);
-        }
-
-        return TypedActionResult.success(player.getStackInHand(hand));
-    }
-
-    @Override
-    public Text getDisplayName() {
-        return null;
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+            user.openHandledScreen(new SimpleNamedScreenHandlerFactory(
+                    (id, inventory, p) -> new CardBinderScreenHandler(id, inventory, this), Text.of("Card Binder")));
+        return TypedActionResult.success(user.getStackInHand(hand));
     }
 }

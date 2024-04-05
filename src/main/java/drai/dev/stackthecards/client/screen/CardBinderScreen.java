@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.util.*;
+import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
 import net.minecraft.screen.*;
 import net.minecraft.text.*;
@@ -14,12 +15,12 @@ import net.minecraft.util.*;
 import net.minecraft.util.collection.*;
 
 @Environment(EnvType.CLIENT)
-public class CardBinderScreen extends Screen {
+public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
     private final DefaultedList<ItemStack> inventory;
     private static int cardsPerPage = 4;
 
-    protected CardBinderScreen(DefaultedList<ItemStack> inventory){
-        super(NarratorManager.EMPTY);
+    public CardBinderScreen(CardBinderScreenHandler handler, PlayerInventory playerInventory, DefaultedList<ItemStack> inventory){
+        super(handler, playerInventory, NarratorManager.EMPTY);
         this.inventory = inventory;
     }
     public static final Identifier BINDER_TEXTURE = new Identifier("stack_the_cards","textures/gui/binder.png");
@@ -65,6 +66,11 @@ public class CardBinderScreen extends Screen {
             context.drawHoverEvent(this.textRenderer, style, mouseX, mouseY);
         }*/
         super.render(context, mouseX, mouseY, delta);
+    }
+
+    @Override
+    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+
     }
 
     /*private StringVisitable getPage(int pageIndex) {

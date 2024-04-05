@@ -1,6 +1,8 @@
 package drai.dev.stackthecards.client.screen;
 
+import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.items.*;
+import drai.dev.stackthecards.registry.Items;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
@@ -11,7 +13,7 @@ import org.jetbrains.annotations.*;
 public class CardBinderScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     public CardBinderScreenHandler(int syncId, PlayerInventory playerInventory, CardBinder cardBinder) {
-        super(syncId, StackTheCards.CARD_BINDER_SCREEN_HANDLER);
+        super(StackTheCards.CARD_BINDER_SCREEN_HANDLER, syncId);
         this.inventory = cardBinder;
 
         inventory.onOpen(playerInventory.player);
@@ -45,10 +47,21 @@ public class CardBinderScreenHandler extends ScreenHandler {
     }
 
     @Override
+    public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
+        if(!stack.isOf(Items.CARD)) return false;
+        return super.canInsertIntoSlot(stack, slot);
+    }
+
+    @Override
+    public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+        super.onSlotClick(slotIndex, button, actionType, player);
+    }
+
+    @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
         ItemStack newStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(invSlot);
-        if (slot != null && slot.hasStack()) {
+        if (slot != null && slot.hasStack() && slot.getStack().isOf(Items.CARD)) {
             ItemStack originalStack = slot.getStack();
             newStack = originalStack.copy();
             if (invSlot < this.inventory.size()) {
