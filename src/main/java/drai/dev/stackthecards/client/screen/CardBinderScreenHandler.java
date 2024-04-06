@@ -111,7 +111,7 @@ public class CardBinderScreenHandler extends ScreenHandler {
 
         @Override
         public void setStack(ItemStack stack) {
-            this.inventory.setStack(getInventoryIndex(), stack, player);
+            this.inventory.setStack(getInventoryIndex(), stack);
         }
 
         @Override
