@@ -39,8 +39,7 @@ public class CardBinderInventory implements Inventory {
         var stack = this.inventory.get(slot);
         ItemStack itemStack = Objects.requireNonNullElse(stack, ItemStack.EMPTY);
         this.inventory.set(slot, ItemStack.EMPTY);*/
-        var stack =Inventories.splitStack(inventory, slot, amount);
-        return stack;
+        return Inventories.splitStack(inventory, slot, amount);
     }
 
     @Override
