@@ -18,24 +18,21 @@ public class CardBinderScreenHandler extends ScreenHandler {
     public CardBinderScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(StackTheCards.CARD_BINDER_SCREEN_HANDLER, syncId);
         this.inventory = new CardBinderInventory();
-
         inventory.onOpen(playerInventory.player);
-
         //This will place the slot in the correct locations for a 3x3 Grid. The slots exist on both server and client!
         //This will not render the background of the slots however, this is the Screens job
-        int i = (3 - 4) * 18;
         int m;
         int l;
         //The player inventory
         for (m = 0; m < 3; ++m) {
             for (l = 0; l < 9; ++l) {
-                var slot = new Slot(playerInventory, l + m * 9 + 9, 8 + l * 18, 103 + m * 18+i);
+                var slot = new Slot(playerInventory, l + m * 9 + 9, 133 + l * 18, 219-(18*2) + m * 18);
                 this.addSlot(slot);
             }
         }
 
         for (m = 0; m < CardBinder.MAX_CARDS_PER_PAGE; ++m) {
-                var slot = new CardItemSlot(inventory, m, 62 + m * 18, 17 /*+ m * 18*/);
+                var slot = new CardItemSlot(inventory, m, 62 + m * 18, 83);
                 this.addSlot(slot);
                 cardSlots.add(slot);
         }
