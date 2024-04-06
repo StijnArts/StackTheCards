@@ -1,5 +1,6 @@
 package drai.dev.stackthecards.client.screen;
 
+import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.items.*;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.item.v1.*;
@@ -27,14 +28,12 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
     public CardBinderScreen(CardBinderScreenHandler handler, PlayerInventory playerInventory, Text text){
         super(handler, playerInventory, text);
         this.inventory = new CardBinderInventory().getInventory();
-        handler.setPageIndex(0, cardsPerPage, getPageCount());
     }
     public static final Identifier BINDER_TEXTURE = new Identifier("stack_the_cards","textures/gui/binder.png");
     protected static final int MAX_TEXT_WIDTH = 114;
     protected static final int MAX_TEXT_HEIGHT = 128;
     protected static final int WIDTH = 192;
     protected static final int HEIGHT = 192;
-    private int pageIndex;
 
     public PageTurnWidget nextPageButton;
     public PageTurnWidget previousPageButton;
@@ -80,28 +79,13 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
 
     }
 
-    /*private StringVisitable getPage(int pageIndex) {
-        if (pageIndex >= 0 && pageIndex < this.getPageCount()) {
-            String string = this.pages.get(pageIndex);
-            try {
-                MutableText stringVisitable = Text.Serializer.fromJson(string);
-                if (stringVisitable != null) {
-                    return stringVisitable;
-                }
-            } catch (Exception exception) {
-                // empty catch block
-            }
-            return StringVisitable.plain(string);
-        }
-        return StringVisitable.EMPTY;
-    }*/
-
     private int getPageCount() {
         int leftOvers = inventory.size()%cardsPerPage;
         return inventory.size()/cardsPerPage + (leftOvers > 0 ? 1 : 0);
     }
 
     protected void addPageButtons() {
+        StackTheCardsClient.PAGE_INDEX = Math.min(StackTheCardsClient.PAGE_INDEX, this.getPageCount()-1);
         int i = (this.width - 192) / 2;
         int j = 2;
         this.nextPageButton = this.addDrawableChild(new PageTurnWidget(i + 116, 159, true, button -> this.goToNextPage(), true));
@@ -110,23 +94,22 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
     }
 
     protected void goToPreviousPage() {
-        if (this.pageIndex > 0) {
-            --this.pageIndex;
+        if (StackTheCardsClient.PAGE_INDEX > 0) {
+            --StackTheCardsClient.PAGE_INDEX;
         }
         this.updatePageButtons();
     }
 
     protected void goToNextPage() {
-        if (this.pageIndex < this.getPageCount() - 1) {
-            ++this.pageIndex;
+        if (StackTheCardsClient.PAGE_INDEX < this.getPageCount() - 1) {
+            ++StackTheCardsClient.PAGE_INDEX;
         }
         this.updatePageButtons();
     }
 
     private void updatePageButtons() {
-        this.nextPageButton.visible = this.pageIndex < this.getPageCount() - 1;
-        this.previousPageButton.visible = this.pageIndex > 0;
-        handler.setPageIndex(this.pageIndex, cardsPerPage, getPageCount());
+        this.nextPageButton.visible = StackTheCardsClient.PAGE_INDEX < this.getPageCount() - 1;
+        this.previousPageButton.visible = StackTheCardsClient.PAGE_INDEX > 0;
     }
 
     @Override

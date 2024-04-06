@@ -93,6 +93,9 @@ public class StackTheCardsClient implements ClientModInitializer {
             shiftKeyReleased = false;
         }
     }
+
+    public static int PAGE_INDEX = 0;
+
     public static int getScrollModifier(){
         return scrollModifier * 5;
     }

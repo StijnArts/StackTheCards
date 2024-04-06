@@ -20,7 +20,7 @@ public class CardBinderInventory implements Inventory {
 
     @Override
     public int size() {
-        return size;
+        return CardBinder.MAX_CARDS_PER_PAGE;
     }
 
     @Override

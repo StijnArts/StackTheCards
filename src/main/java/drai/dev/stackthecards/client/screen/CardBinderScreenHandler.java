@@ -1,6 +1,7 @@
 package drai.dev.stackthecards.client.screen;
 
 import drai.dev.stackthecards.*;
+import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.Items;
 import net.minecraft.entity.player.*;
@@ -14,7 +15,6 @@ import java.util.*;
 public class CardBinderScreenHandler extends ScreenHandler {
     private final CardBinderInventory inventory;
     private final List<CardItemSlot> cardSlots = new ArrayList<>();
-
     public CardBinderScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(StackTheCards.CARD_BINDER_SCREEN_HANDLER, syncId);
         this.inventory = new CardBinderInventory();
@@ -35,7 +35,7 @@ public class CardBinderScreenHandler extends ScreenHandler {
         }
 
         for (m = 0; m < CardBinder.MAX_CARDS_PER_PAGE; ++m) {
-                var slot = new CardItemSlot(inventory, m, 62 + m * 18, 17 /*+ m * 18*/, playerInventory.player);
+                var slot = new CardItemSlot(inventory, m, 62 + m * 18, 17 /*+ m * 18*/);
                 this.addSlot(slot);
                 cardSlots.add(slot);
         }
@@ -82,22 +82,11 @@ public class CardBinderScreenHandler extends ScreenHandler {
         return this.inventory.canPlayerUse(player);
     }
 
-    public void setPageIndex(int pageIndex, int maxCardsPerPage, int pageCount) {
-//        this.pageIndex = pageIndex;
-
-        cardSlots.forEach(cardItemSlot -> {
-            cardItemSlot.setPageIndex(pageIndex, maxCardsPerPage);
-        });
-    }
-
     public static class CardItemSlot extends Slot {
-        private final PlayerEntity player;
-        private int pageIndex;
         private int cardsPerPage = CardBinder.MAX_CARDS_PER_PAGE;
 
-        public CardItemSlot(CardBinderInventory inventory, int index, int x, int y, PlayerEntity player) {
+        public CardItemSlot(CardBinderInventory inventory, int index, int x, int y) {
             super(inventory, index, x, y);
-            this.player = player;
         }
 
         @Override
@@ -115,30 +104,26 @@ public class CardBinderScreenHandler extends ScreenHandler {
         }
 
         @Override
-        protected void onTake(int amount) {
-            super.onTake(amount);
-        }
-
-        @Override
         public ItemStack takeStack(int amount) {
             var stack = this.inventory.removeStack(getInventoryIndex(), amount);
             return stack;
         }
 
+        @Override
+        public void setStackNoCallbacks(ItemStack stack) {
+            this.inventory.setStack(getInventoryIndex(), stack);
+            this.markDirty();
+        }
+
         public int getInventoryIndex(){
             var index = getIndex();
-            var inventoryIndex = index %cardsPerPage + cardsPerPage * pageIndex;
+            var inventoryIndex = index %cardsPerPage + cardsPerPage * StackTheCardsClient.PAGE_INDEX;
             return inventoryIndex;
         }
 
         @Override
         public boolean canInsert(ItemStack stack) {
             return stack.isOf(Items.CARD);
-        }
-
-        public void setPageIndex(int pageIndex, int cardsPerPage) {
-            this.pageIndex = pageIndex;
-            this.cardsPerPage = cardsPerPage;
         }
 
         @Override
@@ -157,6 +142,35 @@ public class CardBinderScreenHandler extends ScreenHandler {
                 this.setStack(ItemStack.EMPTY);
             }
             return Optional.of(itemStack);
+        }
+
+        @Override
+        public ItemStack takeStackRange(int min, int max, PlayerEntity player) {
+            Optional<ItemStack> optional = this.tryTakeStackRange(min, max, player);
+            optional.ifPresent(stack -> this.onTakeItem(player, (ItemStack)stack));
+            return optional.orElse(ItemStack.EMPTY);
+        }
+
+        @Override
+        public ItemStack insertStack(ItemStack stack) {
+            return this.insertStack(stack, stack.getCount());
+        }
+
+        @Override
+        public ItemStack insertStack(ItemStack stack, int count) {
+            if (stack.isEmpty() || !this.canInsert(stack)) {
+                return stack;
+            }
+            ItemStack itemStack = this.getStack();
+            int i = Math.min(Math.min(count, stack.getCount()), this.getMaxItemCount(stack) - itemStack.getCount());
+            if (itemStack.isEmpty()) {
+                this.setStack(stack.split(i));
+            } else if (ItemStack.canCombine(itemStack, stack)) {
+                stack.decrement(i);
+                itemStack.increment(i);
+                this.setStack(itemStack);
+            }
+            return stack;
         }
     }
 }
