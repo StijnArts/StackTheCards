@@ -33,8 +33,8 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
     public static final Identifier BINDER_TEXTURE = new Identifier("stack_the_cards","textures/gui/binder.png");
     protected static final int MAX_TEXT_WIDTH = 114;
     protected static final int MAX_TEXT_HEIGHT = 128;
-    protected static final int WIDTH = 192;
-    protected static final int HEIGHT = 192;
+    protected static final int WIDTH = 256;
+    protected static final int HEIGHT = 256;
 
     public PageTurnWidget nextPageButton;
     public PageTurnWidget previousPageButton;
@@ -47,9 +47,9 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context);
-        int i = (this.width - 192) / 2;
+        int i = (this.width - 256) / 2;
         int j = 2;
-        context.drawTexture(BINDER_TEXTURE, i, 2, 0, 0, 192, 192);
+        context.drawTexture(BINDER_TEXTURE, i, 2, 0, 0, 256, 256);
         //TODO draw card cells
 //        final MultilineText multilineText = MultilineText.create(textRenderer, Text.literal("The text is pretty long ".repeat(20)), width - 20);
 //        multilineText.drawWithShadow(context, 10, height / 2, 16, 0xffffff);
@@ -87,10 +87,10 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
 
     protected void addPageButtons() {
         StackTheCardsClient.PAGE_INDEX = Math.min(StackTheCardsClient.PAGE_INDEX, this.getPageCount()-1);
-        int i = (this.width - 192) / 2;
+        int i = (this.width - 256) / 2;
         int j = 2;
-        this.nextPageButton = this.addDrawableChild(new PageTurnWidget(i + 116, 159, true, button -> this.goToNextPage(), true));
-        this.previousPageButton = this.addDrawableChild(new PageTurnWidget(i + 43, 159, false, button -> this.goToPreviousPage(), true));
+        this.nextPageButton = this.addDrawableChild(new PageTurnWidget(i + 233, 175, true, button -> this.goToNextPage(), true));
+        this.previousPageButton = this.addDrawableChild(new PageTurnWidget(i, 175, false, button -> this.goToPreviousPage(), true));
         this.updatePageButtons();
     }
 
