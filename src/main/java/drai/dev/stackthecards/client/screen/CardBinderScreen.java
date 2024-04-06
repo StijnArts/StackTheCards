@@ -4,6 +4,7 @@ import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.items.*;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.item.v1.*;
+import net.minecraft.block.entity.*;
 import net.minecraft.client.font.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.*;

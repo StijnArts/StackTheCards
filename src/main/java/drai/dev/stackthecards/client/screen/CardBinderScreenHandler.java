@@ -32,7 +32,7 @@ public class CardBinderScreenHandler extends ScreenHandler {
         }
 
         for (m = 0; m < CardBinder.MAX_CARDS_PER_PAGE; ++m) {
-                var slot = new CardItemSlot(inventory, m, 62 + m * 18, 83);
+            var slot = new CardItemSlot(inventory, m, 62 + m * 18, 83);
                 this.addSlot(slot);
                 cardSlots.add(slot);
         }
