@@ -3,16 +3,18 @@ package drai.dev.stackthecards.client.screen;
 import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.Items;
-import net.fabricmc.fabric.api.item.v1.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.*;
-import org.jetbrains.annotations.*;
+
+import java.util.*;
 
 public class CardBinderScreenHandler extends ScreenHandler {
-    private final Inventory inventory;
+    private final CardBinderInventory inventory;
+    private final List<CardItemSlot> cardSlots = new ArrayList<>();
+
     public CardBinderScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(StackTheCards.CARD_BINDER_SCREEN_HANDLER, syncId);
         this.inventory = new CardBinderInventory();
@@ -21,19 +23,21 @@ public class CardBinderScreenHandler extends ScreenHandler {
 
         //This will place the slot in the correct locations for a 3x3 Grid. The slots exist on both server and client!
         //This will not render the background of the slots however, this is the Screens job
+        int i = (3 - 4) * 18;
         int m;
         int l;
-        //Our inventory
-        for (m = 0; m < 3; ++m) {
-            for (l = 0; l < 3; ++l) {
-                this.addSlot(new Slot(inventory, l + m * 3, 62 + l * 18, 17 + m * 18));
-            }
-        }
         //The player inventory
         for (m = 0; m < 3; ++m) {
             for (l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + m * 9 + 9, 8 + l * 18, 84 + m * 18));
+                var slot = new Slot(playerInventory, l + m * 9 + 9, 8 + l * 18, 103 + m * 18+i);
+                this.addSlot(slot);
             }
+        }
+
+        for (m = 0; m < CardBinder.MAX_CARDS_PER_PAGE; ++m) {
+                var slot = new CardItemSlot(inventory, m, 62 + m * 18, 17 /*+ m * 18*/, playerInventory.player);
+                this.addSlot(slot);
+                cardSlots.add(slot);
         }
     }
 
@@ -41,12 +45,6 @@ public class CardBinderScreenHandler extends ScreenHandler {
     public void onClosed(PlayerEntity player) {
         inventory.onClose(player);
         super.onClosed(player);
-    }
-
-    @Override
-    public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
-        if(!stack.isOf(Items.CARD)) return false;
-        return super.canInsertIntoSlot(stack, slot);
     }
 
     @Override
@@ -82,5 +80,83 @@ public class CardBinderScreenHandler extends ScreenHandler {
     @Override
     public boolean canUse(PlayerEntity player) {
         return this.inventory.canPlayerUse(player);
+    }
+
+    public void setPageIndex(int pageIndex, int maxCardsPerPage, int pageCount) {
+//        this.pageIndex = pageIndex;
+
+        cardSlots.forEach(cardItemSlot -> {
+            cardItemSlot.setPageIndex(pageIndex, maxCardsPerPage);
+        });
+    }
+
+    public static class CardItemSlot extends Slot {
+        private final PlayerEntity player;
+        private int pageIndex;
+        private int cardsPerPage = CardBinder.MAX_CARDS_PER_PAGE;
+
+        public CardItemSlot(CardBinderInventory inventory, int index, int x, int y, PlayerEntity player) {
+            super(inventory, index, x, y);
+            this.player = player;
+        }
+
+        @Override
+        public ItemStack getStack(){
+            try{
+                return inventory.getStack(getInventoryIndex());
+            } catch (Exception e){
+                return ItemStack.EMPTY;
+            }
+        }
+
+        @Override
+        public void setStack(ItemStack stack) {
+            this.inventory.setStack(getInventoryIndex(), stack, player);
+        }
+
+        @Override
+        protected void onTake(int amount) {
+            super.onTake(amount);
+        }
+
+        @Override
+        public ItemStack takeStack(int amount) {
+            var stack = this.inventory.removeStack(getInventoryIndex(), amount);
+            return stack;
+        }
+
+        public int getInventoryIndex(){
+            var index = getIndex();
+            var inventoryIndex = index %cardsPerPage + cardsPerPage * pageIndex;
+            return inventoryIndex;
+        }
+
+        @Override
+        public boolean canInsert(ItemStack stack) {
+            return stack.isOf(Items.CARD);
+        }
+
+        public void setPageIndex(int pageIndex, int cardsPerPage) {
+            this.pageIndex = pageIndex;
+            this.cardsPerPage = cardsPerPage;
+        }
+
+        @Override
+        public Optional<ItemStack> tryTakeStackRange(int min, int max, PlayerEntity player) {
+            if (!this.canTakeItems(player)) {
+                return Optional.empty();
+            }
+            if (!this.canTakePartial(player) && max < this.getStack().getCount()) {
+                return Optional.empty();
+            }
+            ItemStack itemStack = this.takeStack(min = Math.min(min, max));
+            if (itemStack.isEmpty()) {
+                return Optional.empty();
+            }
+            if (this.getStack().isEmpty()) {
+                this.setStack(ItemStack.EMPTY);
+            }
+            return Optional.of(itemStack);
+        }
     }
 }

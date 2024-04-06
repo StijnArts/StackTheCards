@@ -7,6 +7,7 @@ import net.minecraft.client.font.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.client.gui.tooltip.*;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.util.*;
 import net.minecraft.entity.player.*;
@@ -16,14 +17,17 @@ import net.minecraft.text.*;
 import net.minecraft.util.*;
 import net.minecraft.util.collection.*;
 
+import static drai.dev.stackthecards.items.CardBinder.MAX_CARDS_PER_PAGE;
+
 @Environment(EnvType.CLIENT)
 public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
     private final DefaultedList<ItemStack> inventory;
-    private static int cardsPerPage = 4;
+    private static int cardsPerPage = MAX_CARDS_PER_PAGE;
 
     public CardBinderScreen(CardBinderScreenHandler handler, PlayerInventory playerInventory, Text text){
         super(handler, playerInventory, text);
         this.inventory = new CardBinderInventory().getInventory();
+        handler.setPageIndex(0, cardsPerPage, getPageCount());
     }
     public static final Identifier BINDER_TEXTURE = new Identifier("stack_the_cards","textures/gui/binder.png");
     protected static final int MAX_TEXT_WIDTH = 114;
@@ -37,7 +41,6 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
 
     @Override
     protected void init() {
-        this.addCloseButton();
         this.addPageButtons();
     }
 
@@ -48,8 +51,8 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
         int j = 2;
         context.drawTexture(BINDER_TEXTURE, i, 2, 0, 0, 192, 192);
         //TODO draw card cells
-        final MultilineText multilineText = MultilineText.create(textRenderer, Text.literal("The text is pretty long ".repeat(20)), width - 20);
-        multilineText.drawWithShadow(context, 10, height / 2, 16, 0xffffff);
+//        final MultilineText multilineText = MultilineText.create(textRenderer, Text.literal("The text is pretty long ".repeat(20)), width - 20);
+//        multilineText.drawWithShadow(context, 10, height / 2, 16, 0xffffff);
         /*if (this.cachedPageIndex != this.pageIndex) {
             StringVisitable stringVisitable = getPage(this.pageIndex);
             this.cachedPage = this.textRenderer.wrapLines(stringVisitable, 114);
@@ -68,6 +71,8 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
             context.drawHoverEvent(this.textRenderer, style, mouseX, mouseY);
         }*/
         super.render(context, mouseX, mouseY, delta);
+//        var itemStack = ((ScreenHandler)this.handler).getCursorStack();
+        this.drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
     @Override
@@ -118,13 +123,10 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
         this.updatePageButtons();
     }
 
-    protected void addCloseButton() {
-        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close()).dimensions(this.width / 2 - 100, 196, 200, 20).build());
-    }
-
     private void updatePageButtons() {
         this.nextPageButton.visible = this.pageIndex < this.getPageCount() - 1;
         this.previousPageButton.visible = this.pageIndex > 0;
+        handler.setPageIndex(this.pageIndex, cardsPerPage, getPageCount());
     }
 
     @Override

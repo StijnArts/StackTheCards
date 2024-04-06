@@ -18,6 +18,8 @@ import java.util.*;
 
 public class CardBinder extends Item {
 
+    public static final int MAX_CARDS_PER_PAGE = 4;
+
     public CardBinder(Settings settings) {
         super(settings);
     }
@@ -25,10 +27,9 @@ public class CardBinder extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if(!world.isClient){
-
-        }
             user.openHandledScreen(new SimpleNamedScreenHandlerFactory(
                     (id, inventory, p) -> new CardBinderScreenHandler(id, inventory), Text.of("Card Binder")));
+        }
         return TypedActionResult.success(user.getStackInHand(hand));
     }
 }

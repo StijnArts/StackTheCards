@@ -1,9 +1,11 @@
 package drai.dev.stackthecards.items;
 
+import drai.dev.stackthecards.registry.Items;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
+import net.minecraft.registry.tag.*;
 import net.minecraft.util.collection.*;
 
 import java.util.*;
@@ -33,9 +35,12 @@ public class CardBinderInventory implements Inventory {
 
     @Override
     public ItemStack removeStack(int slot, int amount) {
-        ItemStack itemStack = Objects.requireNonNullElse(this.inventory.get(slot), ItemStack.EMPTY);
-        this.inventory.set(slot, ItemStack.EMPTY);
-        return itemStack;
+        /*ItemStack itemStack = Inventories.splitStack(inventory, slot, amount);
+        var stack = this.inventory.get(slot);
+        ItemStack itemStack = Objects.requireNonNullElse(stack, ItemStack.EMPTY);
+        this.inventory.set(slot, ItemStack.EMPTY);*/
+        var stack =Inventories.splitStack(inventory, slot, amount);
+        return stack;
     }
 
     @Override
@@ -47,6 +52,7 @@ public class CardBinderInventory implements Inventory {
     public void setStack(int slot, ItemStack stack) {
         this.inventory.set(slot, stack);
     }
+
     @Override
     public void onOpen(PlayerEntity player) {
         var itemStack = player.getMainHandStack();
