@@ -23,7 +23,7 @@ public class CardPackItem extends Item {
         var cardsToDrop = pullResult.getPulledCards();
         var itemsToDrop = pullResult.getPulledItems();
         if(!world.isClient){
-            world.playSound(null, user.getBlockPos(), PACK_RIP, SoundCategory.PLAYERS, 0.8f, 1.3f);
+            world.playSound(null, user.getBlockPos(), PACK_RIP, SoundCategory.PLAYERS, 0.4f, 0.9f);
         }
         for (var card : cardsToDrop) {
             user.dropStack(Card.getAsItemStack(card), 1F);

@@ -41,6 +41,9 @@ public class StackTheCards implements ModInitializer {
     public static final RecipeSerializer<CardBinderCustomizationRecipe> CUSTOM_BINDER =
             Registry.register(Registries.RECIPE_SERIALIZER, new Identifier("stack_the_cards", "custom_card_binder"),
                     new SpecialRecipeSerializer<CardBinderCustomizationRecipe>(CardBinderCustomizationRecipe::new));
+    public static final RecipeSerializer<CardPackMultiplierRecipe> PACK_MULTIPLYING_RECIPE =
+            Registry.register(Registries.RECIPE_SERIALIZER, new Identifier("stack_the_cards", "pack_multiplying"),
+                    new SpecialRecipeSerializer<CardPackMultiplierRecipe>(CardPackMultiplierRecipe::new));
     /**
      * Runs the mod initializer.
      */
