@@ -70,4 +70,9 @@ public class GameCardPack extends CardPack{
     public String getPackTextureLocation() {
         return gameId + "/" + packId;
     }
+
+    @Override
+    public int getCountInGroup() {
+        return getCardGame().getCards().size();
+    }
 }

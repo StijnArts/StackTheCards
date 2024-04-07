@@ -1,7 +1,6 @@
 package drai.dev.stackthecards.items;
 
 import drai.dev.stackthecards.data.cardpacks.*;
-import drai.dev.stackthecards.registry.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
 import net.minecraft.registry.*;
@@ -10,7 +9,8 @@ import net.minecraft.util.*;
 import net.minecraft.world.*;
 
 public class CardPackItem extends Item {
-    private CardPack cardPack = new CardPack("pokemon_tcg", "base", "base");
+    public static final Identifier PACK_RIP_IDENTIFIER = new Identifier("stack_the_cards", "pack_rip");
+    public static SoundEvent PACK_RIP = SoundEvent.of(PACK_RIP_IDENTIFIER);
     public CardPackItem(Settings settings) {
         super(settings);
     }
@@ -22,6 +22,9 @@ public class CardPackItem extends Item {
         var pullResult = cardPack.pull();
         var cardsToDrop = pullResult.getPulledCards();
         var itemsToDrop = pullResult.getPulledItems();
+        if(!world.isClient){
+            world.playSound(null, user.getBlockPos(), PACK_RIP, SoundCategory.PLAYERS, 0.8f, 1.3f);
+        }
         for (var card : cardsToDrop) {
             user.dropStack(Card.getAsItemStack(card), 1F);
         }

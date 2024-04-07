@@ -6,19 +6,18 @@
   "mixins": [
     "ItemFrameEntityMixin",
     "ItemStackMixin",
-    "LootPoolMixin",
-    "ScreenHandlerMixin"
+    "LootPoolMixin"
   ],
   "client": [
-    "BakedModelManagerMixin",
-    "DrawContextMixin",
+    "client.BakedModelManagerMixin",
+    "client.DrawContextMixin",
     "HandledScreenMixin",
-    "HeldItemRendererMixin",
-    "ItemFrameEntityRendererMixin",
-    "ItemRendererMixin",
+    "client.HeldItemRendererMixin",
+    "client.ItemFrameEntityRendererMixin",
+    "client.ItemRendererMixin",
     "KeyboardMixin",
     "OrderedTextComponentRenderer",
-    "TooltipBackgroundRendererMixin"
+    "client.TooltipBackgroundRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

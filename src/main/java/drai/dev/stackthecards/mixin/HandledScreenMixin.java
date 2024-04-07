@@ -1,7 +1,7 @@
 package drai.dev.stackthecards.mixin;
 
 import drai.dev.stackthecards.client.*;
-import drai.dev.stackthecards.tooltips.*;
+import drai.dev.stackthecards.extensions.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.item.*;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
 
 @Mixin(HandledScreen.class)
-public class HandledScreenMixin {
+public class HandledScreenMixin{
     @Final
     @Shadow
     protected ScreenHandler handler;
@@ -47,5 +47,4 @@ public class HandledScreenMixin {
         extensions.setMouseY(mouseY);
         extensions.setMouseX(mouseX);
     }
-
 }

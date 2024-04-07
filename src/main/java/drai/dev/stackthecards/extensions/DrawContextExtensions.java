@@ -1,4 +1,4 @@
-package drai.dev.stackthecards.tooltips;
+package drai.dev.stackthecards.extensions;
 
 /**
  * Provides access to the {@link net.minecraft.client.gui.DrawContext} methods added by the mod.

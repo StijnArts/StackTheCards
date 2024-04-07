@@ -1,31 +1,19 @@
-package drai.dev.stackthecards.mixin;
+package drai.dev.stackthecards.mixin.client;
 
-import com.llamalad7.mixinextras.sugar.*;
-import com.llamalad7.mixinextras.sugar.ref.*;
 import drai.dev.stackthecards.client.*;
-import drai.dev.stackthecards.items.*;
-import drai.dev.stackthecards.registry.*;
-import drai.dev.stackthecards.registry.Items;
+import drai.dev.stackthecards.extensions.*;
 import drai.dev.stackthecards.tooltips.*;
 import net.minecraft.client.font.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.tooltip.*;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.render.model.json.*;
-import net.minecraft.entity.*;
-import net.minecraft.item.*;
-import net.minecraft.text.*;
-import net.minecraft.world.*;
 import org.joml.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.*;
-import org.spongepowered.asm.mixin.injection.invoke.arg.*;
 
 import java.util.*;
 
 @Mixin(DrawContext.class)
-public abstract class DrawContextMixin implements DrawContextExtensions{
+public abstract class DrawContextMixin implements DrawContextExtensions {
 
     @Shadow @Deprecated public abstract void draw(Runnable drawCallback);
 
