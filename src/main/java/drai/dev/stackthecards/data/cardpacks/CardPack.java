@@ -289,7 +289,7 @@ public class CardPack {
         return new Identifier("stack_the_cards", "stc_cards/packs/fallback");
     }
 
-    private CardGame getCardGame() {
+    public CardGame getCardGame() {
         var cardGame = CardGameRegistry.getCardGame(gameId);
         if(cardGame != null){
             return cardGame;
@@ -376,5 +376,9 @@ public class CardPack {
         } else if(pulledObject instanceof Identifier identifier){
             pullResult.pulledItems.add(identifier);
         }
+    }
+
+    public int getCountInGroup() {
+        return getCardSet().getCards().size();
     }
 }

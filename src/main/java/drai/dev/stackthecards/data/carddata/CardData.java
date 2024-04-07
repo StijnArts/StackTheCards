@@ -249,4 +249,8 @@ public class CardData {
     public Identifier getFallbackModel() {
         return new Identifier("stack_the_cards", "stc_cards/backs/fallback");
     }
+
+    public int getCountInGroup() {
+        return getCardSet().getCards().size();
+    }
 }

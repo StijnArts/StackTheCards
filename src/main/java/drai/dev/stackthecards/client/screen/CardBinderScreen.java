@@ -28,16 +28,21 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
 
     public CardBinderScreen(CardBinderScreenHandler handler, PlayerInventory playerInventory, Text text){
         super(handler, playerInventory, text);
-        this.inventory = new CardBinderInventory(playerInventory.player).getInventory();
+        var cardBinderInventory = new CardBinderInventory(playerInventory.player);
+        this.inventory = cardBinderInventory.getInventory();
+        BINDER_TEXTURE = new Identifier("stack_the_cards", "textures/gui/binder"+cardBinderInventory.getColorAffix(playerInventory.player)+".png");
+        BINDER_CARD_SLOT = new Identifier("stack_the_cards", "textures/gui/binder_slot.png");
+        BINDER_TIES = new Identifier("stack_the_cards", "textures/gui/binder_binds.png");
     }
-    public static final Identifier BINDER_TEXTURE = new Identifier("stack_the_cards","textures/gui/binder.png");
+    public final Identifier BINDER_TEXTURE;
+    public final Identifier BINDER_CARD_SLOT;
+    public final Identifier BINDER_TIES;
 
     public PageTurnWidget nextPageButton;
     public PageTurnWidget previousPageButton;
 
     @Override
     protected void init() {
-        var heightUnit = height/backgroundHeight;
         this.backgroundHeight = 256;
         this.backgroundWidth = 256;
         playerInventoryTitleY = this.backgroundHeight - 84;
@@ -60,58 +65,40 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
         int x = (int) getXOrigin();
         int y = (int) getYOrigin();
         context.drawTexture(BINDER_TEXTURE, x, y, 0, 0, 256, 256);
-        //TODO draw card cells
-//        final MultilineText multilineText = MultilineText.create(textRenderer, Text.literal("The text is pretty long ".repeat(20)), width - 20);
-//        multilineText.drawWithShadow(context, 10, height / 2, 16, 0xffffff);
-
-
-        super.render(context, mouseX, mouseY, delta);
         RenderSystem.disableDepthTest();
-//        var itemStack = ((ScreenHandler)this.handler).getCursorStack();
-        this.drawMouseoverTooltip(context, mouseX, mouseY);
         var matrices = context.getMatrices();
         matrices.push();
-        matrices.translate(this.x+9, this.y, 300);
+        matrices.translate(this.x+9, this.y+14, 100);
         var slots = handler.cardSlots;
-        matrices.translate(0,14,0);
         int slotIndex = 0;
         for (int page = 0; page < 2; page++) {
             for (int j = 0; j < 2; ++j) {
                 for (int i = 0; i < 2; i++) {
-                    matrices.translate(54 * i + (132*page),73*j,0);
-                    var stack1 = slots.get(slotIndex).getStack();
+                    var slot = slots.get(slotIndex);
+                    if(!slot.isEnabled()){
+                        slotIndex++;
+                        continue;
+                    }
+                    matrices.push();
+                    context.drawTexture(BINDER_CARD_SLOT, 54 * i + (132*page),73*j, 0, 0, 52, 71, 52, 71);
+                    context.drawTexture(BINDER_TIES, 54 * i + (132*page),73*j-1, 0, 0, 52, 54, 52, 54);
+
+                    var stack1 = slot.getStack();
+                    matrices.translate(54 * i + (132*page),73*j,200);
                     if(!stack1.isEmpty()){
                         StackTheCardsClient.CARD_RENDERER.draw(matrices, context.getVertexConsumers(), stack1, 15728880, 52/(float)128);
                     }
                     matrices.scale(0.5f,0.5f, 0);
                     context.drawText(textRenderer,Text.literal(slotIndex % MAX_CARDS_PER_PAGE + MAX_CARDS_PER_PAGE * StackTheCardsClient.PAGE_INDEX + 1 + ""),
                             74, 110, Formatting.BLACK.getColorValue(), false);
-                    matrices.scale(2f,2f, 0);
-                    matrices.translate((54 * i + (132 * page)) * -1,73*j*-1,0);
+                    matrices.pop();
                     slotIndex++;
                 }
             }
         }
-
-
-        /*var stack2 = slots.get(1).getStack();
-        if(!stack2.isEmpty()){
-            matrices.translate(54,0,0);
-            StackTheCardsClient.CARD_RENDERER.draw(matrices, context.getVertexConsumers(), stack2, 15728880, 52/(float)128);
-            matrices.translate(-54,0,0);
-        }
-        var stack3 = slots.get(2).getStack();
-        if(!stack3.isEmpty()){
-            matrices.translate(132,0,0);
-            StackTheCardsClient.CARD_RENDERER.draw(matrices, context.getVertexConsumers(), stack3, 15728880, 52/(float)128);
-            matrices.translate(-132,0,0);
-        }
-        var stack4 = slots.get(3).getStack();
-        if(!stack4.isEmpty()){
-            matrices.translate(186,0,0);
-            StackTheCardsClient.CARD_RENDERER.draw(matrices, context.getVertexConsumers(), stack4, 15728880, 52/(float)128);
-            matrices.translate(-186,0,0);
-        }*/
+        matrices.pop();
+        super.render(context, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
     @Override
@@ -148,6 +135,7 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
     }
 
     private void updatePageButtons() {
+        this.handler.checkEnabledSlots();
         this.nextPageButton.visible = StackTheCardsClient.PAGE_INDEX < this.getPageCount() - 1;
         this.previousPageButton.visible = StackTheCardsClient.PAGE_INDEX > 0;
     }

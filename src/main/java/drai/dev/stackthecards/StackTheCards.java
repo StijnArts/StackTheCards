@@ -5,11 +5,13 @@ import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.items.*;
+import drai.dev.stackthecards.recipes.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.registry.Items;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.resource.*;
 import net.fabricmc.fabric.api.screenhandler.v1.*;
+import net.minecraft.recipe.*;
 import net.minecraft.registry.*;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.*;
@@ -30,6 +32,15 @@ public class StackTheCards implements ModInitializer {
         CARD_BINDER_SCREEN_HANDLER =  Registry.register(Registries.SCREEN_HANDLER, new Identifier("stack_the_cards", "card_binder_screen"),
                 new ScreenHandlerType<>(CardBinderScreenHandler::new, FeatureFlags.VANILLA_FEATURES) );
     }
+    public static final RecipeSerializer<CardBinderColoringRecipe> BINDER_COLORING =
+            Registry.register(Registries.RECIPE_SERIALIZER, new Identifier("stack_the_cards", "color_card_binder"),
+                    new SpecialRecipeSerializer<CardBinderColoringRecipe>(CardBinderColoringRecipe::new));
+    public static final RecipeSerializer<CardBinderRemoveCustomizationRecipe> BINDER_REMOVE_CUSTOM =
+            Registry.register(Registries.RECIPE_SERIALIZER, new Identifier("stack_the_cards", "remove_custom_card_binder"),
+                    new SpecialRecipeSerializer<CardBinderRemoveCustomizationRecipe>(CardBinderRemoveCustomizationRecipe::new));
+    public static final RecipeSerializer<CardBinderCustomizationRecipe> CUSTOM_BINDER =
+            Registry.register(Registries.RECIPE_SERIALIZER, new Identifier("stack_the_cards", "custom_card_binder"),
+                    new SpecialRecipeSerializer<CardBinderCustomizationRecipe>(CardBinderCustomizationRecipe::new));
     /**
      * Runs the mod initializer.
      */

@@ -1,4 +1,4 @@
-package drai.dev.stackthecards.mixin;
+package drai.dev.stackthecards.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.*;
 import com.llamalad7.mixinextras.sugar.ref.*;

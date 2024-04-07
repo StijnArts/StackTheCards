@@ -3,6 +3,7 @@ package drai.dev.stackthecards.util;
 
 import net.fabricmc.api.*;
 import net.minecraft.client.util.*;
+import net.minecraft.recipe.*;
 import org.jetbrains.annotations.*;
 import org.lwjgl.glfw.*;
 

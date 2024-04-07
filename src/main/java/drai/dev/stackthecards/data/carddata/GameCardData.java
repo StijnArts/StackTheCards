@@ -22,4 +22,9 @@ public class GameCardData extends CardData{
     public String getCardTextureLocation() {
         return gameId + "/" + cardId;
     }
+
+    @Override
+    public int getCountInGroup() {
+        return getCardGame().cards.size();
+    }
 }

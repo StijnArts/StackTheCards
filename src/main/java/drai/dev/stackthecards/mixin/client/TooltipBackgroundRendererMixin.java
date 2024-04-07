@@ -1,4 +1,4 @@
-package drai.dev.stackthecards.mixin;
+package drai.dev.stackthecards.mixin.client;
 
 import drai.dev.stackthecards.extensions.*;
 import net.minecraft.client.gui.*;

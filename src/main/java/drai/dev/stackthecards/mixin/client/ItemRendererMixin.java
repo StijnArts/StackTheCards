@@ -1,4 +1,4 @@
-package drai.dev.stackthecards.mixin;
+package drai.dev.stackthecards.mixin.client;
 
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.items.*;
@@ -28,12 +28,14 @@ public class ItemRendererMixin {
                     if(cardData == null) return;
                     modelIdentifier = cardData.getModelIdentifier();
                     fallBackModel = cardData.getFallbackModel();
-                } else {
+                } else /*if(stack.isOf(Items.CARD_PACK))*/{
                     var cardPack = CardPack.getCardPack(stack);
                     modelIdentifier = cardPack.getModelIdentifier();
-//                    System.out.println(modelIdentifier);
                     fallBackModel = cardPack.getFallbackModel();
-                }
+                } /*else {
+                    var cardBinder = (CardBinder) stack.getItem();
+                    modelIdentifier = fallBackModel = cardBinder.getModelIdentifier();
+                }*/
                 var model = this.models.getModelManager().getModel(modelIdentifier);
                 if(model == null){
                     model = this.models.getModelManager().getModel(fallBackModel);

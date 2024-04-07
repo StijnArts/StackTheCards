@@ -1,17 +1,18 @@
 package drai.dev.stackthecards.items;
 
-import drai.dev.stackthecards.client.*;
-import net.minecraft.client.network.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
+import net.minecraft.util.*;
 import net.minecraft.util.collection.*;
 
 public class CardBinderInventory implements Inventory {
-    public static final String SLOT_AMOUNT_KEY = "amount_of_slots";
+    public static final String CARD_BINDER_SIZE_KEY = "amount_of_slots";
+    public static final String CARD_BINDER_RESTRICTION_KEY = "RestrictedTo";
     public static final String CARD_BINDER_DATA_KEY = "CardBinderData";
-    private static final String CARD_BINDER_INVENTORY_KEY = "CardBinderInventory";
+    public static final String CARD_BINDER_INVENTORY_KEY = "CardBinderInventory";
+    public static final String BINDER_COLOR_KEY = "BinderColor";
     public int size;
     private DefaultedList<ItemStack> inventory;
 
@@ -23,7 +24,7 @@ public class CardBinderInventory implements Inventory {
 
     @Override
     public int size() {
-        return CardBinder.MAX_CARDS_PER_PAGE;
+        return size;
     }
 
     @Override
@@ -52,7 +53,9 @@ public class CardBinderInventory implements Inventory {
 
     @Override
     public void setStack(int slot, ItemStack stack) {
-        this.inventory.set(slot, stack);
+        if(slot < inventory.size()){
+            this.inventory.set(slot, stack);
+        }
     }
 
     @Override
@@ -66,14 +69,30 @@ public class CardBinderInventory implements Inventory {
         inventory = newInventory;
     }
 
-    public int getInventorySize(ItemStack itemStack){
-        int maxSlots = Card.getCardDataNBT(itemStack, CARD_BINDER_DATA_KEY).getCompound(0).getInt(SLOT_AMOUNT_KEY);
+    public static int getInventorySize(ItemStack itemStack){
+        var binderSizeNbt = itemStack.getOrCreateNbt();
+        if(binderSizeNbt== null || binderSizeNbt.getSize()==0) return 120;
+        int maxSlots = binderSizeNbt.getInt(CARD_BINDER_SIZE_KEY);
         if(maxSlots == 0){
             maxSlots = 120;
-        } else {
-            maxSlots = maxSlots + (maxSlots % CardBinder.MAX_CARDS_PER_PAGE == 0 ? 0: CardBinder.MAX_CARDS_PER_PAGE);
-        }
+        } /*else {
+            maxSlots = maxSlots + (maxSlots % CardBinder.MAX_CARDS_PER_PAGE == 0 ? 0: CardBinder.MAX_CARDS_PER_PAGE - maxSlots % CardBinder.MAX_CARDS_PER_PAGE);
+        }*/
         return maxSlots;
+    }
+
+    public String getColorAffix(PlayerEntity player){
+        var itemStack = player.getMainHandStack();
+        String color = ((CardBinder)itemStack.getItem()).getColor().asString();
+        if(color == null || color.isEmpty()){
+            return "_brown";
+        } else {
+            try{
+                return "_"+color;
+            } catch (Exception e){
+                return "";
+            }
+        }
     }
 
     @Override

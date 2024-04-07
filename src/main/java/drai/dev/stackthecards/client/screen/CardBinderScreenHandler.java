@@ -83,11 +83,19 @@ public class CardBinderScreenHandler extends ScreenHandler {
         return this.inventory.canPlayerUse(player);
     }
 
+    public void checkEnabledSlots() {
+        for (CardItemSlot slot : cardSlots) {
+            slot.checkEnabled();
+        }
+    }
+
     public static class CardItemSlot extends Slot {
         private int cardsPerPage = CardBinder.MAX_CARDS_PER_PAGE;
+        private boolean enabled;
 
         public CardItemSlot(CardBinderInventory inventory, int index, int x, int y) {
             super(inventory, index, x, y);
+            this.checkEnabled();
         }
 
         @Override
@@ -101,17 +109,20 @@ public class CardBinderScreenHandler extends ScreenHandler {
 
         @Override
         public void setStack(ItemStack stack) {
+            if(!isEnabled()) return;
             this.inventory.setStack(getInventoryIndex(), stack);
         }
 
         @Override
         public ItemStack takeStack(int amount) {
+            if(!isEnabled()) return ItemStack.EMPTY;
             var stack = this.inventory.removeStack(getInventoryIndex(), amount);
             return stack;
         }
 
         @Override
         public void setStackNoCallbacks(ItemStack stack) {
+            if(!isEnabled()) return;
             this.inventory.setStack(getInventoryIndex(), stack);
             this.markDirty();
         }
@@ -124,11 +135,28 @@ public class CardBinderScreenHandler extends ScreenHandler {
 
         @Override
         public boolean canInsert(ItemStack stack) {
+            if(!enabled) return false;
             return stack.isOf(Items.CARD);
         }
 
         @Override
+        public boolean canBeHighlighted() {
+            return enabled;
+        }
+
+        @Override
+        public boolean canTakePartial(PlayerEntity player) {
+            return enabled;
+        }
+
+        @Override
+        public boolean canTakeItems(PlayerEntity playerEntity) {
+            return enabled;
+        }
+
+        @Override
         public Optional<ItemStack> tryTakeStackRange(int min, int max, PlayerEntity player) {
+            if(!isEnabled()) Optional.empty();
             if (!this.canTakeItems(player)) {
                 return Optional.empty();
             }
@@ -159,6 +187,7 @@ public class CardBinderScreenHandler extends ScreenHandler {
 
         @Override
         public ItemStack insertStack(ItemStack stack, int count) {
+            if(!enabled) return stack;
             if (stack.isEmpty() || !this.canInsert(stack)) {
                 return stack;
             }
@@ -172,6 +201,16 @@ public class CardBinderScreenHandler extends ScreenHandler {
                 this.setStack(itemStack);
             }
             return stack;
+        }
+
+        public void checkEnabled() {
+            var index = this.getInventoryIndex();
+            var isWithinBounds = index < inventory.size();
+            this.enabled = isWithinBounds;
+        }
+
+        public boolean isEnabled(){
+            return enabled;
         }
     }
 }
