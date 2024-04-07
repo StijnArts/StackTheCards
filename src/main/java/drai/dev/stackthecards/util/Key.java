@@ -16,6 +16,10 @@ public final class Key {
         this.inner = key;
     }
 
+    public static Key rightCardLoreKey() {
+        return new Key(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_RIGHT_CONTROL));
+    }
+
     public InputUtil.Key get() {
         return this.inner;
     }
@@ -26,7 +30,7 @@ public final class Key {
 
     @Nullable
     public static Key cardLoreKey() {
-            return new Key(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_LEFT_SHIFT));
+            return new Key(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_LEFT_CONTROL));
     }
     @Nullable
     public static Key flipCardKey() {

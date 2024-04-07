@@ -4,6 +4,7 @@ import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.Items;
+import net.minecraft.client.network.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
@@ -14,10 +15,10 @@ import java.util.*;
 
 public class CardBinderScreenHandler extends ScreenHandler {
     private final CardBinderInventory inventory;
-    private final List<CardItemSlot> cardSlots = new ArrayList<>();
+    public final List<CardItemSlot> cardSlots = new ArrayList<>();
     public CardBinderScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(StackTheCards.CARD_BINDER_SCREEN_HANDLER, syncId);
-        this.inventory = new CardBinderInventory();
+        this.inventory = new CardBinderInventory(playerInventory.player);
         inventory.onOpen(playerInventory.player);
         //This will place the slot in the correct locations for a 3x3 Grid. The slots exist on both server and client!
         //This will not render the background of the slots however, this is the Screens job
@@ -26,15 +27,20 @@ public class CardBinderScreenHandler extends ScreenHandler {
         //The player inventory
         for (m = 0; m < 3; ++m) {
             for (l = 0; l < 9; ++l) {
-                var slot = new Slot(playerInventory, l + m * 9 + 9, 133 + l * 18, 219-(18*2) + m * 18);
+                var slot = new Slot(playerInventory, l + m * 9 + 9, 48 + l * 18, 182+m * 18);
                 this.addSlot(slot);
             }
         }
-
-        for (m = 0; m < CardBinder.MAX_CARDS_PER_PAGE; ++m) {
-            var slot = new CardItemSlot(inventory, m, 62 + m * 18, 83);
-                this.addSlot(slot);
-                cardSlots.add(slot);
+        int slotIndex = 0;
+        for (int page = 0; page < 2; page++) {
+            for (int j = 0; j < 2; ++j) {
+                for (int i = 0; i < 2; i++) {
+                    var slot = new CardItemSlot(inventory, slotIndex, 27 + i * 54 + page*132, 68 + j * 73);
+                    this.addSlot(slot);
+                    cardSlots.add(slot);
+                    slotIndex++;
+                }
+            }
         }
     }
 
@@ -53,24 +59,22 @@ public class CardBinderScreenHandler extends ScreenHandler {
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
         ItemStack newStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(invSlot);
-        if (slot != null && slot.hasStack() && slot.getStack().isOf(Items.CARD)) {
-            ItemStack originalStack = slot.getStack();
-            newStack = originalStack.copy();
-            if (invSlot < this.inventory.size()) {
-                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+        if(player instanceof ClientPlayerEntity){
+
+        } else {
+            if (slot.hasStack() && slot.getStack().isOf(Items.CARD)) {
+                ItemStack originalStack = slot.getStack();
+                newStack = originalStack.copy();
+                if (invSlot < 3*9 ? !this.insertItem(originalStack, 3*9, this.slots.size(), false) : !this.insertItem(originalStack, 0, 3*9, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
-                return ItemStack.EMPTY;
-            }
-
-            if (originalStack.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
-            } else {
-                slot.markDirty();
+                if (originalStack.isEmpty()) {
+                    slot.setStack(ItemStack.EMPTY);
+                } else {
+                    slot.markDirty();
+                }
             }
         }
-
         return newStack;
     }
 
@@ -114,7 +118,7 @@ public class CardBinderScreenHandler extends ScreenHandler {
 
         public int getInventoryIndex(){
             var index = getIndex();
-            var inventoryIndex = index %cardsPerPage + cardsPerPage * StackTheCardsClient.PAGE_INDEX;
+            var inventoryIndex = index % cardsPerPage + cardsPerPage * StackTheCardsClient.PAGE_INDEX;
             return inventoryIndex;
         }
 

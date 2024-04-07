@@ -1,5 +1,6 @@
 package drai.dev.stackthecards.items;
 
+import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.client.screen.*;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.*;
@@ -18,7 +19,7 @@ import java.util.*;
 
 public class CardBinder extends Item {
 
-    public static final int MAX_CARDS_PER_PAGE = 4;
+    public static final int MAX_CARDS_PER_PAGE = 8;
 
     public CardBinder(Settings settings) {
         super(settings);
@@ -28,7 +29,7 @@ public class CardBinder extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if(!world.isClient){
             user.openHandledScreen(new SimpleNamedScreenHandlerFactory(
-                    (id, inventory, p) -> new CardBinderScreenHandler(id, inventory), Text.of("Card Binder")));
+                    (id, inventory, playerEntity) -> StackTheCards.CARD_BINDER_SCREEN_HANDLER.create(id, inventory), Text.of("Card Binder")));
         }
         return TypedActionResult.success(user.getStackInHand(hand));
     }

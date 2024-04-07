@@ -1,22 +1,25 @@
 package drai.dev.stackthecards.items;
 
-import drai.dev.stackthecards.registry.Items;
+import drai.dev.stackthecards.client.*;
+import net.minecraft.client.network.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
-import net.minecraft.registry.tag.*;
 import net.minecraft.util.collection.*;
-
-import java.util.*;
 
 public class CardBinderInventory implements Inventory {
     public static final String SLOT_AMOUNT_KEY = "amount_of_slots";
     public static final String CARD_BINDER_DATA_KEY = "CardBinderData";
     private static final String CARD_BINDER_INVENTORY_KEY = "CardBinderInventory";
-    public int size = 100;
-    private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
+    public int size;
+    private DefaultedList<ItemStack> inventory;
 
+    public CardBinderInventory(PlayerEntity player){
+        var itemStack = player.getMainHandStack();
+        size = getInventorySize(itemStack);
+        inventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
+    }
 
     @Override
     public int size() {
@@ -56,14 +59,21 @@ public class CardBinderInventory implements Inventory {
     public void onOpen(PlayerEntity player) {
         var itemStack = player.getMainHandStack();
 
-        int maxSlots = Card.getCardDataNBT(itemStack, CARD_BINDER_DATA_KEY).getCompound(0).getInt(SLOT_AMOUNT_KEY);
-        if(maxSlots != 0){
-            size = maxSlots;
-        }
+        size = getInventorySize(itemStack);
         var compound2 = itemStack.getOrCreateNbt().getCompound(CARD_BINDER_INVENTORY_KEY);
         var newInventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
         Inventories.readNbt(compound2, newInventory);
         inventory = newInventory;
+    }
+
+    public int getInventorySize(ItemStack itemStack){
+        int maxSlots = Card.getCardDataNBT(itemStack, CARD_BINDER_DATA_KEY).getCompound(0).getInt(SLOT_AMOUNT_KEY);
+        if(maxSlots == 0){
+            maxSlots = 120;
+        } else {
+            maxSlots = maxSlots + (maxSlots % CardBinder.MAX_CARDS_PER_PAGE == 0 ? 0: CardBinder.MAX_CARDS_PER_PAGE);
+        }
+        return maxSlots;
     }
 
     @Override

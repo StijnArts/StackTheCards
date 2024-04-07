@@ -2,6 +2,7 @@ package drai.dev.stackthecards.client;
 
 import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.client.screen.*;
+import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.models.*;
 import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.*;
@@ -10,10 +11,13 @@ import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.client.model.loading.v1.*;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.client.screen.v1.*;
+import net.fabricmc.fabric.api.resource.*;
 import net.minecraft.client.*;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.util.*;
 import net.minecraft.item.*;
+import net.minecraft.registry.*;
+import net.minecraft.resource.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
@@ -52,6 +56,18 @@ public class StackTheCardsClient implements ClientModInitializer {
             scrollModifier+= vert;
 //            System.out.println("scrollModifier: " + scrollModifier);
         }));
+
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+            @Override
+            public Identifier getFabricId() {
+                return new Identifier("stack_the_cards", "card_resources_client");
+            }
+
+            @Override
+            public void reload(ResourceManager manager) {
+                StackTheCardsClient.CARD_RENDERER.clearStateTextures();
+            }
+        });
     }
 
     private static boolean isKeyPressed(@Nullable Key key) {
@@ -62,13 +78,13 @@ public class StackTheCardsClient implements ClientModInitializer {
 
     public static void updateKeys() {
         var previousShiftKeyState = shiftKeyPressed;
-        shiftKeyPressed = isKeyPressed(Key.cardLoreKey());
+        shiftKeyPressed = isKeyPressed(Key.cardLoreKey()) || isKeyPressed(Key.rightCardLoreKey());;
         if(previousShiftKeyState && !shiftKeyPressed) shiftKeyReleased = true;
         ctrlKeyPressed = isKeyPressed(Key.flipCardKey());
     }
 
     public static void modifyCardStackTooltip(Consumer<Collection<Text>> tooltip) {
-        MutableText loreKeyHint = Text.literal("Shift: ");
+        MutableText loreKeyHint = Text.literal("Control: ");
         loreKeyHint.fillStyle(Style.EMPTY.withColor(Formatting.GOLD));
         loreKeyHint.append(Text.literal("view card lore").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
         tooltip.accept(List.of(loreKeyHint));
@@ -77,7 +93,7 @@ public class StackTheCardsClient implements ClientModInitializer {
 
 
     public static void modifyPackStackTooltip(Consumer<Collection<Text>> tooltip) {
-        MutableText loreKeyHint = Text.literal("Shift: ");
+        MutableText loreKeyHint = Text.literal("Control: ");
         loreKeyHint.fillStyle(Style.EMPTY.withColor(Formatting.GOLD));
         loreKeyHint.append(Text.literal("view pack details").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
         tooltip.accept(List.of(loreKeyHint));
