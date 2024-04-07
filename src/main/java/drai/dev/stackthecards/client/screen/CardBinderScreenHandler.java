@@ -59,9 +59,7 @@ public class CardBinderScreenHandler extends ScreenHandler {
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
         ItemStack newStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(invSlot);
-        if(player instanceof ClientPlayerEntity){
-
-        } else {
+        if(!(player instanceof ClientPlayerEntity)){
             if (slot.hasStack() && slot.getStack().isOf(Items.CARD)) {
                 ItemStack originalStack = slot.getStack();
                 newStack = originalStack.copy();
