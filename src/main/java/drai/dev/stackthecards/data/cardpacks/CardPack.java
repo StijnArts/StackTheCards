@@ -6,9 +6,7 @@ import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.registry.Items;
-import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.tooltips.parts.*;
-import net.minecraft.block.*;
 import net.minecraft.entity.*;
 import net.minecraft.item.*;
 import net.minecraft.loot.context.*;
@@ -22,7 +20,6 @@ import java.util.concurrent.*;
 import java.util.function.*;
 
 import static drai.dev.stackthecards.data.CardConnectionEntry.*;
-import static drai.dev.stackthecards.data.CardIdentifier.*;
 import static drai.dev.stackthecards.data.carddata.CardData.*;
 import static drai.dev.stackthecards.items.Card.getCardDataNBT;
 
@@ -42,7 +39,7 @@ public class CardPack {
     protected final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
     private final List<CardPackPool> pools = new ArrayList<>();
     private final Map<Identifier, Integer> guaranteedItems = new HashMap<>();
-    private final Map<CardRarityIdentifier, Integer> guaranteedCards = new HashMap<>();
+    private final Map<CardIdentifier, Integer> guaranteedCards = new HashMap<>();
     protected String packName;
     private double weight = 1;
     private boolean droppedByMobs = true;
@@ -152,7 +149,7 @@ public class CardPack {
                 JSONArray contents = (JSONArray) json.get(JSON_GUARANTEED_CARDS_KEY);
                 for (var section : contents) {
                     var sectionAsObject = (JSONObject)section;
-                    cardPack.guaranteedCards.put(new CardRarityIdentifier((String) sectionAsObject.get(JSON_SELF_GAME_ID_KEY),
+                    cardPack.guaranteedCards.put(new CardIdentifier((String) sectionAsObject.get(JSON_SELF_GAME_ID_KEY),
                                     (String) sectionAsObject.get(JSON_SELF_SET_ID_KEY),(String) sectionAsObject.get(JSON_SELF_CARD_ID_KEY),
                                     (sectionAsObject.containsKey("rarity") ? (String) sectionAsObject.get("rarity") : "")),
                             (int) (long)sectionAsObject.get("amount"));
@@ -225,18 +222,8 @@ public class CardPack {
     }
 
     private CardIdentifier getCardIdentifier() {
-        return new CardIdentifier(gameId, setId, packId);
+        return new CardIdentifier(gameId, setId, packId, "");
     }
-
-/*    public static NbtList createNbt(CardPack cardIdentifier) {
-        NbtCompound nbtCompound = new NbtCompound();
-        nbtCompound.putString(CARD_ID_KEY, String.valueOf(cardIdentifier.packId));
-        nbtCompound.putString(SET_ID_KEY, String.valueOf(cardIdentifier.setId));
-        nbtCompound.putString(GAME_ID_KEY, String.valueOf(cardIdentifier.gameId));
-        var nbtList = new NbtList();
-        nbtList
-        return nbtCompound;
-    }*/
 
     public String getPackId() {
         return packId;
@@ -356,23 +343,20 @@ public class CardPack {
         return pullresult;
     }
 
-    private CardRarityIdentifier getCardsFromRarity(CardRarity rarity) {
+    private CardIdentifier getCardsFromRarity(CardRarity rarity) {
         var cardsInRarity = getCardGame().getCardSet(setId).getCards().values().stream()
                 .filter(cardData -> cardData.cardRarityIds.contains(rarity.rarityId)).toList();
         if(cardsInRarity.size()<1) return null;
 
         var roll = ThreadLocalRandom.current().nextInt(0,cardsInRarity.size());
         var identifier = cardsInRarity.get(roll).getCardIdentifier();
-        return new CardRarityIdentifier(identifier.gameId, identifier.setId, identifier.cardId, rarity.rarityId);
+        return new CardIdentifier(identifier.gameId, identifier.setId, identifier.cardId, rarity.rarityId);
     }
 
     public void pull(PullResult pullResult, RandomCollection collection) {
         var pulledObject = collection.next();
-        if(pulledObject instanceof CardRarityIdentifier cardIdentifier){
+        if(pulledObject instanceof CardIdentifier cardIdentifier){
             pullResult.pulledCards.add(cardIdentifier);
-        } else if(pulledObject instanceof CardIdentifier cardIdentifier){
-            pullResult.pulledCards.add(new CardRarityIdentifier(cardIdentifier.gameId, cardIdentifier.setId, cardIdentifier.cardId,
-                    CardGameRegistry.getCardData(cardIdentifier).cardRarityIds.get(0)));
         } else if(pulledObject instanceof CardRarity rarity){
             var card = getCardsFromRarity(rarity);
             if(card == null){

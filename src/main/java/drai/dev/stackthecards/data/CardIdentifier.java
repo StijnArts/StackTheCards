@@ -2,6 +2,7 @@ package drai.dev.stackthecards.data;
 
 import net.minecraft.nbt.*;
 import net.minecraft.server.command.*;
+import org.jetbrains.annotations.*;
 
 import java.util.*;
 
@@ -9,14 +10,17 @@ public class CardIdentifier {
     public static final String CARD_ID_KEY = "card_id";
     public static final String SET_ID_KEY = "set_id";
     public static final String GAME_ID_KEY = "game_id";
+    private static final String RARITY_ID_KEY = "rarity_id";
+    public String rarityId;
     public String cardId;
     public String gameId;
     public String setId;
 
-    public CardIdentifier(String gameId, String setId, String cardId) {
+    public CardIdentifier(String gameId, String setId, String cardId, @Nullable String rarityId) {
         this.cardId = cardId;
         this.gameId = gameId;
         this.setId = setId;
+        this.rarityId = rarityId;
     }
 
     public CardIdentifier() {
@@ -30,6 +34,7 @@ public class CardIdentifier {
         nbtCompound.putString(CARD_ID_KEY, String.valueOf(cardIdentifier.cardId));
         nbtCompound.putString(SET_ID_KEY, String.valueOf(cardIdentifier.setId));
         nbtCompound.putString(GAME_ID_KEY, String.valueOf(cardIdentifier.gameId));
+        nbtCompound.putString(RARITY_ID_KEY, String.valueOf(cardIdentifier.rarityId));
         return nbtCompound;
     }
 
@@ -37,13 +42,15 @@ public class CardIdentifier {
         var gameId = "";
         var setId = "";
         var cardId = "";
+        var rarityId = "";
         for (int i = 0; i < nbtList.size(); i++) {
             NbtCompound nbtCompound = nbtList.getCompound(i);
             if(nbtCompound.contains(GAME_ID_KEY)) gameId = nbtCompound.getString(GAME_ID_KEY);
             if(nbtCompound.contains(SET_ID_KEY)) setId = nbtCompound.getString(SET_ID_KEY);
             if(nbtCompound.contains(CARD_ID_KEY)) cardId = nbtCompound.getString(CARD_ID_KEY);
+            if(nbtCompound.contains(RARITY_ID_KEY)) rarityId = nbtCompound.getString(RARITY_ID_KEY);
         }
-        CardIdentifier identifier = tryParse(gameId, setId, cardId);
+        CardIdentifier identifier = tryParse(gameId, setId, cardId, rarityId);
         if(identifier != null){
             return identifier;
         }
@@ -54,7 +61,7 @@ public class CardIdentifier {
         var cardIdentifiers = new ArrayList<CardIdentifier>();
         for (int i = 0; i < list.size(); i++) {
             NbtCompound nbtCompound = list.getCompound(i);
-            CardIdentifier identifier = tryParse(nbtCompound.getString(GAME_ID_KEY), nbtCompound.getString(SET_ID_KEY), nbtCompound.getString(CARD_ID_KEY));
+            CardIdentifier identifier = tryParse(nbtCompound.getString(GAME_ID_KEY), nbtCompound.getString(SET_ID_KEY), nbtCompound.getString(CARD_ID_KEY), nbtCompound.getString(RARITY_ID_KEY));
             if(identifier != null){
                 cardIdentifiers.add(identifier);
             }
@@ -63,14 +70,14 @@ public class CardIdentifier {
     }
 
     public static CardIdentifier getCardIdentifier(NbtCompound nbtCompound) {
-        var identifier = tryParse(nbtCompound.getString(GAME_ID_KEY), nbtCompound.getString(SET_ID_KEY), nbtCompound.getString(CARD_ID_KEY));
+        var identifier = tryParse(nbtCompound.getString(GAME_ID_KEY), nbtCompound.getString(SET_ID_KEY), nbtCompound.getString(CARD_ID_KEY), nbtCompound.getString(RARITY_ID_KEY));
         if(identifier == null) return new CardIdentifier();
         return identifier;
     }
 
-    private static CardIdentifier tryParse(String gameId, String setId, String cardId) {
+    private static CardIdentifier tryParse(String gameId, String setId, String cardId, String rarityId) {
         if(gameId.isEmpty() || gameId.isBlank() || cardId.isEmpty() || cardId.isBlank()) return null;
-        return new CardIdentifier(gameId, setId, cardId);
+        return new CardIdentifier(gameId, setId, cardId, rarityId);
     }
 
     public static boolean isValid(CardIdentifier cardIdentifier) {

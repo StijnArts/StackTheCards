@@ -1,7 +1,6 @@
 {
-  "formatId": "legend",
-  "argbColorHex": "FFAA00",
-  "bold": true,
+  "rarityId": "legend",
+  "rarityName": "Legend",
   "text": {
     "parts": [
       {

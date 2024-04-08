@@ -21,6 +21,10 @@
         {
           "rarityId": "commonEnergy",
           "weight": 20
+        },
+        {
+          "rarityId": "reverseHolo",
+          "weight": 20
         }
       ],
       "items": [],

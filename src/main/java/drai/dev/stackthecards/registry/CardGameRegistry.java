@@ -27,12 +27,14 @@ public class CardGameRegistry {
         if(cardIdentifier.ToList().stream().allMatch(id-> id.equals("missing"))){
             return MISSING_CARD_DATA;
         }
+        var cardData = MISSING_CARD_DATA;
         var cardGame = getCardGame(cardIdentifier.gameId);
         var gameCard = cardGame.getCards().get(cardIdentifier.cardId);
-        if(gameCard != null) return gameCard;
+        if(gameCard != null) cardData = gameCard;
         var cardSet = cardGame.getCardSet(cardIdentifier.setId);
-        if(cardSet != null) return cardSet.getCardData(cardIdentifier.cardId);
-        return MISSING_CARD_DATA;
+        if(cardSet != null) cardData = cardSet.getCardData(cardIdentifier.cardId);
+        if(cardData!=MISSING_CARD_DATA) cardData.rarity = cardIdentifier.rarityId;
+        return cardData;
     }
 
     public static CardPack getPackData(CardIdentifier cardIdentifier) {

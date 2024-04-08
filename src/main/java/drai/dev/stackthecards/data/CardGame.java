@@ -20,6 +20,7 @@ public class CardGame {
     public static final String JSON_GAME_CARD_BACK_CARD_KEY = "cardBackTextureName";
     public static final String JSON_GAME_CARD_PACK_ITEM_MODEL_KEY = "cardPackModel";
     public static final String JSON_GAME_CARD_PACK_IMAGE_KEY = "cardPackTextureName";
+    private static final CardRarity MISSING_RARITY = new CardRarity("missing");
     public Optional<Boolean> hasRoundedCorners = Optional.empty();
     private String gameId;
     public CardStackingDirection cardStackingDirection = CardStackingDirection.TOP;
@@ -215,6 +216,8 @@ public class CardGame {
     }
 
     public CardRarity getRarity(String rarityId) {
+        var rarity = rarities.get(rarityId);
+        if(rarity == null) return MISSING_RARITY;
         return rarities.get(rarityId);
     }
 }

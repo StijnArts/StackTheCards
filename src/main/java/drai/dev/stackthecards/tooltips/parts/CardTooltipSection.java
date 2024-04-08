@@ -1,8 +1,7 @@
-package drai.dev.stackthecards.tooltips;
+package drai.dev.stackthecards.tooltips.parts;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.*;
-import drai.dev.stackthecards.tooltips.parts.*;
 import net.minecraft.text.*;
 import org.json.simple.*;
 

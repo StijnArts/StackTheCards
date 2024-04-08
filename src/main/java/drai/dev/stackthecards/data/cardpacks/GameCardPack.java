@@ -2,7 +2,6 @@ package drai.dev.stackthecards.data.cardpacks;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.*;
-import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.tooltips.parts.*;
 import org.json.simple.*;
 

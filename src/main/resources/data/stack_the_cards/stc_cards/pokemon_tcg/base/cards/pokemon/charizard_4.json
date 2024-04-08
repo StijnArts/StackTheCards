@@ -1,7 +1,7 @@
 {
   "cardId": "charizard_4",
   "name": "Charizard",
-  "rarityId": "rareHolo",
+  "rarityId": ["rareHolo", "reverseHolo"],
   "detailHeader": [
     {
       "text": "Charizard",

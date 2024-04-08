@@ -5,7 +5,6 @@ import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.renderers.*;
-import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.tooltips.parts.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
@@ -33,7 +32,7 @@ public class CardData {
     private CardTooltipLine detailHeader;
     public String cardName = "Missing Card Data";
     public List<String> cardRarityIds = new ArrayList<>();
-    public String rarity ="";
+    public String rarity;
 
     public CardData(String cardId) {
 //        this.cardSet = cardSet;
@@ -66,6 +65,7 @@ public class CardData {
                         cardData.cardRarityIds.add((String) jsonContent);
                     }
                 }
+                cardData.rarity = cardData.cardRarityIds.get(0);
             } catch (Exception e){
                 throw new MalformedJsonException("Card rarity id was malformed: "+e.getMessage());
             }
@@ -140,7 +140,7 @@ public class CardData {
     }
 
     public CardIdentifier getCardIdentifier() {
-        return new CardIdentifier(gameId, getCardSet().getSetId(), cardId);
+        return new CardIdentifier(gameId, getCardSet().getSetId(), cardId, this.rarity);
     }
 
     public String getCardName() {
@@ -176,7 +176,11 @@ public class CardData {
     @NotNull
     public static ArrayList<Text> getTexts(List<CardTooltipSection> sections, CardData self) {
         var tooltips = new ArrayList<Text>();
-        tooltips.addAll(CardGameRegistry.getCardGame(self.gameId).getRarity(self.rarity).getText());
+        var rarity = self.rarity;
+        if(rarity == null){
+             rarity = self.cardRarityIds.get(0);
+        }
+        tooltips.addAll(CardGameRegistry.getCardGame(self.gameId).getRarity(rarity).getText());
         for (int i = 0; i < sections.size(); i++) {
             var section = sections.get(i);
             tooltips.addAll(section.getText());

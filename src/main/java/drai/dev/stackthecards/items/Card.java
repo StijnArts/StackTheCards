@@ -35,16 +35,17 @@ public class Card extends Item {
     public static void addCardIdentifier(ItemStack stack, CardIdentifier cardIdentifier) {
         NbtList nbtList = Card.getCardDataNBT(stack, STORED_CARD_DATA_KEY);
         boolean cardHasId = false;
-            for(int i = 0; i < nbtList.size(); ++i) {
-                NbtCompound nbtCompound = nbtList.getCompound(i);
-                CardIdentifier cardIdentifier2 = CardIdentifier.getCardIdentifier(nbtCompound);
-                if (CardIdentifier.isValid(cardIdentifier2)) continue;
-                cardHasId = true;
-                break;
-            }
-            if (!cardHasId) {
-                nbtList.add(CardIdentifier.createNbt(cardIdentifier));
-            }
+        for(int i = 0; i < nbtList.size(); ++i) {
+            NbtCompound nbtCompound = nbtList.getCompound(i);
+            CardIdentifier cardIdentifier2 = CardIdentifier.getCardIdentifier(nbtCompound);
+            if (CardIdentifier.isValid(cardIdentifier2)) continue;
+            cardHasId = true;
+            break;
+        }
+        if(cardIdentifier.rarityId == null || cardIdentifier.rarityId.isEmpty()) cardIdentifier.rarityId = CardGameRegistry.getCardData(cardIdentifier).rarity;
+        if (!cardHasId) {
+            nbtList.add(CardIdentifier.createNbt(cardIdentifier));
+        }
         stack.getOrCreateNbt().put(STORED_CARD_DATA_KEY, nbtList);
     }
 

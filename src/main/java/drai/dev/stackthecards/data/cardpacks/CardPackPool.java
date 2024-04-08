@@ -60,7 +60,7 @@ public class CardPackPool {
                 JSONArray contents = (JSONArray) json.get(JSON_POOL_CARDS_KEY);
                 for (var section : contents) {
                     var sectionAsObject = (JSONObject)section;
-                    pool.cardsInPool.put(new CardRarityIdentifier((String) sectionAsObject.get(JSON_SELF_GAME_ID_KEY),
+                    pool.cardsInPool.put(new CardIdentifier((String) sectionAsObject.get(JSON_SELF_GAME_ID_KEY),
                                     (String) sectionAsObject.get(JSON_SELF_SET_ID_KEY),(String) sectionAsObject.get(JSON_SELF_CARD_ID_KEY),
                                     (sectionAsObject.containsKey("rarity") ? (String) sectionAsObject.get("rarity") : "")),
                             (int) (long)sectionAsObject.get("weight"));

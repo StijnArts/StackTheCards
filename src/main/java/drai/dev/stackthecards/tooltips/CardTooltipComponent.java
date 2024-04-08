@@ -46,7 +46,7 @@ public class CardTooltipComponent implements TooltipComponent {
         var stack = cardTooltipData.getStack();
         var cardData = Card.getCardData(stack);
         double offsetScale = getCardPreviewSize() / (double) cardData.getMaxSide();
-        drawAt(stack, x, y, context, textRenderer, 0, 0, offsetScale);
+        drawAt(stack, x, y, context, offsetScale);
     }
 
     public void drawItemsWithTooltipPosition(TextRenderer textRenderer, int x, int y, DrawContext context,
@@ -69,7 +69,7 @@ public class CardTooltipComponent implements TooltipComponent {
                 x = x - w -8;
             }
         }
-        drawAt(stack, x, Math.max(y,5), context, textRenderer, mouseX, mouseY, offsetScale);
+        drawAt(stack, x, Math.max(y,5), context, offsetScale);
     }
 
     private double getCardPreviewSize() {
@@ -84,7 +84,7 @@ public class CardTooltipComponent implements TooltipComponent {
         return 0.007413793103 * getCardPreviewSize();
     }
 
-    private void drawAt(ItemStack stack, int x, int y, DrawContext context, TextRenderer textRenderer, int mouseX, int mouseY, double offsetScale) {
-        this.cardTooltipRenderer.draw(stack, x, y, context, textRenderer, mouseX, mouseY, getCardPreviewSize(), offsetScale, getCardScale());
+    private void drawAt(ItemStack stack, int x, int y, DrawContext context, double offsetScale) {
+        this.cardTooltipRenderer.draw(stack, x, y, context, getCardPreviewSize(), offsetScale, getCardScale());
     }
 }

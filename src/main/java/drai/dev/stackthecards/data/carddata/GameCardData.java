@@ -15,7 +15,7 @@ public class GameCardData extends CardData{
 
     @Override
     public CardIdentifier getCardIdentifier() {
-        return new CardIdentifier(gameId, null, getCardGame().getGameId());
+        return new CardIdentifier(gameId, null, getCardGame().getGameId(), "");
     }
 
     @Override

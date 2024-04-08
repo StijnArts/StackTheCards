@@ -78,7 +78,7 @@ public class StackTheCards implements ModInitializer {
                         for (var rarityResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/rarities", path-> path.getPath().endsWith(".json")).entrySet()){
                             try{
                                 JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(rarityResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-                                CardRarity rarity = CardRarity.parse(jsonObjectCard);
+                                CardRarity rarity = CardRarity.parse(jsonObjectCard, cardGame);
                                 cardGame.addRarity(rarity);
                             } catch (Exception e){
                                 System.out.println("formatting json file "+rarityResource.getKey() + " was invalid: "+e.getMessage());

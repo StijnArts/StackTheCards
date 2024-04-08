@@ -13,7 +13,7 @@ public class CardTooltipRenderer {
         this.cardRenderer = cardRenderer;
     }
 
-    public void draw(ItemStack stack, int x, int y, DrawContext context, TextRenderer textRenderer, int mouseX, int mouseY,
+    public void draw(ItemStack stack, int x, int y, DrawContext context,
                      double cardSpace, double offsetScale, double cardScale) {
 //        if(!StackTheCardsClient.cardLoreKeyPressed){
             drawCardPreview(stack, x, y, context, cardSpace, offsetScale, cardScale);

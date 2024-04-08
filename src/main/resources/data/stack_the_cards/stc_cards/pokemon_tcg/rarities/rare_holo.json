@@ -1,0 +1,13 @@
+{
+  "rarityId": "rareHolo",
+  "rarityName": "Rare Holo",
+  "text": {
+    "parts": [
+      {
+        "text": "Rare Holo",
+        "formatting": "rareHolo"
+      }
+    ],
+    "noNewLine":true
+  }
+}

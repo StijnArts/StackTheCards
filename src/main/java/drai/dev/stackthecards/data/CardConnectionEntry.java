@@ -7,6 +7,7 @@ public class CardConnectionEntry {
     public static final String JSON_SELF_GAME_ID_KEY = "gameId";
     public static final String JSON_SELF_SET_ID_KEY = "setId";
     public static final String JSON_SELF_CARD_ID_KEY = "cardId";
+    public static final String JSON_SELF_RARITY_ID_KEY = "rarityId";
     public static final String JSON_ROTATION_KEY = "rotated";
     public static final String JSON_CONNECTION_DIRECTION_KEY = "connectionDirection";
     public static final String JSON_X_MODIFIER_KEY = "xTranslationModifier";
@@ -48,7 +49,7 @@ public class CardConnectionEntry {
         CardConnectionEntry connectionEntry;
         try{
             connectionEntry = new CardConnectionEntry(new CardIdentifier((String) json.get(JSON_SELF_GAME_ID_KEY),
-                    (String) json.get(JSON_SELF_SET_ID_KEY),(String) json.get(JSON_SELF_CARD_ID_KEY)));
+                    (String) json.get(JSON_SELF_SET_ID_KEY),(String) json.get(JSON_SELF_CARD_ID_KEY), (String) json.get(JSON_SELF_RARITY_ID_KEY)));
         } catch (Exception e){
             throw new MalformedJsonException("Card identifier was malformed: "+e.getMessage());
         }

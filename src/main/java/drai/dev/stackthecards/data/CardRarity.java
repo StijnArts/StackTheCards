@@ -1,8 +1,6 @@
 package drai.dev.stackthecards.data;
 
 import com.google.gson.stream.*;
-import drai.dev.stackthecards.data.cardpacks.*;
-import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.tooltips.parts.*;
 import net.minecraft.text.*;
 import org.json.simple.*;
@@ -10,7 +8,6 @@ import org.json.simple.*;
 import java.util.*;
 import java.util.stream.*;
 
-import static drai.dev.stackthecards.data.carddata.CardData.JSON_NAME_HEADER_KEY;
 import static drai.dev.stackthecards.data.carddata.CardData.NEW_LINE;
 
 public class CardRarity {
@@ -42,10 +39,15 @@ public class CardRarity {
         }
         if(json.containsKey("text")){
             try{
-                JSONArray contents = (JSONArray) json.get("text");
-                for (var section : contents) {
-                    cardRarity.text.add(CardTooltipSection.parse((JSONObject) section, game));
+                var contents = json.get("text");
+                if(contents instanceof JSONArray arrayContents){
+                    for (var section : arrayContents) {
+                        cardRarity.text.add(CardTooltipSection.parse((JSONObject) section, game));
+                    }
+                } else {
+                    cardRarity.text.add(CardTooltipSection.parse((JSONObject) contents, game));
                 }
+
             } catch (Exception e){
                 throw new MalformedJsonException("Card hover tooltip value was malformed: "+e.getMessage());
             }
@@ -56,13 +58,6 @@ public class CardRarity {
 
 
     public List<Text> getText() {
-        var tooltips = new ArrayList<>();
-        for (int i = 0; i < sections.size(); i++) {
-            var section = sections.get(i);
-            tooltips.addAll(section.getText());
-            if(i < sections.size()-1 && !section.noLineBreak){
-                tooltips.add(NEW_LINE);
-            }
-        }
+        return text.stream().map(text -> text.getText()).flatMap(List::stream).collect(Collectors.toList());
     }
 }

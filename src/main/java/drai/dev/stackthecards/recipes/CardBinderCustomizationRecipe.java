@@ -74,7 +74,7 @@ public class CardBinderCustomizationRecipe extends SpecialCraftingRecipe {
         } else {
             var cardData = CardPack.getCardPack(gameOrSetDefiningItem);
             inventorySize = cardData.getCountInGroup();
-            cardIdentifier = new CardIdentifier(cardData.getGameId(), cardData.getSetId(), cardData.getPackId());
+            cardIdentifier = new CardIdentifier(cardData.getGameId(), cardData.getSetId(), cardData.getPackId(), "");
         }
         var itemStackResult = cardBinder.copy();
         if(cardBinder.hasNbt()){

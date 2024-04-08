@@ -1,4 +1,13 @@
 {
   "rarityId": "commonEnergy",
-  "rarityName": "Energy"
+  "rarityName": "Energy",
+  "text": {
+    "parts": [
+      {
+        "text": "Energy",
+        "formatting": "energy"
+      }
+    ],
+    "noNewLine":true
+  }
 }
