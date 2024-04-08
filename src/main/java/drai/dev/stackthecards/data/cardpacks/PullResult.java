@@ -6,10 +6,10 @@ import net.minecraft.util.*;
 import java.util.*;
 
 public class PullResult {
-    public List<CardIdentifier> pulledCards = new ArrayList<>();
+    public List<CardRarityIdentifier> pulledCards = new ArrayList<>();
     public List<Identifier> pulledItems = new ArrayList<>();
 
-    public List<CardIdentifier> getPulledCards() {
+    public List<CardRarityIdentifier> getPulledCards() {
         return pulledCards;
     }
 

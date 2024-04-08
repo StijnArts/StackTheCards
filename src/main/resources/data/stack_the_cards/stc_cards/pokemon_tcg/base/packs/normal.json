@@ -13,7 +13,8 @@
           "cardId": "charizard_4",
           "setId": "base",
           "gameId": "pokemon_tcg",
-          "weight": 1
+          "weight": 1,
+          "rarity": "rareHolo"
         }
       ],
       "rarities": [

@@ -32,7 +32,8 @@ public class CardData {
     private final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
     private CardTooltipLine detailHeader;
     public String cardName = "Missing Card Data";
-    public String cardRarityId;
+    public List<String> cardRarityIds;
+    public String rarity ="";
 
     public CardData(String cardId) {
 //        this.cardSet = cardSet;
@@ -56,7 +57,15 @@ public class CardData {
         }
         if(json.containsKey(JSON_RARITY_ID_KEY)){
             try{
-                cardData.cardRarityId = (String) json.get(JSON_RARITY_ID_KEY);
+                var retrievedJson = json.get(JSON_RARITY_ID_KEY);
+                if(retrievedJson instanceof String jsonString){
+                    cardData.cardRarityIds.add(jsonString);
+                } else if(retrievedJson instanceof JSONArray jsonArray){
+                    for (var jsonContent :
+                            jsonArray) {
+                        cardData.cardRarityIds.add((String) jsonContent);
+                    }
+                }
             } catch (Exception e){
                 throw new MalformedJsonException("Card rarity id was malformed: "+e.getMessage());
             }
