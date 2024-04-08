@@ -59,7 +59,7 @@ public class CardBinder extends Item {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         var nbt = stack.getOrCreateNbt();
         var inventorySize = nbt.getInt(CARD_BINDER_COUNT_KEY);
-        if(inventorySize!=0) tooltip.add(Text.literal("Contains " + inventorySize + " Unique cards").fillStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+        if(inventorySize!=0) tooltip.add(Text.literal("Contains " + inventorySize + " Unique card(s)").fillStyle(Style.EMPTY.withColor(Formatting.GRAY)));
 
         if(nbt.contains(CARD_BINDER_RESTRICTION_KEY)){
             var cardIdentifier = CardIdentifier.getCardIdentifier(nbt.getCompound(CARD_BINDER_RESTRICTION_KEY));
