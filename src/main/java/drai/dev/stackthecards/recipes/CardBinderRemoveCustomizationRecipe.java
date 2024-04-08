@@ -54,6 +54,8 @@ public class CardBinderRemoveCustomizationRecipe extends SpecialCraftingRecipe {
         var nbt = itemStackResult.getOrCreateNbt();
         nbt.remove(CARD_BINDER_SIZE_KEY);
         nbt.remove(CARD_BINDER_RESTRICTION_KEY);
+        nbt.remove(CARD_BINDER_EFFECT_KEY);
+        nbt.remove(CARD_BINDER_SHOULD_APPLY_EFFECT_KEY);
         return itemStackResult;
     }
 

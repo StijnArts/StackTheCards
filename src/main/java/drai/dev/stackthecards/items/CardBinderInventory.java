@@ -1,5 +1,9 @@
 package drai.dev.stackthecards.items;
 
+import drai.dev.stackthecards.data.*;
+import drai.dev.stackthecards.data.carddata.*;
+import drai.dev.stackthecards.registry.*;
+import net.minecraft.entity.effect.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
@@ -7,12 +11,18 @@ import net.minecraft.nbt.*;
 import net.minecraft.util.*;
 import net.minecraft.util.collection.*;
 
+import java.util.*;
+
+import static drai.dev.stackthecards.items.CardBinder.CARD_BINDER_COUNT_KEY;
+
 public class CardBinderInventory implements Inventory {
     public static final String CARD_BINDER_SIZE_KEY = "amount_of_slots";
     public static final String CARD_BINDER_RESTRICTION_KEY = "RestrictedTo";
     public static final String CARD_BINDER_DATA_KEY = "CardBinderData";
     public static final String CARD_BINDER_INVENTORY_KEY = "CardBinderInventory";
     public static final String BINDER_COLOR_KEY = "BinderColor";
+    public static final String CARD_BINDER_SHOULD_APPLY_EFFECT_KEY = "AppliesEffect";
+    public static final String CARD_BINDER_EFFECT_KEY = "Effect";
     public int size;
     private DefaultedList<ItemStack> inventory;
 
@@ -102,11 +112,34 @@ public class CardBinderInventory implements Inventory {
         Inventories.writeNbt(nbt, inventory, true);
         itemStack.removeSubNbt(CARD_BINDER_INVENTORY_KEY);
         itemStack.getOrCreateNbt().put(CARD_BINDER_INVENTORY_KEY, nbt);
+        var appliesEffect = 0;
+        String effect = "";
+        List<CardData> collectionCards;
+        var identifier = getCardIdentifier(itemStack);
+        if(identifier.setId.isEmpty()){
+            var game = CardGameRegistry.getCardGame(identifier.gameId);
+            collectionCards = game.cards.values().stream().toList();
+            if(game.getEffectIdentifier() != null) effect = game.getEffectIdentifier();
+        } else {
+            var set = CardGameRegistry.getCardGame(identifier.gameId).getCardSet(identifier.setId);
+            collectionCards = set.getCards().values().stream().toList();
+            if(set.getEffectIdentifier() != null) effect = set.getEffectIdentifier();
+        }
+        var distinctCards = inventory.stream().filter(stack -> !stack.isEmpty()).map(Card::getCardData).distinct().toList();
+        var cardsInInventory = distinctCards.stream().filter(collectionCards::contains).toList();
+        if(cardsInInventory.size() == collectionCards.size()) appliesEffect = 1;
+        itemStack.getOrCreateNbt().put(CARD_BINDER_SHOULD_APPLY_EFFECT_KEY, NbtInt.of(appliesEffect));
+        itemStack.getOrCreateNbt().put(CARD_BINDER_COUNT_KEY, NbtInt.of(distinctCards.size()));
+        itemStack.getOrCreateNbt().put(CARD_BINDER_EFFECT_KEY, NbtString.of(effect));
     }
 
     @Override
     public void markDirty() {
 
+    }
+
+    public CardIdentifier getCardIdentifier(ItemStack stack){
+        return CardIdentifier.getCardIdentifier(stack.getOrCreateNbt().getCompound(CARD_BINDER_RESTRICTION_KEY));
     }
 
     @Override
@@ -121,5 +154,24 @@ public class CardBinderInventory implements Inventory {
 
     public DefaultedList<ItemStack> getInventory() {
         return inventory;
+    }
+
+    public ItemStack removeStack(int inventoryIndex, int amount, PlayerEntity player) {
+        var stack = this.removeStack(inventoryIndex, amount);
+        var itemStack = player.getMainHandStack();
+        var nbt = new NbtCompound();
+        Inventories.writeNbt(nbt, inventory, true);
+        itemStack.removeSubNbt(CARD_BINDER_INVENTORY_KEY);
+        itemStack.getOrCreateNbt().put(CARD_BINDER_INVENTORY_KEY, nbt);
+        return stack;
+    }
+
+    public void setStack(int inventoryIndex, ItemStack stack, PlayerEntity player) {
+        this.setStack(inventoryIndex, stack);
+        var itemStack = player.getMainHandStack();
+        var nbt = new NbtCompound();
+        Inventories.writeNbt(nbt, inventory, true);
+        itemStack.removeSubNbt(CARD_BINDER_INVENTORY_KEY);
+        itemStack.getOrCreateNbt().put(CARD_BINDER_INVENTORY_KEY, nbt);
     }
 }

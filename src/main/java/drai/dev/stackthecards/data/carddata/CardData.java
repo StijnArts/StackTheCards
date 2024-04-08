@@ -6,6 +6,7 @@ import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.parts.*;
+import net.minecraft.registry.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;

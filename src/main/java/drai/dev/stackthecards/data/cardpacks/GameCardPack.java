@@ -74,4 +74,9 @@ public class GameCardPack extends CardPack{
     public int getCountInGroup() {
         return getCardGame().getCards().size();
     }
+
+    @Override
+    public String getEffectIdentifier() {
+        return getCardGame().getEffectIdentifier();
+    }
 }

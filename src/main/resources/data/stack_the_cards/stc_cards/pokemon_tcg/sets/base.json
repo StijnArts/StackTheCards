@@ -1,3 +1,5 @@
 {
-  "setId": "base"
+  "setId": "base",
+  "name": "Base",
+  "effect": "minecraft:strength"
 }

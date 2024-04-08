@@ -35,7 +35,7 @@ public class CardBinderScreenHandler extends ScreenHandler {
         for (int page = 0; page < 2; page++) {
             for (int j = 0; j < 2; ++j) {
                 for (int i = 0; i < 2; i++) {
-                    var slot = new CardItemSlot(inventory, slotIndex, 27 + i * 54 + page*132, 68 + j * 73);
+                    var slot = new CardItemSlot(inventory, slotIndex, 27 + i * 54 + page*132, 68 + j * 73, playerInventory.player);
                     this.addSlot(slot);
                     cardSlots.add(slot);
                     slotIndex++;
@@ -90,9 +90,11 @@ public class CardBinderScreenHandler extends ScreenHandler {
     public static class CardItemSlot extends Slot {
         private int cardsPerPage = CardBinder.MAX_CARDS_PER_PAGE;
         private boolean enabled;
+        private PlayerEntity player;
 
-        public CardItemSlot(CardBinderInventory inventory, int index, int x, int y) {
+        public CardItemSlot(CardBinderInventory inventory, int index, int x, int y, PlayerEntity player) {
             super(inventory, index, x, y);
+            this.player = player;
             this.checkEnabled();
         }
 
@@ -108,20 +110,20 @@ public class CardBinderScreenHandler extends ScreenHandler {
         @Override
         public void setStack(ItemStack stack) {
             if(!isEnabled()) return;
-            this.inventory.setStack(getInventoryIndex(), stack);
+            ((CardBinderInventory)this.inventory).setStack(getInventoryIndex(), stack, player);
         }
 
         @Override
         public ItemStack takeStack(int amount) {
             if(!isEnabled()) return ItemStack.EMPTY;
-            var stack = this.inventory.removeStack(getInventoryIndex(), amount);
+            var stack = ((CardBinderInventory)this.inventory).removeStack(getInventoryIndex(), amount, player);
             return stack;
         }
 
         @Override
         public void setStackNoCallbacks(ItemStack stack) {
             if(!isEnabled()) return;
-            this.inventory.setStack(getInventoryIndex(), stack);
+            ((CardBinderInventory)this.inventory).setStack(getInventoryIndex(), stack, player);
             this.markDirty();
         }
 

@@ -37,6 +37,9 @@ public class CardGame {
     private String cardPackTextureName;
     private GameCardData cardPackData;
     private final Map<String, CardRarity> rarities = new HashMap<>();
+    private String effectIdentifier;
+    private String name;
+
     public static CardGame parse(JSONObject json) throws MalformedJsonException {
         if(json.isEmpty() || !json.containsKey(JSON_GAME_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         CardGame game;
@@ -50,6 +53,20 @@ public class CardGame {
                 game.setCardStackingDirection(CardStackingDirection.valueOf((String) json.get(JSON_CARD_STACKING_KEY)));
             } catch (Exception e){
                 throw new MalformedJsonException("Card game stacking direction was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey("name")){
+            try{
+                game.name = (String) json.get("name");
+            } catch (Exception e){
+                throw new MalformedJsonException("Card game name was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey("effect")){
+            try{
+                game.effectIdentifier = (String) json.get("effect");
+            } catch (Exception e){
+                throw new MalformedJsonException("Card game effect was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_CARD_STACKING_DISTANCE_KEY)){
@@ -219,5 +236,13 @@ public class CardGame {
         var rarity = rarities.get(rarityId);
         if(rarity == null) return MISSING_RARITY;
         return rarities.get(rarityId);
+    }
+
+    public String getEffectIdentifier() {
+        return effectIdentifier;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -372,4 +372,8 @@ public class CardPack {
     public int getCountInGroup() {
         return getCardSet().getCards().size();
     }
+
+    public String getEffectIdentifier() {
+        return getCardGame().getCardSet(this.getSetId()).getEffectIdentifier();
+    }
 }

@@ -27,6 +27,8 @@ public class CardSet {
     @Nullable
     private GameCardData cardBackData;
     public Optional<Boolean> hasRoundedCorners = Optional.empty();
+    private String effectIdentifier;
+    private String name;
 
     public CardSet(String cardSetId) {
         this.setId = cardSetId;
@@ -39,6 +41,13 @@ public class CardSet {
             cardSet = new CardSet((String) json.get(JSON_SET_ID_KEY));
         } catch (Exception e){
             throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
+        }
+        if(json.containsKey("name")){
+            try{
+                cardSet.name = (String) json.get("name");
+            } catch (Exception e){
+                throw new MalformedJsonException("Card set name was malformed: "+e.getMessage());
+            }
         }
         if(json.containsKey(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)){
             try{
@@ -60,6 +69,13 @@ public class CardSet {
                 cardSet.hasRoundedCorners = Optional.of((boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY));
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey("effect")){
+            try{
+                cardSet.effectIdentifier = (String) json.get("effect");
+            } catch (Exception e){
+                throw new MalformedJsonException("Card set effect was malformed: "+e.getMessage());
             }
         }
         return cardSet;
@@ -88,8 +104,7 @@ public class CardSet {
     public CardData getCardData(String cardId){
         if(cards.containsKey(cardId)){
             return cards.get(cardId);
-        } else
-        return CardGameRegistry.MISSING_CARD_DATA;
+        } else return CardGameRegistry.MISSING_CARD_DATA;
     }
 
     @Nullable
@@ -134,5 +149,13 @@ public class CardSet {
 
     public Map<String, CardPack> getCardPacks() {
         return cardPacks;
+    }
+
+    public String getEffectIdentifier() {
+        return effectIdentifier == null ? "" : effectIdentifier;
+    }
+
+    public String getName() {
+        return name;
     }
 }

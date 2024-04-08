@@ -8,7 +8,9 @@ import drai.dev.stackthecards.tooltips.*;
 import net.minecraft.client.item.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
+import net.minecraft.registry.*;
 import net.minecraft.text.*;
+import net.minecraft.util.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
@@ -44,9 +46,19 @@ public abstract class ItemStackMixin {
         if(self.isOf(Items.CARD_PACK)){
             var tooltip = ci.getReturnValue();
             if(StackTheCardsClient.shiftKeyPressed){
-                tooltip.addAll(CardPack.getCardPack(self).getDetailToolTips());
+                var pack = CardPack.getCardPack(self);
+                var effect = Registries.STATUS_EFFECT.get(Identifier.tryParse(pack.getEffectIdentifier()));
+                if(effect != null){
+                    tooltip.add(Text.literal("When completed in a binder grants: " +Language.getInstance().get(effect.getTranslationKey())).fillStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                }
+                tooltip.addAll(pack.getDetailToolTips());
             } else {
-                tooltip.addAll(CardPack.getCardPack(self).getTooltipsDescriptors());
+                var pack = CardPack.getCardPack(self);
+                var effect = Registries.STATUS_EFFECT.get(Identifier.tryParse(pack.getEffectIdentifier()));
+                if(effect != null){
+                    tooltip.add(Text.literal("When completed in a binder grants: " +Language.getInstance().get(effect.getTranslationKey())).fillStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                }
+                tooltip.addAll(pack.getTooltipsDescriptors());
                 StackTheCardsClient.modifyPackStackTooltip(tooltip::addAll);
             }
         }
