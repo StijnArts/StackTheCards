@@ -356,6 +356,8 @@ public class CardPack {
     public void pull(PullResult pullResult, RandomCollection collection) {
         var pulledObject = collection.next();
         if(pulledObject instanceof CardIdentifier cardIdentifier){
+            if(cardIdentifier.rarityId == null || cardIdentifier.rarityId.isEmpty())
+                cardIdentifier.rarityId = CardGameRegistry.getCardData(cardIdentifier).cardRarityIds.get(0);
             pullResult.pulledCards.add(cardIdentifier);
         } else if(pulledObject instanceof CardRarity rarity){
             var card = getCardsFromRarity(rarity);

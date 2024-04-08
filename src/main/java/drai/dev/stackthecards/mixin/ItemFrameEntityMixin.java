@@ -137,7 +137,6 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
         }
         ItemStack stack = this.getHeldItemStack();
         if(stack.isOf(Items.CARD)){
-            //TODO break connections after removing all the attached cards unless shift is pressed
             var attachedCards = Card.getAttachedCards(stack);
             if(alwaysDrop){
                 for (var attachedCard: attachedCards) {

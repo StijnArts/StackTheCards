@@ -24,7 +24,6 @@ public class CardTexture {
     private int originalImageHeight = 0;
 
     public CardTexture(CardData cardData) {
-        //TODO add option to shift cards into a direction for cards that connect with each other
         this.cardData = cardData;
         var foundTexture = getCardTextureFromData(cardData);
         this.texture = createTexture(cardData.hasRoundedCorners(), foundTexture, this);

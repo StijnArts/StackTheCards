@@ -54,20 +54,7 @@ public class StackTheCardsClient implements ClientModInitializer {
         });
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> ScreenMouseEvents.afterMouseScroll(screen).register((_screen, x, y, horiz, vert) -> {
             scrollModifier+= vert;
-//            System.out.println("scrollModifier: " + scrollModifier);
         }));
-
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
-            @Override
-            public Identifier getFabricId() {
-                return new Identifier("stack_the_cards", "card_resources_client");
-            }
-
-            @Override
-            public void reload(ResourceManager manager) {
-                StackTheCardsClient.CARD_RENDERER.clearStateTextures();
-            }
-        });
     }
 
     private static boolean isKeyPressed(@Nullable Key key) {

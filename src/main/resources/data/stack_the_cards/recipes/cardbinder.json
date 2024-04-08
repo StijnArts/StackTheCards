@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "minecraft:bookshelf_books"
+    },
+    {
+      "item": "stack_the_cards:card"
+    }
+  ],
+  "result": {
+    "item": "stack_the_cards:card_binder_brown",
+    "count": 1
+  }
+}

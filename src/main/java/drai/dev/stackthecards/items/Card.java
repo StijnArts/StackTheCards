@@ -57,7 +57,6 @@ public class Card extends Item {
         nbtCompound.putBoolean(FLIPPED_KEY, !isFlipped);
         nbtList.add(nbtCompound);
         stack.getOrCreateNbt().put(STORED_CARD_FLIPPED_STATE, nbtList);
-        //TODO flip connectedCards
     }
 
     public static void attachCard(ItemStack topCard, CardIdentifier newCard){

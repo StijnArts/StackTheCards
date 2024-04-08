@@ -66,7 +66,6 @@ public class CardConnection {
         var poppedCard = nbtList.getCompound(nbtList.size()-1);
         nbtList.remove(nbtList.size()-1);
         stack.getOrCreateNbt().put(Card.STORED_CARD_CONNECTION_KEY, nbtList);
-        System.out.println("removed bottom card from connection: current size ="+nbtList.size());
         if(nbtList.size()<3){
             CardConnection.breakConnections(stack);
         }

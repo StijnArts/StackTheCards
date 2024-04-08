@@ -82,7 +82,6 @@ public class CardIdentifier {
 
     public static boolean isValid(CardIdentifier cardIdentifier) {
         return cardIdentifier.cardId.equalsIgnoreCase("missing") ||
-                cardIdentifier.setId.equalsIgnoreCase("missing") || //TODO check if set could be missing if a card is just in a game
                 cardIdentifier.gameId.equalsIgnoreCase("missing");
     }
 

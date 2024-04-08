@@ -178,7 +178,7 @@ public class CardData {
     public static ArrayList<Text> getTexts(List<CardTooltipSection> sections, CardData self) {
         var tooltips = new ArrayList<Text>();
         var rarity = self.rarity;
-        if(rarity == null){
+        if(rarity == null || rarity.isEmpty() || rarity.isBlank()){
              rarity = self.cardRarityIds.get(0);
         }
         tooltips.addAll(CardGameRegistry.getCardGame(self.gameId).getRarity(rarity).getText());

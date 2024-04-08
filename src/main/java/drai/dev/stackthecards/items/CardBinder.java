@@ -142,11 +142,14 @@ public class CardBinder extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if(!world.isClient){
-            user.openHandledScreen(new SimpleNamedScreenHandlerFactory(
-                    (id, inventory, playerEntity) -> StackTheCards.CARD_BINDER_SCREEN_HANDLER.create(id, inventory), Text.of("Card Binder")));
+        if(hand == Hand.MAIN_HAND){
+            if(!world.isClient){
+                user.openHandledScreen(new SimpleNamedScreenHandlerFactory(
+                        (id, inventory, playerEntity) -> StackTheCards.CARD_BINDER_SCREEN_HANDLER.create(id, inventory), Text.of("Card Binder")));
+            }
+            return TypedActionResult.success(user.getStackInHand(hand));
         }
-        return TypedActionResult.success(user.getStackInHand(hand));
+        return TypedActionResult.pass(user.getStackInHand(hand));
     }
 
     public Identifier getModelIdentifier() {
