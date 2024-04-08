@@ -1,12 +1,12 @@
 {
-  "formatId": "rareHolo",
+  "formatId": "legend",
   "argbColorHex": "55FFFF",
   "bold": true,
   "text": {
     "parts": [
       {
-        "text": "Rare Holo",
-        "formatting": "rareHolo"
+        "text": "Legend",
+        "formatting": "legend"
       }
     ],
     "noNewLine":true

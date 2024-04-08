@@ -1,5 +1,14 @@
 {
   "formatId": "energy",
   "argbColorHex": "FFFFFF",
-  "bold": true
+  "bold": true,
+  "text": {
+    "parts": [
+      {
+        "text": "Energy",
+        "formatting": "energy"
+      }
+    ],
+    "noNewLine":true
+  }
 }

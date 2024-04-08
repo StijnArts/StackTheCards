@@ -13,15 +13,6 @@
     {
       "parts": [
         {
-          "text": "Energy",
-          "formatting": "energy"
-        }
-      ],
-      "noNewLine":true
-    },
-    {
-      "parts": [
-        {
           "text": [
             {
               "text":"Base Set - ",
@@ -38,15 +29,6 @@
     }
     ],
   "textSectionsForDetailTooltip": [
-    {
-      "parts": [
-        {
-          "text": "Energy",
-          "formatting": "energy"
-        }
-      ],
-      "noNewLine":true
-    },
     {
       "parts": [
         {

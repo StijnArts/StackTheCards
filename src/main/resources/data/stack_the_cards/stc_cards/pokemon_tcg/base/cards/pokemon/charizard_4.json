@@ -22,15 +22,6 @@
     {
       "parts": [
         {
-          "text": "Rare Holo",
-          "formatting": "rareHolo"
-        }
-      ],
-      "noNewLine":true
-    },
-    {
-      "parts": [
-        {
           "text": "Stage 2 - Evolves from Charmeleon",
           "formatting": "seperator"
         }
@@ -63,15 +54,6 @@
     }
   ],
   "textSectionsForDetailTooltip": [
-    {
-      "parts": [
-        {
-          "text": "Rare Holo",
-          "formatting": "rareHolo"
-        }
-      ],
-      "noNewLine":true
-    },
     {
       "parts": [
         {

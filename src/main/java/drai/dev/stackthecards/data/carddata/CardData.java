@@ -32,7 +32,7 @@ public class CardData {
     private final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
     private CardTooltipLine detailHeader;
     public String cardName = "Missing Card Data";
-    public List<String> cardRarityIds;
+    public List<String> cardRarityIds = new ArrayList<>();
     public String rarity ="";
 
     public CardData(String cardId) {
@@ -170,10 +170,24 @@ public class CardData {
     public static Text NEW_LINE = Text.literal(" ");
     public static Text TAB = Text.literal("      ");
     public List<? extends Text> getDetailToolTips() {
-        return getTexts(detailTooltipSections);
+        return getTexts(detailTooltipSections, this);
     }
 
     @NotNull
+    public static ArrayList<Text> getTexts(List<CardTooltipSection> sections, CardData self) {
+        var tooltips = new ArrayList<Text>();
+        tooltips.addAll(CardGameRegistry.getCardGame(self.gameId).getRarity(self.rarity).getText());
+        for (int i = 0; i < sections.size(); i++) {
+            var section = sections.get(i);
+            tooltips.addAll(section.getText());
+            if(i < sections.size()-1 && !section.noLineBreak){
+                tooltips.add(NEW_LINE);
+            }
+        }
+
+        return tooltips;
+    }
+
     public static ArrayList<Text> getTexts(List<CardTooltipSection> sections) {
         var tooltips = new ArrayList<Text>();
         for (int i = 0; i < sections.size(); i++) {
@@ -197,7 +211,7 @@ public class CardData {
     }
 
     public List<Text> getTooltipsDescriptors(){
-        return getTexts(hoverTooltipSections);
+        return getTexts(hoverTooltipSections, this);
     }
 
     public boolean hasRoundedCorners() {
