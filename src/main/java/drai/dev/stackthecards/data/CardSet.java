@@ -10,8 +10,7 @@ import org.json.simple.*;
 
 import java.util.*;
 
-import static drai.dev.stackthecards.data.CardGame.JSON_GAME_CARD_BACK_CARD_KEY;
-import static drai.dev.stackthecards.data.CardGame.JSON_GAME_CARD_BACK_ITEM_MODEL_KEY;
+import static drai.dev.stackthecards.data.CardGame.*;
 import static drai.dev.stackthecards.data.carddata.CardData.JSON_ROUNDED_CORNERS_ID_KEY;
 
 public class CardSet {
@@ -29,6 +28,7 @@ public class CardSet {
     public Optional<Boolean> hasRoundedCorners = Optional.empty();
     private String effectIdentifier;
     private String name;
+    public boolean appliesEffect = true;
 
     public CardSet(String cardSetId) {
         this.setId = cardSetId;
@@ -76,6 +76,13 @@ public class CardSet {
                 cardSet.effectIdentifier = (String) json.get("effect");
             } catch (Exception e){
                 throw new MalformedJsonException("Card set effect was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey(JSON_GAME_SHOULD_APPLY_EFFECT_KEY)){
+            try{
+                cardSet.appliesEffect = (boolean) json.get(JSON_GAME_SHOULD_APPLY_EFFECT_KEY);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }
         }
         return cardSet;

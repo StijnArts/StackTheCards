@@ -20,8 +20,10 @@ public class CardGame {
     public static final String JSON_GAME_CARD_BACK_CARD_KEY = "cardBackTextureName";
     public static final String JSON_GAME_CARD_PACK_ITEM_MODEL_KEY = "cardPackModel";
     public static final String JSON_GAME_CARD_PACK_IMAGE_KEY = "cardPackTextureName";
+    public static final String JSON_GAME_SHOULD_APPLY_EFFECT_KEY = "appliesEffect";
     private static final CardRarity MISSING_RARITY = new CardRarity("missing");
     public Optional<Boolean> hasRoundedCorners = Optional.empty();
+    public boolean appliesEffect = true;
     private String gameId;
     public CardStackingDirection cardStackingDirection = CardStackingDirection.TOP;
     public float cardStackingDistance = 18F;
@@ -109,6 +111,13 @@ public class CardGame {
         if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
             try{
                 game.hasRoundedCorners = Optional.of((boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY));
+            } catch (Exception e){
+                throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey(JSON_GAME_SHOULD_APPLY_EFFECT_KEY)){
+            try{
+                game.appliesEffect = (boolean) json.get(JSON_GAME_SHOULD_APPLY_EFFECT_KEY);
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }

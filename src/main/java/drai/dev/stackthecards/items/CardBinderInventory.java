@@ -113,6 +113,7 @@ public class CardBinderInventory implements Inventory {
         itemStack.removeSubNbt(CARD_BINDER_INVENTORY_KEY);
         itemStack.getOrCreateNbt().put(CARD_BINDER_INVENTORY_KEY, nbt);
         var appliesEffect = 0;
+        var shouldApplyEffect = true;
         String effect = "";
         List<CardData> collectionCards;
         var identifier = getCardIdentifier(itemStack);
@@ -120,14 +121,16 @@ public class CardBinderInventory implements Inventory {
             var game = CardGameRegistry.getCardGame(identifier.gameId);
             collectionCards = game.cards.values().stream().toList();
             if(game.getEffectIdentifier() != null) effect = game.getEffectIdentifier();
+            shouldApplyEffect = game.appliesEffect;
         } else {
             var set = CardGameRegistry.getCardGame(identifier.gameId).getCardSet(identifier.setId);
             collectionCards = set.getCards().values().stream().toList();
             if(set.getEffectIdentifier() != null) effect = set.getEffectIdentifier();
+            shouldApplyEffect = set.appliesEffect;
         }
         var distinctCards = inventory.stream().filter(stack -> !stack.isEmpty()).map(Card::getCardData).distinct().toList();
         var cardsInInventory = distinctCards.stream().filter(collectionCards::contains).toList();
-        if(cardsInInventory.size() == collectionCards.size()) appliesEffect = 1;
+        if(cardsInInventory.size() == collectionCards.size() && shouldApplyEffect) appliesEffect = 1;
         itemStack.getOrCreateNbt().put(CARD_BINDER_SHOULD_APPLY_EFFECT_KEY, NbtInt.of(appliesEffect));
         itemStack.getOrCreateNbt().put(CARD_BINDER_COUNT_KEY, NbtInt.of(distinctCards.size()));
         itemStack.getOrCreateNbt().put(CARD_BINDER_EFFECT_KEY, NbtString.of(effect));

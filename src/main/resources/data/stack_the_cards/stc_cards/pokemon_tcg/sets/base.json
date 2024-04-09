@@ -1,5 +1,6 @@
 {
   "setId": "base",
   "name": "Base",
-  "effect": "minecraft:strength"
+  "effect": "minecraft:strength",
+  "appliesEffect": false
 }
