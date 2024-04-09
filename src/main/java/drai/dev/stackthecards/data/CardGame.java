@@ -41,6 +41,7 @@ public class CardGame {
     private final Map<String, CardRarity> rarities = new HashMap<>();
     private String effectIdentifier;
     private String name;
+    private Map<String, CardPack> parentPacks = new HashMap<>();
 
     public static CardGame parse(JSONObject json) throws MalformedJsonException {
         if(json.isEmpty() || !json.containsKey(JSON_GAME_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
@@ -253,5 +254,13 @@ public class CardGame {
 
     public String getName() {
         return name;
+    }
+
+    public void addParentPacks(CardPack cardPack) {
+        this.parentPacks.put(cardPack.getPackId(),cardPack);
+    }
+
+    public CardPack getParentPack(String s) {
+        return parentPacks.get(s);
     }
 }

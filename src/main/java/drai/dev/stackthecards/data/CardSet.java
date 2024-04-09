@@ -29,6 +29,7 @@ public class CardSet {
     private String effectIdentifier;
     private String name;
     public boolean appliesEffect = true;
+    private Map<String, CardPack> parentPacks = new HashMap<>();
 
     public CardSet(String cardSetId) {
         this.setId = cardSetId;
@@ -164,5 +165,13 @@ public class CardSet {
 
     public String getName() {
         return name;
+    }
+
+    public void addParentPacks(CardPack cardPack) {
+        this.parentPacks.put(cardPack.getPackId(), cardPack);
+    }
+
+    public CardPack getParentPack(String id) {
+        return parentPacks.get(id);
     }
 }

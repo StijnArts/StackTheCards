@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "stack_the_cards:item/card_packs/base_charizard"
+  }
+}

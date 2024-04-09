@@ -102,6 +102,20 @@ public class StackTheCards implements ModInitializer {
                                         System.out.println("card json file "+cardResource.getKey() + " was invalid: "+e.getMessage());
                                     }
                                 }
+
+                                //Parent Packs
+                                for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/"+cardSet.getSetId()+"/parent_packs", path-> path.getPath().endsWith(".json")).entrySet()){
+                                    try{
+                                        JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
+                                        CardPack cardPack = CardPack.parse(jsonObjectCard, cardGame, cardSet);
+                                        cardPack.setSet(cardSet.getSetId());
+                                        cardSet.addParentPacks(cardPack);
+                                    } catch (Exception e){
+                                        System.out.println("pack json file "+packResource.getKey() + " was invalid: "+e.getMessage());
+                                    }
+                                }
+
+                                //Packs
                                 for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/"+cardSet.getSetId()+"/packs", path-> path.getPath().endsWith(".json")).entrySet()){
                                     try{
                                         JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
@@ -120,6 +134,7 @@ public class StackTheCards implements ModInitializer {
                         for (var cardResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/cards", path-> path.getPath().endsWith(".json")).entrySet()){
                             try{
                                 //TODO do this last
+                                //todo make it possible for a pack to inherit from a parent. deep copy
 //                                JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(cardResource.getValue().getInputStream(), StandardCharsets.UTF_8));
 //                                GameCardData cardData = GameCardData.parse(jsonObjectCard);
 //                                cardData.setGame(cardGame);
@@ -137,6 +152,18 @@ public class StackTheCards implements ModInitializer {
                                 cardGame.addConnection(connection);
                             } catch (Exception e){
                                 System.out.println("connection json file "+connectionsResource.getKey() + " was invalid: "+e.getMessage());
+                            }
+                        }
+
+                        //parent packs
+                        for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/parent_packs", path-> path.getPath().endsWith(".json")).entrySet()){
+                            try{
+                                JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
+                                CardPack cardPack = GameCardPack.parse(jsonObject, cardGame);
+                                cardPack.setGame(cardGame);
+                                cardGame.addParentPacks(cardPack);
+                            } catch (Exception e){
+                                System.out.println("game pack json file "+packResource.getKey() + " was invalid: "+e.getMessage());
                             }
                         }
 

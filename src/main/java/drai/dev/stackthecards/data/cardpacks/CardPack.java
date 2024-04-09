@@ -29,20 +29,21 @@ public class CardPack {
     protected static final String JSON_GUARANTEED_CARDS_KEY = "guaranteedCards";
     protected static final String JSON_GUARANTEED_ITEMS_KEY = "guaranteedItems";
     protected static final String STORED_CARD_PACK_DATA_KEY = "CardPackData";
-    private static final String JSON_WEIGHT_IN_LOOT_POOL_KEY = "weightInLootPool";
-    private static final String JSON_DROPPED_BY_MOBS_KEY = "droppedByMobs";
+    public static final String JSON_WEIGHT_IN_LOOT_POOL_KEY = "weightInLootPool";
+    public static final String JSON_DROPPED_BY_MOBS_KEY = "droppedByMobs";
+    public static final String JSON_PARENT_KEY = "parent";
     protected String packId;
     protected String gameId;
     protected String setId;
     protected CardTooltipLine detailHeader;
-    protected final List<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
-    protected final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
-    private final List<CardPackPool> pools = new ArrayList<>();
-    private final Map<Identifier, Integer> guaranteedItems = new HashMap<>();
-    private final Map<CardIdentifier, Integer> guaranteedCards = new HashMap<>();
+    protected List<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
+    protected List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
+    protected List<CardPackPool> pools = new ArrayList<>();
+    protected Map<Identifier, Integer> guaranteedItems = new HashMap<>();
+    protected Map<CardIdentifier, Integer> guaranteedCards = new HashMap<>();
     protected String packName;
-    private double weight = 1;
-    private boolean droppedByMobs = true;
+    protected double weight = 1;
+    protected boolean droppedByMobs = true;
 
     protected CardPack(String gameId, String packId){
         this.gameId = gameId;
@@ -53,6 +54,41 @@ public class CardPack {
         this.gameId = gameId;
         this.setId = setId;
         this.packName = packId;
+    }
+
+    public CardPack(String packId, String gameId, String setId, CardTooltipLine detailHeader, List<CardTooltipSection>
+            hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
+                    Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
+                    String packName, double weight, boolean droppedByMobs) {
+        this.packId = packId;
+        this.gameId = gameId;
+        this.setId = setId;
+        this.detailHeader = detailHeader;
+        this.hoverTooltipSections = hoverTooltipSections;
+        this.detailTooltipSections = detailTooltipSections;
+        this.pools = pools;
+        this.guaranteedItems = guaranteedItems;
+        this.guaranteedCards = guaranteedCards;
+        this.packName = packName;
+        this.weight = weight;
+        this.droppedByMobs = droppedByMobs;
+    }
+
+    public CardPack(String packId, String gameId, CardTooltipLine detailHeader, List<CardTooltipSection>
+            hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
+                    Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
+                    String packName, double weight, boolean droppedByMobs) {
+        this.packId = packId;
+        this.gameId = gameId;
+        this.detailHeader = detailHeader;
+        this.hoverTooltipSections = hoverTooltipSections;
+        this.detailTooltipSections = detailTooltipSections;
+        this.pools = pools;
+        this.guaranteedItems = guaranteedItems;
+        this.guaranteedCards = guaranteedCards;
+        this.packName = packName;
+        this.weight = weight;
+        this.droppedByMobs = droppedByMobs;
     }
 
     public static CardPack getCardPack(ItemStack stack) {
@@ -80,10 +116,19 @@ public class CardPack {
     public static CardPack parse(JSONObject json, CardGame game, CardSet cardSet) throws MalformedJsonException {
         if(json.isEmpty() || !json.containsKey(JSON_PACK_ID_KEY)) throw new MalformedJsonException("Card pack Json was empty");
         CardPack cardPack;
-        try{
-            cardPack = new CardPack(game.getGameId(), cardSet.getSetId(), (String) json.get(JSON_PACK_ID_KEY));
-        } catch (Exception e){
-            throw new MalformedJsonException("Card pack id was malformed: "+e.getMessage());
+
+        if(json.containsKey(JSON_PARENT_KEY)) {
+            try {
+                cardPack = cardSet.getParentPack((String) json.get(JSON_PARENT_KEY)).copy((String) json.get(JSON_PACK_ID_KEY));
+            } catch (Exception e) {
+                throw new MalformedJsonException("Card pack parent was malformed: " + e.getMessage());
+            }
+        } else {
+            try {
+                cardPack = new CardPack(game.getGameId(), cardSet.getSetId(), (String) json.get(JSON_PACK_ID_KEY));
+            } catch (Exception e) {
+                throw new MalformedJsonException("Card pack id was malformed: " + e.getMessage());
+            }
         }
         if(json.containsKey(JSON_NAME_HEADER_KEY)){
             try{
@@ -186,6 +231,10 @@ public class CardPack {
             }
         }
         return cardPack;
+    }
+
+    public CardPack copy(String packId) {
+        return new CardPack(packId, this.gameId, this.setId, this.detailHeader, this.hoverTooltipSections, this.detailTooltipSections, this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs);
     }
 
     public static CardPack getRandomCardPack(boolean forMobDrops) {
