@@ -4,6 +4,7 @@ import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.client.screen.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.models.*;
+import drai.dev.stackthecards.registry.ItemGroups;
 import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.util.*;
@@ -55,6 +56,7 @@ public class StackTheCardsClient implements ClientModInitializer {
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> ScreenMouseEvents.afterMouseScroll(screen).register((_screen, x, y, horiz, vert) -> {
             scrollModifier+= vert;
         }));
+        Registry.register(Registries.ITEM_GROUP, new Identifier("stack_the_cards", "item_group"), ItemGroups.CARD_ITEM_GROUP);
     }
 
     private static boolean isKeyPressed(@Nullable Key key) {

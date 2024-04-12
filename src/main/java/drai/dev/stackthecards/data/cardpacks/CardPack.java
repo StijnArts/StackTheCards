@@ -44,7 +44,7 @@ public class CardPack {
     protected String packName;
     protected double weight = 1;
     protected boolean droppedByMobs = true;
-    private int ordering;
+    private int ordering = 0;
 
     protected CardPack(String gameId, String packId){
         this.gameId = gameId;
@@ -434,5 +434,13 @@ public class CardPack {
 
     public String getEffectIdentifier() {
         return getCardGame().getCardSet(this.getSetId()).getEffectIdentifier();
+    }
+
+    public int getOrdering() {
+        return ordering;
+    }
+
+    public CardIdentifier getIdentifier() {
+        return new CardIdentifier(gameId, setId, packId, "");
     }
 }

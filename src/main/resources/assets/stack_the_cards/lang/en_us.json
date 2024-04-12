@@ -15,5 +15,6 @@
     "item.stack_the_cards.card_binder_purple": "Card Binder",
     "item.stack_the_cards.card_binder_red": "Card Binder",
     "item.stack_the_cards.card_binder_white": "Card Binder",
-    "item.stack_the_cards.card_binder_yellow": "Card Binder"
+    "item.stack_the_cards.card_binder_yellow": "Card Binder",
+    "itemGroup.stack_the_cards.item_group": "Stack the Cards"
 }

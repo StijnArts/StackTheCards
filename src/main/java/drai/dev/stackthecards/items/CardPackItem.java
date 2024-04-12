@@ -1,12 +1,15 @@
 package drai.dev.stackthecards.items;
 
 import drai.dev.stackthecards.data.cardpacks.*;
+import drai.dev.stackthecards.registry.Items;
 import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
 import net.minecraft.registry.*;
 import net.minecraft.sound.*;
 import net.minecraft.util.*;
 import net.minecraft.world.*;
+
+import static drai.dev.stackthecards.items.Card.addCardIdentifier;
 
 public class CardPackItem extends Item {
     public static final Identifier PACK_RIP_IDENTIFIER = new Identifier("stack_the_cards", "pack_rip");
@@ -43,4 +46,9 @@ public class CardPackItem extends Item {
         }
     }
 
+    public static ItemStack of(CardPack cardPack){
+        var itemStack = new ItemStack(Items.CARD_PACK);
+        addCardIdentifier(itemStack, cardPack.getIdentifier());
+        return itemStack;
+    }
 }
