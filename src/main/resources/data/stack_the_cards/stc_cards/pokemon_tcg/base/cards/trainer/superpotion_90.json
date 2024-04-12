@@ -1,0 +1,86 @@
+{
+  "cardId": "superpotion_90",
+  "name": "Super Potion",
+  "rarityId": "uncommon",
+  "detailHeader": [
+    {
+      "text": "Super Potion",
+      "formatting": "colorless",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "",
+          "formatting": ""
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "90 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "",
+          "formatting": ""
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Rules",
+          "formatting": "rules"
+        },
+        {
+          "text": "Discard 1 Energy card attached to your own Pokemon in order to remove up to 4 damage counters from that Pokemon.",
+          "formatting": "seperator"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "90 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Keiji Kinebuchi",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

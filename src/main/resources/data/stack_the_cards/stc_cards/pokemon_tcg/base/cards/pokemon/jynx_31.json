@@ -1,0 +1,210 @@
+{
+  "cardId": "jynx_31",
+  "name": "Jynx",
+  "rarityId": "uncommon",
+  "detailHeader": [
+    {
+      "text": "Jynx",
+      "formatting": "common",
+      "bold": true
+    },
+    {
+      "text": " - ",
+      "formatting": "seperator"
+    },
+    {
+      "text": "70 HP",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Basic",
+          "formatting": "basic"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "31 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Basic",
+          "formatting": "basic"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Doubleslap"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "10Ã—",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "Flip 2 coins. This attack does 10 damage times the number of heads.",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Psychic",
+              "formatting": "psychic"
+            },
+            {
+              "text": "x1",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Meditate"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "20+",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "Does 20 damage plus 10 more damage for each damage counter on the Defending Pokemon.",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Psychic",
+              "formatting": "psychic"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x1",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Weakness: ",
+          "formatting": "weakness"
+        },
+        {
+          "text": [
+            {
+              "text": "Psychic x2",
+              "formatting": "psychic"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Retreat Cost: ",
+              "formatting": "retreatCost"
+            },
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "31 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Ken Sugimori",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Merely by meditating, the Pokemon launches a powerful psychic energy attack.",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,196 @@
+{
+  "cardId": "beedrill_17",
+  "name": "Beedrill",
+  "rarityId": "rare",
+  "detailHeader": [
+    {
+      "text": "Beedrill",
+      "formatting": "common",
+      "bold": true
+    },
+    {
+      "text": " - ",
+      "formatting": "seperator"
+    },
+    {
+      "text": "80 HP",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Stage 2 - Evolves from Kakuna",
+          "formatting": "seperator"
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "17 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Stage 2 - Evolves from Kakuna",
+          "formatting": "seperator"
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Twineedle"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "30Ã—",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "Flip 2 coins. This attack does 30 damage times the number of heads.",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x3",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Poison Sting"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "40",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "Flip a coin. If heads, the Defending Pokemon is now Poisoned.",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Grass",
+              "formatting": "grass"
+            },
+            {
+              "text": "x3",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Weakness: ",
+          "formatting": "weakness"
+        },
+        {
+          "text": [
+            {
+              "text": "Fire x2",
+              "formatting": "fire"
+            }
+          ]
+        },
+        {
+          "text": "Resistance: ",
+          "formatting": "resistance"
+        },
+        {
+          "text": [
+            {
+              "text": "Fighting x-30",
+              "formatting": "fighting"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "17 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Ken Sugimori",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Flies at high speed and attacks using the large, venomous stingers on its forelegs and tail.",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

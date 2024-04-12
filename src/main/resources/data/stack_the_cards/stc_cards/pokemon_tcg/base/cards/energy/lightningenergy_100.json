@@ -1,11 +1,11 @@
 {
-  "cardId": "fire_energy_98",
-  "name": "Fire Energy",
-  "rarityId": "commonEnergy",
+  "cardId": "lightningenergy_100",
+  "name": "Lightning Energy",
+  "rarityId": "",
   "detailHeader": [
     {
-      "text": "Fire Energy",
-      "formatting": "fire",
+      "text": "Lightning Energy",
+      "formatting": "lightning",
       "bold": true
     }
   ],
@@ -15,36 +15,45 @@
         {
           "text": [
             {
-              "text":"Base Set - ",
+              "text": "Base - ",
               "formatting": "pokedexEntry"
             },
             {
-              "text": "98 / 102",
+              "text": "100 / 102",
               "italic": true
             }
           ]
         }
       ],
-      "noNewLine":true
+      "noNewLine": true
     }
   ],
   "textSectionsForDetailTooltip": [
+    null,
     {
       "parts": [
         {
           "text": [
             {
-              "text":"Base Set - ",
+              "text": "Base - ",
               "formatting": "pokedexEntry"
             },
             {
-              "text": "98 / 102",
+              "text": "100 / 102",
               "italic": true
             }
           ]
         }
       ],
-      "noNewLine":true
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Keiji Kinebuchi",
+          "formatting": "pokedexEntry"
+        }
+      ]
     }
   ]
 }

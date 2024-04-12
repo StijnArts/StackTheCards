@@ -44,6 +44,7 @@ public class CardPack {
     protected String packName;
     protected double weight = 1;
     protected boolean droppedByMobs = true;
+    private int ordering;
 
     protected CardPack(String gameId, String packId){
         this.gameId = gameId;
@@ -128,6 +129,13 @@ public class CardPack {
                 cardPack = new CardPack(game.getGameId(), cardSet.getSetId(), (String) json.get(JSON_PACK_ID_KEY));
             } catch (Exception e) {
                 throw new MalformedJsonException("Card pack id was malformed: " + e.getMessage());
+            }
+        }
+        if(json.containsKey("ordering")){
+            try{
+                cardPack.ordering = (int)(long) json.get("ordering");
+            } catch (Exception e){
+                throw new MalformedJsonException("Card pack name value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_NAME_HEADER_KEY)){

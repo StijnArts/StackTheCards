@@ -41,6 +41,7 @@ public class CardTooltipLine {
                 if(game.formatting.containsKey(formattingId)){
                     part.cardTextFormatting = game.formatting.get(formattingId);
                 } else {
+                    System.out.println("Format: "+formattingId+" wasn't found");
                     part.cardTextFormatting = new CardTextFormatting();
                 }
             } catch (Exception e){

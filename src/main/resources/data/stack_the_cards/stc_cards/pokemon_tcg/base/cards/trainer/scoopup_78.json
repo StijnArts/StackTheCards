@@ -1,0 +1,86 @@
+{
+  "cardId": "scoopup_78",
+  "name": "Scoop Up",
+  "rarityId": "rare",
+  "detailHeader": [
+    {
+      "text": "Scoop Up",
+      "formatting": "colorless",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "",
+          "formatting": ""
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "78 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "",
+          "formatting": ""
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Rules",
+          "formatting": "rules"
+        },
+        {
+          "text": "Choose 1 of your Pokemon in play and return its Basic Pokemon card to your hand. (Discard all cards attached to that card.)",
+          "formatting": "seperator"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "78 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Keiji Kinebuchi",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

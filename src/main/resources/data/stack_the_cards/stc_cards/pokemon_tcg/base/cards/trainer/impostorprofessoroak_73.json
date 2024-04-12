@@ -1,0 +1,86 @@
+{
+  "cardId": "impostorprofessoroak_73",
+  "name": "Impostor Professor Oak",
+  "rarityId": "rare",
+  "detailHeader": [
+    {
+      "text": "Impostor Professor Oak",
+      "formatting": "colorless",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "",
+          "formatting": ""
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "73 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "",
+          "formatting": ""
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Rules",
+          "formatting": "rules"
+        },
+        {
+          "text": "Your opponent shuffles his or her hand into his or her deck, then draws 7 cards.",
+          "formatting": "seperator"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "73 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Ken Sugimori",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

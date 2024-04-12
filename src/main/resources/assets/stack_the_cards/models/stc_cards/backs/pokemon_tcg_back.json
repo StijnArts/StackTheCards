@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "stack_the_cards:item/classic_card_back"
-  }
-}

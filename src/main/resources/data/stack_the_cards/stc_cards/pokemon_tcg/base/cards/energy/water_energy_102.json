@@ -1,11 +1,11 @@
 {
-  "cardId": "fire_energy_98",
-  "name": "Fire Energy",
-  "rarityId": "commonEnergy",
+  "cardId": "water_energy_102",
+  "name": "Water Energy",
+  "rarityId": "",
   "detailHeader": [
     {
-      "text": "Fire Energy",
-      "formatting": "fire",
+      "text": "Water Energy",
+      "formatting": "water",
       "bold": true
     }
   ],
@@ -15,36 +15,45 @@
         {
           "text": [
             {
-              "text":"Base Set - ",
+              "text": "Base - ",
               "formatting": "pokedexEntry"
             },
             {
-              "text": "98 / 102",
+              "text": "102 / 102",
               "italic": true
             }
           ]
         }
       ],
-      "noNewLine":true
+      "noNewLine": true
     }
   ],
   "textSectionsForDetailTooltip": [
+    null,
     {
       "parts": [
         {
           "text": [
             {
-              "text":"Base Set - ",
+              "text": "Base - ",
               "formatting": "pokedexEntry"
             },
             {
-              "text": "98 / 102",
+              "text": "102 / 102",
               "italic": true
             }
           ]
         }
       ],
-      "noNewLine":true
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Keiji Kinebuchi",
+          "formatting": "pokedexEntry"
+        }
+      ]
     }
   ]
 }

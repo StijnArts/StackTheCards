@@ -1,0 +1,216 @@
+{
+  "cardId": "pidgeotto_22",
+  "name": "Pidgeotto",
+  "rarityId": "rare",
+  "detailHeader": [
+    {
+      "text": "Pidgeotto",
+      "formatting": "common",
+      "bold": true
+    },
+    {
+      "text": " - ",
+      "formatting": "seperator"
+    },
+    {
+      "text": "60 HP",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Stage 1 - Evolves from Pidgey",
+          "formatting": "seperator"
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "22 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Stage 1 - Evolves from Pidgey",
+          "formatting": "seperator"
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Whirlwind"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "20",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "If your opponent has any Benched Pokemon, he or she chooses 1 of them and switches it with the Defending Pokemon. (Do the damage before switching the Pokemon.)",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Mirror Move"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "If Pidgeotto was attacked last turn, do the final result of that attack on Pidgeotto to the Defending Pokemon.",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x3",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Weakness: ",
+          "formatting": "weakness"
+        },
+        {
+          "text": [
+            {
+              "text": "Lightning x2",
+              "formatting": "lightning"
+            }
+          ]
+        },
+        {
+          "text": "Resistance: ",
+          "formatting": "resistance"
+        },
+        {
+          "text": [
+            {
+              "text": "Fighting x-30",
+              "formatting": "fighting"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Retreat Cost: ",
+              "formatting": "retreatCost"
+            },
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x1",
+              "formatting": "seperator"
+            },
+            {
+              "text": ", ",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "22 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Ken Sugimori",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Very protective of its sprawling territory, this Pokemon will fiercely peck at any intruder.",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

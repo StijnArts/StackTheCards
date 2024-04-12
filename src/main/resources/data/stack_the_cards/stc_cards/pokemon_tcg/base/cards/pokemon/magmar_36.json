@@ -1,0 +1,210 @@
+{
+  "cardId": "magmar_36",
+  "name": "Magmar",
+  "rarityId": "uncommon",
+  "detailHeader": [
+    {
+      "text": "Magmar",
+      "formatting": "common",
+      "bold": true
+    },
+    {
+      "text": " - ",
+      "formatting": "seperator"
+    },
+    {
+      "text": "50 HP",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Basic",
+          "formatting": "basic"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "36 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Basic",
+          "formatting": "basic"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Fire Punch"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "30",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Fire",
+              "formatting": "fire"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Flamethrower"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "50",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "Discard 1 Fire Energy card attached to Magmar in order to use this attack.",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x1",
+              "formatting": "seperator"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Fire",
+              "formatting": "fire"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Weakness: ",
+          "formatting": "weakness"
+        },
+        {
+          "text": [
+            {
+              "text": "Water x2",
+              "formatting": "water"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Retreat Cost: ",
+              "formatting": "retreatCost"
+            },
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "36 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Ken Sugimori",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Its body always burns with an orange glow that enables it to hide perfectly among flames.",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

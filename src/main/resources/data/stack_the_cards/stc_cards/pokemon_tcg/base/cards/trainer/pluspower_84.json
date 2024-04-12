@@ -1,0 +1,86 @@
+{
+  "cardId": "pluspower_84",
+  "name": "PlusPower",
+  "rarityId": "uncommon",
+  "detailHeader": [
+    {
+      "text": "PlusPower",
+      "formatting": "colorless",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "",
+          "formatting": ""
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "84 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "",
+          "formatting": ""
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Rules",
+          "formatting": "rules"
+        },
+        {
+          "text": "Attach PlusPower to your Active Pokemon. At the end of your turn, discard PlusPower. If this Pokemon\u0027s attack does damage to the Defending Pokemon (after applying Weakness and Resistance), the attack does 10 more damage to the Defending Pokemon.",
+          "formatting": "seperator"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "84 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Keiji Kinebuchi",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

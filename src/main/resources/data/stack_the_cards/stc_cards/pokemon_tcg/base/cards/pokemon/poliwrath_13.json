@@ -1,0 +1,224 @@
+{
+  "cardId": "poliwrath_13",
+  "name": "Poliwrath",
+  "rarityId": "rareHolo",
+  "detailHeader": [
+    {
+      "text": "Poliwrath",
+      "formatting": "common",
+      "bold": true
+    },
+    {
+      "text": " - ",
+      "formatting": "seperator"
+    },
+    {
+      "text": "90 HP",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Stage 2 - Evolves from Poliwhirl",
+          "formatting": "seperator"
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "13 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Stage 2 - Evolves from Poliwhirl",
+          "formatting": "seperator"
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Water Gun"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "30+",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "Does 30 damage plus 10 more damage for each Water Energy attached to Poliwrath but not used to pay for this attack\u0027s Energy cost. Extra Water Energy after the 2nd doesn\u0027t count.",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Water",
+              "formatting": "water"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x1",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Whirlpool"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "40",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "If the Defending Pokemon has any Energy cards attached to it, choose 1 of them and discard it.",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Water",
+              "formatting": "water"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Weakness: ",
+          "formatting": "weakness"
+        },
+        {
+          "text": [
+            {
+              "text": "Grass x2",
+              "formatting": "grass"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Retreat Cost: ",
+              "formatting": "retreatCost"
+            },
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x3",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "13 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Ken Sugimori",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "An adept swimmer at both the front crawl and breaststroke. Easily overtakes the best human swimmers.",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

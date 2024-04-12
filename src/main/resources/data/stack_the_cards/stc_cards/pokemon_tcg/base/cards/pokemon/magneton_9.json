@@ -1,0 +1,228 @@
+{
+  "cardId": "magneton_9",
+  "name": "Magneton",
+  "rarityId": "rareHolo",
+  "detailHeader": [
+    {
+      "text": "Magneton",
+      "formatting": "common",
+      "bold": true
+    },
+    {
+      "text": " - ",
+      "formatting": "seperator"
+    },
+    {
+      "text": "60 HP",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Stage 1 - Evolves from Magnemite",
+          "formatting": "seperator"
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "9 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "Stage 1 - Evolves from Magnemite",
+          "formatting": "seperator"
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Thunder Wave"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "30",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "Flip a coin. If heads, the Defending Pokemon is now Paralyzed.",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x1",
+              "formatting": "seperator"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Lightning",
+              "formatting": "lightning"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Selfdestruct"
+            },
+            {
+              "text": " - ",
+              "formatting": "seperator"
+            },
+            {
+              "text": "80",
+              "formatting": "damage"
+            }
+          ]
+        },
+        {
+          "text": "Does 20 damage to each Pokemon on each player\u0027s Bench. (Don\u0027t apply Weakness and Resistance for Benched Pokemon.) Magneton does 80 damage to itself.",
+          "formatting": "seperator"
+        },
+        {
+          "text": "Cost: "
+        },
+        {
+          "text": [
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Lightning",
+              "formatting": "lightning"
+            },
+            {
+              "text": "x2",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Weakness: ",
+          "formatting": "weakness"
+        },
+        {
+          "text": [
+            {
+              "text": "Fighting x2",
+              "formatting": "fighting"
+            }
+          ]
+        },
+        {
+          "text": [
+            {
+              "text": "Retreat Cost: ",
+              "formatting": "retreatCost"
+            },
+            {
+              "text": "Colorless",
+              "formatting": "colorless"
+            },
+            {
+              "text": "x1",
+              "formatting": "seperator"
+            },
+            {
+              "text": ", ",
+              "formatting": "seperator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "9 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Keiji Kinebuchi",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Formed by several Magnemites linked together. It frequently appears when sunspots flare up.",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

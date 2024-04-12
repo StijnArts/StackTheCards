@@ -1,0 +1,86 @@
+{
+  "cardId": "pokedex_87",
+  "name": "Pokedex",
+  "rarityId": "uncommon",
+  "detailHeader": [
+    {
+      "text": "Pokedex",
+      "formatting": "colorless",
+      "bold": true
+    }
+  ],
+  "textSectionsForHoverTooltip": [
+    {
+      "parts": [
+        {
+          "text": "",
+          "formatting": ""
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "87 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    }
+  ],
+  "textSectionsForDetailTooltip": [
+    {
+      "parts": [
+        {
+          "text": "",
+          "formatting": ""
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": "Rules",
+          "formatting": "rules"
+        },
+        {
+          "text": "Look at up to 5 cards from the top of your deck and rearrange them as you like.",
+          "formatting": "seperator"
+        }
+      ]
+    },
+    {
+      "parts": [
+        {
+          "text": [
+            {
+              "text": "Base - ",
+              "formatting": "pokedexEntry"
+            },
+            {
+              "text": "87 / 102",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Keiji Kinebuchi",
+          "formatting": "pokedexEntry"
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "cardId": "fire_energy_98",
   "name": "Fire Energy",
-  "rarityId": "commonEnergy",
+  "rarityId": "",
   "detailHeader": [
     {
       "text": "Fire Energy",
@@ -15,7 +15,7 @@
         {
           "text": [
             {
-              "text":"Base Set - ",
+              "text": "Base - ",
               "formatting": "pokedexEntry"
             },
             {
@@ -25,16 +25,17 @@
           ]
         }
       ],
-      "noNewLine":true
+      "noNewLine": true
     }
   ],
   "textSectionsForDetailTooltip": [
+    null,
     {
       "parts": [
         {
           "text": [
             {
-              "text":"Base Set - ",
+              "text": "Base - ",
               "formatting": "pokedexEntry"
             },
             {
@@ -44,7 +45,15 @@
           ]
         }
       ],
-      "noNewLine":true
+      "noNewLine": true
+    },
+    {
+      "parts": [
+        {
+          "text": "Drawn by Keiji Kinebuchi",
+          "formatting": "pokedexEntry"
+        }
+      ]
     }
   ]
 }

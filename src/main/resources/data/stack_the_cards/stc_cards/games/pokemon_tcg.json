@@ -1,9 +1,0 @@
-{
-  "cardStackingDirection": "TOP_RIGHT",
-  "cardStackingDistance": 25.0,
-  "gameId": "pokemon_tcg",
-  "name": "Pokemon Trading Card Game",
-  "cardBackModel": "stack_the_cards:stc_cards/backs/pokemon_tcg_modern_back",
-  "cardBackTextureName": "high_res_modern_card_back",
-  "hasRoundedCorners": true
-}
