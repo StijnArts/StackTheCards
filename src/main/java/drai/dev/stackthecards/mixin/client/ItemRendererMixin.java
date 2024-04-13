@@ -1,10 +1,14 @@
 package drai.dev.stackthecards.mixin.client;
 
+import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.Items;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.item.*;
 import net.minecraft.client.render.model.*;
+import net.minecraft.client.render.model.json.*;
+import net.minecraft.client.util.math.*;
 import net.minecraft.entity.*;
 import net.minecraft.item.*;
 import net.minecraft.util.*;

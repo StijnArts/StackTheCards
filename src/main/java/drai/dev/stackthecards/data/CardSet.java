@@ -30,6 +30,7 @@ public class CardSet {
     private String name;
     public boolean appliesEffect = true;
     private Map<String, CardPack> parentPacks = new HashMap<>();
+    private int ordering = 0;
 
     public CardSet(String cardSetId) {
         this.setId = cardSetId;
@@ -56,6 +57,13 @@ public class CardSet {
                 cardSet.setCardBackModel(new Identifier(identifierArray[0], identifierArray[1]));
             } catch (Exception e){
                 throw new MalformedJsonException("Card back identifier was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey("ordering")){
+            try{
+                cardSet.ordering = (int)(long) json.get("ordering");
+            } catch (Exception e){
+                throw new MalformedJsonException("Card pack name value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_GAME_CARD_BACK_CARD_KEY)){
@@ -132,6 +140,9 @@ public class CardSet {
         return setId;
     }
 
+    public int getOrdering() {
+        return ordering;
+    }
     public void addCard(CardData cardData) {
         cards.put(cardData.getCardId(), cardData);
     }

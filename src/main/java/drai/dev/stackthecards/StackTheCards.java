@@ -85,13 +85,13 @@ public class StackTheCards implements ModInitializer {
                             }
                         }
 
-                        for (var setResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/sets", path-> path.getPath().endsWith(".json")).entrySet()){
+                        for (var setResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/sets/_ids", path-> path.getPath().endsWith(".json")).entrySet()){
                             try{
                                 JSONObject jsonObjectSet = (JSONObject) jsonParser.parse(new InputStreamReader(setResource.getValue().getInputStream(), StandardCharsets.UTF_8));
                                 CardSet cardSet = CardSet.parse(jsonObjectSet);
                                 cardSet.setGame(cardGame);
                                 cardGame.addSet(cardSet);
-                                for (var cardResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/"+cardSet.getSetId()+"/cards", path-> path.getPath().endsWith(".json")).entrySet()){
+                                for (var cardResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/sets/"+cardSet.getSetId()+"/cards", path-> path.getPath().endsWith(".json")).entrySet()){
                                     try{
                                         JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(cardResource.getValue().getInputStream(), StandardCharsets.UTF_8));
                                         CardData cardData = CardData.parse(jsonObjectCard, cardGame);
@@ -104,7 +104,7 @@ public class StackTheCards implements ModInitializer {
                                 }
 
                                 //Parent Packs
-                                for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/"+cardSet.getSetId()+"/parent_packs", path-> path.getPath().endsWith(".json")).entrySet()){
+                                for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/sets/"+cardSet.getSetId()+"/parent_packs", path-> path.getPath().endsWith(".json")).entrySet()){
                                     try{
                                         JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
                                         CardPack cardPack = CardPack.parse(jsonObjectCard, cardGame, cardSet);
@@ -116,7 +116,7 @@ public class StackTheCards implements ModInitializer {
                                 }
 
                                 //Packs
-                                for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/"+cardSet.getSetId()+"/packs", path-> path.getPath().endsWith(".json")).entrySet()){
+                                for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/sets/"+cardSet.getSetId()+"/packs", path-> path.getPath().endsWith(".json")).entrySet()){
                                     try{
                                         JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
                                         CardPack cardPack = CardPack.parse(jsonObjectCard, cardGame, cardSet);
@@ -187,13 +187,13 @@ public class StackTheCards implements ModInitializer {
 
                 System.out.println("Testing-Cards give commands");
                 for (var game : CardGameRegistry.getCardGames().values()) {
-                    for (var card : game.getCards().keySet() ) {
+                    /*for (var card : game.getCards().keySet() ) {
                         System.out.println("/give @a stack_the_cards:card{CardData:[{card_id:"+card+", set_id:base, game_id:pokemon_tcg}]}");
-                    }
+                    }*/
                     for (var set : game.getCardSets().values() ) {
-                        for (var card : set.getCards().keySet() ) {
+                        /*for (var card : set.getCards().keySet() ) {
                             System.out.println("/give @a stack_the_cards:card{CardData:[{card_id:"+card+", set_id:"+set.getSetId()+", game_id:pokemon_tcg}]}");
-                        }
+                        }*/
                         for (var pack : set.getCardPacks().keySet() ) {
                             System.out.println("/give @a stack_the_cards:card_pack{CardPackData:[{card_id:"+pack+", set_id:base, game_id:pokemon_tcg}]}");
                         }

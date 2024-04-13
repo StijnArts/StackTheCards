@@ -17,8 +17,10 @@ public class GameCardPack extends CardPack{
         super(gameId, packId);
     }
 
-    public GameCardPack(String packId, String gameId, CardTooltipLine detailHeader, List<CardTooltipSection> hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools, Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards, String packName, double weight, boolean droppedByMobs, int ordering) {
-        super(packId, gameId, detailHeader, hoverTooltipSections, detailTooltipSections, pools, guaranteedItems, guaranteedCards, packName, weight, droppedByMobs, ordering);
+    public GameCardPack(String packId, String gameId, CardTooltipLine detailHeader, List<CardTooltipSection> hoverTooltipSections, List<CardTooltipSection> detailTooltipSections,
+                        List<CardPackPool> pools, Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards, String packName,
+                        double weight, boolean droppedByMobs) {
+        super(packId, gameId, detailHeader, hoverTooltipSections, detailTooltipSections, pools, guaranteedItems, guaranteedCards, packName, weight, droppedByMobs);
     }
 
     public static CardPack parse(JSONObject json, CardGame game) throws MalformedJsonException {
@@ -137,19 +139,12 @@ public class GameCardPack extends CardPack{
                 throw new MalformedJsonException("Card guaranteed items was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey("ordering")){
-            try{
-                cardPack.ordering = (int)(long) json.get("ordering");
-            } catch (Exception e){
-                throw new MalformedJsonException("Card pack name value was malformed: "+e.getMessage());
-            }
-        }
         return cardPack;
     }
 
     @Override
     public CardPack copy(String packId) {
-        return new GameCardPack(packId, this.gameId, this.detailHeader, this.hoverTooltipSections, this.detailTooltipSections, this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs, this.ordering);
+        return new GameCardPack(packId, this.gameId, this.detailHeader, this.hoverTooltipSections, this.detailTooltipSections, this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs);
     }
 
     @Override

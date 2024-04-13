@@ -44,7 +44,6 @@ public class CardPack {
     protected String packName;
     protected double weight = 1;
     protected boolean droppedByMobs = true;
-    protected int ordering = 0;
 
     protected CardPack(String gameId, String packId){
         this.gameId = gameId;
@@ -60,7 +59,7 @@ public class CardPack {
     public CardPack(String packId, String gameId, String setId, CardTooltipLine detailHeader, List<CardTooltipSection>
             hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
                     Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
-                    String packName, double weight, boolean droppedByMobs, int ordering) {
+                    String packName, double weight, boolean droppedByMobs) {
         this.packId = packId;
         this.gameId = gameId;
         this.setId = setId;
@@ -73,13 +72,12 @@ public class CardPack {
         this.packName = packName;
         this.weight = weight;
         this.droppedByMobs = droppedByMobs;
-        this.ordering = ordering;
     }
 
     public CardPack(String packId, String gameId, CardTooltipLine detailHeader, List<CardTooltipSection>
             hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
                     Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
-                    String packName, double weight, boolean droppedByMobs, int ordering) {
+                    String packName, double weight, boolean droppedByMobs) {
         this.packId = packId;
         this.gameId = gameId;
         this.detailHeader = detailHeader;
@@ -91,7 +89,6 @@ public class CardPack {
         this.packName = packName;
         this.weight = weight;
         this.droppedByMobs = droppedByMobs;
-        this.ordering = ordering;
     }
 
     public static CardPack getCardPack(ItemStack stack) {
@@ -131,13 +128,6 @@ public class CardPack {
                 cardPack = new CardPack(game.getGameId(), cardSet.getSetId(), (String) json.get(JSON_PACK_ID_KEY));
             } catch (Exception e) {
                 throw new MalformedJsonException("Card pack id was malformed: " + e.getMessage());
-            }
-        }
-        if(json.containsKey("ordering")){
-            try{
-                cardPack.ordering = (int)(long) json.get("ordering");
-            } catch (Exception e){
-                throw new MalformedJsonException("Card pack name value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_NAME_HEADER_KEY)){
@@ -230,7 +220,7 @@ public class CardPack {
             try{
                 cardPack.weight = (int) (long) json.get(JSON_WEIGHT_IN_LOOT_POOL_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Card guaranteed items was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Card pack weight in loot pool was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_DROPPED_BY_MOBS_KEY)){
@@ -244,7 +234,8 @@ public class CardPack {
     }
 
     public CardPack copy(String packId) {
-        return new CardPack(packId, this.gameId, this.setId, this.detailHeader, this.hoverTooltipSections, this.detailTooltipSections, this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs, this.ordering);
+        return new CardPack(packId, this.gameId, this.setId, this.detailHeader, this.hoverTooltipSections, this.detailTooltipSections,
+                this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs);
     }
 
     public static CardPack getRandomCardPack(boolean forMobDrops) {
@@ -439,7 +430,7 @@ public class CardPack {
     }
 
     public int getOrdering() {
-        return ordering;
+        return getCardSet().getOrdering();
     }
 
     public CardIdentifier getIdentifier() {

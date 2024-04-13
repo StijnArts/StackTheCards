@@ -58,9 +58,7 @@ public class CardRenderer {
             texture = getCardPackTexture(cardPack);
             if(texture == null || cardGame == null ) return;
             if(textureManager == null) textureManager = MinecraftClient.getInstance().getTextureManager();
-            CardTexture.draw(matrices, vertexConsumers, light, texture.getRenderLayer(), 0, Card.getAttachedCards(stack).size()*-1, 1, cardGame, 0, 0);
-            drawAttachedCards(matrices, vertexConsumers, stack, light, 1, false, cardGame);
-            cardTextures.size();
+            CardTexture.draw(matrices, vertexConsumers, light, texture.getRenderLayer(), 0, 0, 1, cardGame, 0, 0);
         }
     }
 
@@ -80,7 +78,6 @@ public class CardRenderer {
         if(textureManager == null) textureManager = MinecraftClient.getInstance().getTextureManager();
         CardTexture.draw(matrices, vertexConsumers, light, texture.getRenderLayer(), 0, Card.getAttachedCards(stack).size()*-1, scale, cardGame, 0, 0);
         drawAttachedCards(matrices, vertexConsumers, stack, light, scale, false, cardGame);
-        cardTextures.size();
     }
 
     private CardTexture getCardPackTexture(CardPack cardPack) {

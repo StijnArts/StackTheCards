@@ -92,6 +92,11 @@ public class CardTexture {
 
     public static void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, RenderLayer renderLayer,
                             int layersHigh, int amountOfCardsAttached, double scale, CardGame game, double xOffset, double yOffset) {
+        draw(matrices, vertexConsumers.getBuffer(renderLayer), light, renderLayer, layersHigh, amountOfCardsAttached, scale, game, xOffset, yOffset);
+    }
+
+    public static void draw(MatrixStack matrices, VertexConsumer vertexConsumer, int light, RenderLayer renderLayer,
+                            int layersHigh, int amountOfCardsAttached, double scale, CardGame game, double xOffset, double yOffset) {
         var cardDistance = game.cardStackingDistance;
         var y = 0F;
         var x = 0F;
@@ -102,7 +107,6 @@ public class CardTexture {
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         matrix4f.translate(x, y, amountOfCardsAttached*0.1F);
 //        matrix4f Maybe rotate a little if cards attached
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(renderLayer);
 
         //bottom left
         vertexConsumer.vertex(matrix4f, (float) (0.0F + yOffset), (float) (128.0F * scale + xOffset), -0.01F).color(255, 255, 255, 255).texture(0.0F, 1.0F).light(light).next();
