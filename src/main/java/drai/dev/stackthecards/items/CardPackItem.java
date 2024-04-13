@@ -9,6 +9,7 @@ import net.minecraft.sound.*;
 import net.minecraft.util.*;
 import net.minecraft.world.*;
 
+import static drai.dev.stackthecards.data.cardpacks.CardPack.addCardPackIdentifier;
 import static drai.dev.stackthecards.items.Card.addCardIdentifier;
 
 public class CardPackItem extends Item {
@@ -48,7 +49,9 @@ public class CardPackItem extends Item {
 
     public static ItemStack of(CardPack cardPack){
         var itemStack = new ItemStack(Items.CARD_PACK);
-        addCardIdentifier(itemStack, cardPack.getIdentifier());
+        addCardPackIdentifier(itemStack, cardPack.getIdentifier());
         return itemStack;
     }
+
+
 }

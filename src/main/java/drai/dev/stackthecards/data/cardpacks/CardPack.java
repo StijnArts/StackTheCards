@@ -44,7 +44,7 @@ public class CardPack {
     protected String packName;
     protected double weight = 1;
     protected boolean droppedByMobs = true;
-    private int ordering = 0;
+    protected int ordering = 0;
 
     protected CardPack(String gameId, String packId){
         this.gameId = gameId;
@@ -60,7 +60,7 @@ public class CardPack {
     public CardPack(String packId, String gameId, String setId, CardTooltipLine detailHeader, List<CardTooltipSection>
             hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
                     Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
-                    String packName, double weight, boolean droppedByMobs) {
+                    String packName, double weight, boolean droppedByMobs, int ordering) {
         this.packId = packId;
         this.gameId = gameId;
         this.setId = setId;
@@ -73,12 +73,13 @@ public class CardPack {
         this.packName = packName;
         this.weight = weight;
         this.droppedByMobs = droppedByMobs;
+        this.ordering = ordering;
     }
 
     public CardPack(String packId, String gameId, CardTooltipLine detailHeader, List<CardTooltipSection>
             hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
                     Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
-                    String packName, double weight, boolean droppedByMobs) {
+                    String packName, double weight, boolean droppedByMobs, int ordering) {
         this.packId = packId;
         this.gameId = gameId;
         this.detailHeader = detailHeader;
@@ -90,6 +91,7 @@ public class CardPack {
         this.packName = packName;
         this.weight = weight;
         this.droppedByMobs = droppedByMobs;
+        this.ordering = ordering;
     }
 
     public static CardPack getCardPack(ItemStack stack) {
@@ -242,7 +244,7 @@ public class CardPack {
     }
 
     public CardPack copy(String packId) {
-        return new CardPack(packId, this.gameId, this.setId, this.detailHeader, this.hoverTooltipSections, this.detailTooltipSections, this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs);
+        return new CardPack(packId, this.gameId, this.setId, this.detailHeader, this.hoverTooltipSections, this.detailTooltipSections, this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs, this.ordering);
     }
 
     public static CardPack getRandomCardPack(boolean forMobDrops) {

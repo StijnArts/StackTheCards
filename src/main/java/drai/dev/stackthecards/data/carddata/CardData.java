@@ -179,9 +179,13 @@ public class CardData {
         var tooltips = new ArrayList<Text>();
         var rarity = self.rarity;
         if(rarity == null || rarity.isEmpty() || rarity.isBlank()){
-             rarity = self.cardRarityIds.get(0);
+            if(self.cardRarityIds != null && self.cardRarityIds.size() > 0){
+                rarity = self.cardRarityIds.get(0);
+            }
         }
-        tooltips.addAll(CardGameRegistry.getCardGame(self.gameId).getRarity(rarity).getText());
+        if(rarity!=null){
+            tooltips.addAll(CardGameRegistry.getCardGame(self.gameId).getRarity(rarity).getText());
+        }
         for (int i = 0; i < sections.size(); i++) {
             var section = sections.get(i);
             tooltips.addAll(section.getText());
