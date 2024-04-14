@@ -23,18 +23,20 @@ public class CardPackPool {
     public Map<CardIdentifier, Integer> cardsInPool = new HashMap<>();
     public Map<CardRarity, Integer> raritiesInPool = new HashMap<>();
     public Map<Identifier, Integer> itemsInPool = new HashMap<>();
+    private final CardPack cardPack;
 //    public Map<Identifier, Integer> tagsInPool = new HashMap<>();
 
-    public CardPackPool(int minimumAmountOfCardsFromPool){
+    public CardPackPool(int minimumAmountOfCardsFromPool, CardPack cardPack){
         this.minimumAmountOfCardsFromPool = minimumAmountOfCardsFromPool;
         this.maximumAmountOfCardsFromPool = minimumAmountOfCardsFromPool;
+        this.cardPack = cardPack;
     }
-    public static CardPackPool parse(JSONObject json, CardGame game) throws MalformedJsonException {
+    public static CardPackPool parse(JSONObject json, CardGame game, CardPack cardPack) throws MalformedJsonException {
         if(json.isEmpty() || !json.containsKey(JSON_POOL_MINIMUM_AMOUNT_KEY) ||
                 (!json.containsKey(JSON_POOL_CARDS_KEY) && !json.containsKey(JSON_POOL_RARITIES_KEY) && !json.containsKey(JSON_POOL_ITEMS_KEY) /*&& !json.containsKey(JSON_POOL_TAGS_KEY)*/)) throw new MalformedJsonException("Card pack Json was empty");
         CardPackPool pool;
         try{
-            pool = new CardPackPool((int) (long) json.get(JSON_POOL_MINIMUM_AMOUNT_KEY));
+            pool = new CardPackPool((int) (long) json.get(JSON_POOL_MINIMUM_AMOUNT_KEY), cardPack);
         } catch (Exception e){
             throw new MalformedJsonException("Card minimum value was malformed: "+e.getMessage());
         }
@@ -74,8 +76,15 @@ public class CardPackPool {
                 JSONArray contents = (JSONArray) json.get(JSON_POOL_RARITIES_KEY);
                 for (var rarity : contents) {
                     var rarityAsObject = (JSONObject)rarity;
-                    pool.raritiesInPool.put(game.getRarity((String) ((JSONObject) rarity).get("rarityId")),
-                            (int) (long)rarityAsObject.get("weight"));
+                    var foundRarity = game.getRarity((String) ((JSONObject) rarity).get("rarityId"));
+                    if(!foundRarity.rarityId.equals("missing")){
+                        var cardCount = cardPack.getCardGame().getCardSet(cardPack.setId).getCards().values().stream()
+                                .filter(cardData -> cardData.cardRarityIds.contains(foundRarity.rarityId)).toList().size();
+                        if(cardCount > 0){
+                            pool.raritiesInPool.put(foundRarity,
+                                    (int) (long)rarityAsObject.get("weight"));
+                        }
+                    }
                 }
             } catch (Exception e){
                 throw new MalformedJsonException("Card pool rarities value was malformed: "+e.getMessage());
@@ -107,7 +116,8 @@ public class CardPackPool {
 //                throw new MalformedJsonException("Card hover tooltip value was malformed: "+e.getMessage());
 //            }
 //        }
-
         return pool;
     }
+
+
 }

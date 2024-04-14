@@ -87,7 +87,7 @@ public class GameCardPack extends CardPack{
                 JSONArray pools = (JSONArray) json.get(JSON_PACK_POOLS_KEY);
                 for (var pool: pools) {
                     try{
-                        cardPack.pools.add(CardPackPool.parse((JSONObject)pool, game));
+                        cardPack.pools.add(CardPackPool.parse((JSONObject)pool, game, cardPack));
                     } catch(Exception e){
                         throw new MalformedJsonException("Card Pack pool entry was malformed: "+e.getMessage());
                     }

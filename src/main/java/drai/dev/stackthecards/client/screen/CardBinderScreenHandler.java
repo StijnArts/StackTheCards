@@ -2,24 +2,33 @@ package drai.dev.stackthecards.client.screen;
 
 import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.client.*;
+import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.Items;
 import net.minecraft.client.network.*;
 import net.minecraft.entity.player.*;
-import net.minecraft.inventory.*;
 import net.minecraft.item.*;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.*;
+import org.jetbrains.annotations.*;
 
 import java.util.*;
 
 public class CardBinderScreenHandler extends ScreenHandler {
     private final CardBinderInventory inventory;
     public final List<CardItemSlot> cardSlots = new ArrayList<>();
+    @Nullable
+    private CardIdentifier boundIdentifier;
+    private boolean isBound;
+
     public CardBinderScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(StackTheCards.CARD_BINDER_SCREEN_HANDLER, syncId);
         this.inventory = new CardBinderInventory(playerInventory.player);
         inventory.onOpen(playerInventory.player);
+        this.isBound = inventory.isBound(playerInventory.player);
+        if(isBound){
+            boundIdentifier = inventory.getBoundIdentifier(playerInventory.player);
+        }
         //This will place the slot in the correct locations for a 3x3 Grid. The slots exist on both server and client!
         //This will not render the background of the slots however, this is the Screens job
         int m;
@@ -35,7 +44,7 @@ public class CardBinderScreenHandler extends ScreenHandler {
         for (int page = 0; page < 2; page++) {
             for (int j = 0; j < 2; ++j) {
                 for (int i = 0; i < 2; i++) {
-                    var slot = new CardItemSlot(inventory, slotIndex, 27 + i * 54 + page*132, 68 + j * 73, playerInventory.player);
+                    var slot = new CardItemSlot(inventory, slotIndex, 27 + i * 54 + page*132, 68 + j * 73, playerInventory.player, isBound, boundIdentifier);
                     this.addSlot(slot);
                     cardSlots.add(slot);
                     slotIndex++;
@@ -57,23 +66,90 @@ public class CardBinderScreenHandler extends ScreenHandler {
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
+        //TODO make shift clicking a card put it in the slot associated with the card number
         ItemStack newStack = ItemStack.EMPTY;
-        Slot slot = this.slots.get(invSlot);
+        Slot clickedSlot = this.slots.get(invSlot);
         if(!(player instanceof ClientPlayerEntity)){
-            if (slot.hasStack() && slot.getStack().isOf(Items.CARD)) {
-                ItemStack originalStack = slot.getStack();
+            if (clickedSlot.hasStack() && clickedSlot.getStack().isOf(Items.CARD)) {
+
+                ItemStack originalStack = clickedSlot.getStack();
                 newStack = originalStack.copy();
-                if (invSlot < 3*9 ? !this.insertItem(originalStack, 3*9, this.slots.size(), false) : !this.insertItem(originalStack, 0, 3*9, false)) {
-                    return ItemStack.EMPTY;
+                boolean useCardBinderQuickmove = false;
+                var cardData = Card.getCardData(originalStack);
+                var set = cardData.getCardSet();
+                if(isBound){
+                    useCardBinderQuickmove = set.getCardGame().getGameId().equalsIgnoreCase(boundIdentifier.gameId)&&set.getSetId().equalsIgnoreCase(boundIdentifier.setId);
                 }
-                if (originalStack.isEmpty()) {
-                    slot.setStack(ItemStack.EMPTY);
+                if(useCardBinderQuickmove){
+                    var cardIndex = cardData.index;
+                    if(!insertItem(originalStack, cardIndex, player)){
+                        return ItemStack.EMPTY;
+                    } /*else {
+                        if (!super.insertItem(originalStack, 0, , false) : !super.insertItem(originalStack, 0, 3*9, false)) {
+                            return ItemStack.EMPTY;
+                        }
+                    }*/
+                    if (originalStack.isEmpty()) {
+                        clickedSlot.setStack(ItemStack.EMPTY);
+                    } else {
+                        clickedSlot.markDirty();
+                    }
                 } else {
-                    slot.markDirty();
+                    if (invSlot < 3*9 ? !super.insertItem(originalStack, 3*9, this.slots.size(), false) : !super.insertItem(originalStack, 0, 3*9, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                    if (originalStack.isEmpty()) {
+                        clickedSlot.setStack(ItemStack.EMPTY);
+                    } else {
+                        clickedSlot.markDirty();
+                    }
                 }
+
             }
         }
         return newStack;
+    }
+
+    protected boolean insertItem(ItemStack stack, int index, PlayerEntity player) {
+        ItemStack itemStack;
+        boolean bl = false;
+        int i = index;
+        if (stack.isStackable()) {
+            while (!stack.isEmpty() && i == index) {
+                itemStack = inventory.getStack(i);
+                if (!itemStack.isEmpty() && ItemStack.canCombine(stack, itemStack)) {
+                    int j = itemStack.getCount() + stack.getCount();
+                    if (j <= stack.getMaxCount()) {
+                        stack.setCount(0);
+                        itemStack.setCount(j);
+                        bl = true;
+                    } else if (itemStack.getCount() < stack.getMaxCount()) {
+                        stack.decrement(stack.getMaxCount() - itemStack.getCount());
+                        itemStack.setCount(stack.getMaxCount());
+                        bl = true;
+                    }
+                }
+                ++i;
+            }
+        }
+        if (!stack.isEmpty()) {
+            i = index;
+            while (index == i) {
+                itemStack = inventory.getStack(i);
+
+                if (itemStack.isEmpty()) {
+                    if (stack.getCount() > 64) {
+                        inventory.setStack(i, stack.split(64), player);
+                    } else {
+                        inventory.setStack(i, stack.split(stack.getCount()), player);
+                    }
+                    bl = true;
+                    break;
+                }
+                ++i;
+            }
+        }
+        return bl;
     }
 
     @Override
@@ -90,11 +166,15 @@ public class CardBinderScreenHandler extends ScreenHandler {
     public static class CardItemSlot extends Slot {
         private int cardsPerPage = CardBinder.MAX_CARDS_PER_PAGE;
         private boolean enabled;
+        private boolean isBound;
+        private CardIdentifier boundIdentifier;
         private PlayerEntity player;
 
-        public CardItemSlot(CardBinderInventory inventory, int index, int x, int y, PlayerEntity player) {
+        public CardItemSlot(CardBinderInventory inventory, int index, int x, int y, PlayerEntity player, boolean isBound, @Nullable CardIdentifier boundIdentifier) {
             super(inventory, index, x, y);
             this.player = player;
+            this.isBound = isBound;
+            this.boundIdentifier = boundIdentifier;
             this.checkEnabled();
         }
 
@@ -136,7 +216,11 @@ public class CardBinderScreenHandler extends ScreenHandler {
         @Override
         public boolean canInsert(ItemStack stack) {
             if(!enabled) return false;
-            return stack.isOf(Items.CARD);
+            if(!stack.isOf(Items.CARD)) return false;
+            if(!isBound) return true;
+            var data = Card.getCardData(stack);
+            var set = data.getCardSet();
+            return set.getCardGame().getGameId().equalsIgnoreCase(boundIdentifier.gameId) && set.getSetId().equalsIgnoreCase(boundIdentifier.setId) && data.index == getInventoryIndex();
         }
 
         @Override

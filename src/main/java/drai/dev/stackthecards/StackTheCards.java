@@ -178,27 +178,25 @@ public class StackTheCards implements ModInitializer {
                                 System.out.println("game pack json file "+packResource.getKey() + " was invalid: "+e.getMessage());
                             }
                         }
-
-
                     } catch (Exception e){
                         System.out.println("game json file "+gameResource.getKey() + " was invalid: "+e.getMessage());
                     }
                 }
 
-                System.out.println("Testing-Cards give commands");
+                /*System.out.println("Testing-Cards give commands");
                 for (var game : CardGameRegistry.getCardGames().values()) {
-                    /*for (var card : game.getCards().keySet() ) {
+                    *//*for (var card : game.getCards().keySet() ) {
                         System.out.println("/give @a stack_the_cards:card{CardData:[{card_id:"+card+", set_id:base, game_id:pokemon_tcg}]}");
-                    }*/
+                    }*//*
                     for (var set : game.getCardSets().values() ) {
-                        /*for (var card : set.getCards().keySet() ) {
+                        *//*for (var card : set.getCards().keySet() ) {
                             System.out.println("/give @a stack_the_cards:card{CardData:[{card_id:"+card+", set_id:"+set.getSetId()+", game_id:pokemon_tcg}]}");
-                        }*/
+                        }*//*
                         for (var pack : set.getCardPacks().keySet() ) {
                             System.out.println("/give @a stack_the_cards:card_pack{CardPackData:[{card_id:"+pack+", set_id:base, game_id:pokemon_tcg}]}");
                         }
                     }
-                }
+                }*/
             }
         });
         Items.register();

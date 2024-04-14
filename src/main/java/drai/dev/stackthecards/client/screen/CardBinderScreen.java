@@ -19,6 +19,7 @@ import net.minecraft.screen.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import net.minecraft.util.collection.*;
+import org.lwjgl.glfw.*;
 
 import static drai.dev.stackthecards.items.CardBinder.MAX_CARDS_PER_PAGE;
 
@@ -118,7 +119,7 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
         this.nextPageButton = this.addDrawableChild(new PageTurnWidget(i + 233, 175, true, button -> this.goToNextPage(), true));
         this.previousPageButton = this.addDrawableChild(new PageTurnWidget(i, 175, false, button -> this.goToPreviousPage(), true));
         this.updatePageButtons();
-    }
+    }BookScreen
 
     protected void goToPreviousPage() {
         if (StackTheCardsClient.PAGE_INDEX > 0) {
@@ -146,11 +147,11 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
             return true;
         }
         switch (keyCode) {
-            case 266: {
+            case GLFW.GLFW_KEY_LEFT: {
                 this.previousPageButton.onPress();
                 return true;
             }
-            case 267: {
+            case GLFW.GLFW_KEY_RIGHT: {
                 this.nextPageButton.onPress();
                 return true;
             }

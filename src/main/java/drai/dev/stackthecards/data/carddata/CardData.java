@@ -22,6 +22,7 @@ public class CardData {
     public static final String JSON_CARD_DETAIL_TOOLTIP_KEY = "textSectionsForDetailTooltip";
     public static final String JSON_ROUNDED_CORNERS_ID_KEY = "hasRoundedCorners";
     public static final String JSON_DETAIL_HEADER_KEY = "detailHeader";
+    public static final String JSON_INDEX_KEY = "index";
     public static final String JSON_NAME_HEADER_KEY = "name";
     //    private static CardSet TEST_CARD_SET = new CardSet();
     protected CardSet cardSet = new CardSet("missing");
@@ -34,6 +35,7 @@ public class CardData {
     public String cardName = "Missing Card Data";
     public List<String> cardRarityIds = new ArrayList<>();
     public String rarity;
+    public int index;
 
     public CardData(String cardId) {
 //        this.cardSet = cardSet;
@@ -41,7 +43,7 @@ public class CardData {
     }
 
     public static CardData parse(JSONObject json, CardGame game) throws MalformedJsonException {
-        if(json.isEmpty() || !json.containsKey(JSON_CARD_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+        if(json.isEmpty() || !json.containsKey(JSON_CARD_ID_KEY) || !json.containsKey(JSON_INDEX_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         CardData cardData;
         try{
             cardData = new CardData((String) json.get(JSON_CARD_ID_KEY));
@@ -76,6 +78,13 @@ public class CardData {
                 cardData.setHasRoundedCorners((boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY));
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey(JSON_INDEX_KEY)){
+            try{
+                cardData.index =  (int)(long) json.get(JSON_INDEX_KEY);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card index value was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_CARD_HOVER_TOOLTIP_KEY)){

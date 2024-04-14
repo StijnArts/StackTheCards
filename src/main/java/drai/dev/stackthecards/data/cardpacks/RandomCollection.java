@@ -11,6 +11,10 @@ public class RandomCollection<E> {
         this(new Random());
     }
 
+    public double getTotal(){
+        return total;
+    }
+
     public RandomCollection(Random random) {
         this.random = random;
     }

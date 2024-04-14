@@ -178,7 +178,7 @@ public class CardPack {
                 JSONArray pools = (JSONArray) json.get(JSON_PACK_POOLS_KEY);
                 for (var pool: pools) {
                     try{
-                        cardPack.pools.add(CardPackPool.parse((JSONObject)pool, game));
+                        cardPack.pools.add(CardPackPool.parse((JSONObject)pool, game, cardPack));
                     } catch(Exception e){
                         throw new MalformedJsonException("Card Pack pool entry was malformed: "+e.getMessage());
                     }
@@ -370,11 +370,13 @@ public class CardPack {
     public PullResult pull() {
         var pullresult = new PullResult();
         for (var pool : pools) {
-            var randomCollection = new RandomCollection<Object>();
+            var randomCollection = new RandomCollection<>();
             pool.cardsInPool.forEach((cardIdentifier, integer) -> randomCollection.add(integer, cardIdentifier));
             pool.raritiesInPool.forEach((rarity, integer) -> randomCollection.add(integer, rarity));
             pool.itemsInPool.forEach((items, integer) -> randomCollection.add(integer, items));
 //            pool.tagsInPool.forEach((cardIdentifier, integer) -> randomCollection.add(integer, cardIdentifier));
+            if(randomCollection.getTotal()<1) continue;
+            if(pool.cardsInPool.values().isEmpty() && pool.itemsInPool.values().isEmpty() && pool.raritiesInPool.values().isEmpty()) continue;
             var amountOfPulls = ThreadLocalRandom.current().nextInt(pool.minimumAmountOfCardsFromPool, pool.maximumAmountOfCardsFromPool+1);
             for (int i = 0; i < amountOfPulls; i++) {
                 pull(pullresult, randomCollection);
@@ -393,24 +395,22 @@ public class CardPack {
         return pullresult;
     }
 
-    private CardIdentifier getCardsFromRarity(CardRarity rarity) {
+    public CardIdentifier rollCardInRarity(CardRarity rarity) {
         var cardsInRarity = getCardGame().getCardSet(setId).getCards().values().stream()
                 .filter(cardData -> cardData.cardRarityIds.contains(rarity.rarityId)).toList();
-        if(cardsInRarity.size()<1) return null;
-
         var roll = ThreadLocalRandom.current().nextInt(0,cardsInRarity.size());
         var identifier = cardsInRarity.get(roll).getCardIdentifier();
         return new CardIdentifier(identifier.gameId, identifier.setId, identifier.cardId, rarity.rarityId);
     }
 
-    public void pull(PullResult pullResult, RandomCollection collection) {
+    public void pull(PullResult pullResult, RandomCollection<Object> collection) {
         var pulledObject = collection.next();
         if(pulledObject instanceof CardIdentifier cardIdentifier){
             if(cardIdentifier.rarityId == null || cardIdentifier.rarityId.isEmpty())
                 cardIdentifier.rarityId = CardGameRegistry.getCardData(cardIdentifier).cardRarityIds.get(0);
             pullResult.pulledCards.add(cardIdentifier);
         } else if(pulledObject instanceof CardRarity rarity){
-            var card = getCardsFromRarity(rarity);
+            var card = rollCardInRarity(rarity);
             if(card == null){
                 pull(pullResult, collection);
             } else {

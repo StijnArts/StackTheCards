@@ -177,4 +177,16 @@ public class CardBinderInventory implements Inventory {
         itemStack.removeSubNbt(CARD_BINDER_INVENTORY_KEY);
         itemStack.getOrCreateNbt().put(CARD_BINDER_INVENTORY_KEY, nbt);
     }
+
+    public boolean isBound(PlayerEntity player) {
+        var itemStack = player.getMainHandStack();
+        var nbt = itemStack.getOrCreateNbt();
+        return nbt.contains(CARD_BINDER_RESTRICTION_KEY);
+    }
+
+    public CardIdentifier getBoundIdentifier(PlayerEntity player){
+        var itemStack = player.getMainHandStack();
+        var nbt = itemStack.getOrCreateNbt();
+        return CardIdentifier.getCardIdentifier(nbt.getCompound(CARD_BINDER_RESTRICTION_KEY));
+    }
 }
