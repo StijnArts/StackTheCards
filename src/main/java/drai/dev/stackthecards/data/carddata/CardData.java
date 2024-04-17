@@ -6,7 +6,6 @@ import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.parts.*;
-import net.minecraft.registry.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
@@ -24,6 +23,7 @@ public class CardData {
     public static final String JSON_DETAIL_HEADER_KEY = "detailHeader";
     public static final String JSON_INDEX_KEY = "index";
     public static final String JSON_NAME_HEADER_KEY = "name";
+    public String nameSpace;
     //    private static CardSet TEST_CARD_SET = new CardSet();
     protected CardSet cardSet = new CardSet("missing");
     protected String cardId;
@@ -37,16 +37,17 @@ public class CardData {
     public String rarity;
     public int index;
 
-    public CardData(String cardId) {
+    public CardData(String cardId, String nameSpace) {
 //        this.cardSet = cardSet;
         this.cardId = cardId;
+        this.nameSpace = nameSpace;
     }
 
-    public static CardData parse(JSONObject json, CardGame game) throws MalformedJsonException {
+    public static CardData parse(JSONObject json, CardGame game, String nameSpace) throws MalformedJsonException {
         if(json.isEmpty() || !json.containsKey(JSON_CARD_ID_KEY) || !json.containsKey(JSON_INDEX_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         CardData cardData;
         try{
-            cardData = new CardData((String) json.get(JSON_CARD_ID_KEY));
+            cardData = new CardData((String) json.get(JSON_CARD_ID_KEY), nameSpace);
         } catch (Exception e){
             throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
         }

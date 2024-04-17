@@ -113,13 +113,13 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
     }
 
     protected void addPageButtons() {
-        StackTheCardsClient.PAGE_INDEX = Math.min(StackTheCardsClient.PAGE_INDEX, this.getPageCount()-1);
+        StackTheCardsClient.PAGE_INDEX = Math.min(StackTheCardsClient.PAGE_INDEX, this.getPageCount() - 1);
         int i = (this.width - 256) / 2;
         int j = 2;
         this.nextPageButton = this.addDrawableChild(new PageTurnWidget(i + 233, 175, true, button -> this.goToNextPage(), true));
         this.previousPageButton = this.addDrawableChild(new PageTurnWidget(i, 175, false, button -> this.goToPreviousPage(), true));
         this.updatePageButtons();
-    }BookScreen
+    }
 
     protected void goToPreviousPage() {
         if (StackTheCardsClient.PAGE_INDEX > 0) {
@@ -143,9 +143,6 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (super.keyPressed(keyCode, scanCode, modifiers)) {
-            return true;
-        }
         switch (keyCode) {
             case GLFW.GLFW_KEY_LEFT: {
                 this.previousPageButton.onPress();
@@ -156,6 +153,6 @@ public class CardBinderScreen extends HandledScreen<CardBinderScreenHandler> {
                 return true;
             }
         }
-        return false;
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

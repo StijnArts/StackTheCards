@@ -1,5 +1,6 @@
 package drai.dev.stackthecards.recipes;
 
+import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.items.*;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
@@ -26,6 +27,7 @@ public class CardPackMultiplierRecipe extends SpecialCraftingRecipe {
                 ++i;
                 if(i == 5){
                     if(!itemStack.hasNbt()) return false;
+                    if(!CardPack.getCardPack(itemStack).duplicationAllowed) return false;
                 }
             } else {
                 return false;

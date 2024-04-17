@@ -42,8 +42,9 @@ public class CardGame {
     private String effectIdentifier;
     private String name;
     private Map<String, CardPack> parentPacks = new HashMap<>();
+    private String nameSpace;
 
-    public static CardGame parse(JSONObject json) throws MalformedJsonException {
+    public static CardGame parse(JSONObject json, String nameSpace) throws MalformedJsonException {
         if(json.isEmpty() || !json.containsKey(JSON_GAME_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         CardGame game;
         try{
@@ -186,16 +187,9 @@ public class CardGame {
 
     public CardData getCardBackData() {
         if(this.cardBackData == null){
-            this.cardBackData = new GameCardData(gameId, cardBackTextureName);
+            this.cardBackData = new GameCardData(gameId, cardBackTextureName, nameSpace);
         }
         return cardBackData;
-    }
-
-    public CardData getCardPackData() {
-        if(this.cardPackData == null){
-            this.cardPackData = new GameCardData(gameId, cardPackTextureName);
-        }
-        return cardPackData;
     }
 
     public void setCardBackModel(Identifier cardBackModel) {

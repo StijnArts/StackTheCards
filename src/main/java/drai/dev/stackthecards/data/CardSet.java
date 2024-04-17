@@ -15,6 +15,7 @@ import static drai.dev.stackthecards.data.carddata.CardData.JSON_ROUNDED_CORNERS
 
 public class CardSet {
     private static final String JSON_SET_ID_KEY = "setId";
+    private static final String JSON_GAME_CARD_BACK_NAMESPACE_CARD_KEY = "cardBackTextureNameSpace";
     public String gameId;
     private final String setId;
     private final Map<String, CardData> cards = new HashMap<>();
@@ -31,6 +32,7 @@ public class CardSet {
     public boolean appliesEffect = true;
     private Map<String, CardPack> parentPacks = new HashMap<>();
     private int ordering = 0;
+    private String cardBackTextureNameSpace;
 
     public CardSet(String cardSetId) {
         this.setId = cardSetId;
@@ -71,6 +73,13 @@ public class CardSet {
                 cardSet.setCardBackTextureName((String) json.get(JSON_GAME_CARD_BACK_CARD_KEY));
             } catch (Exception e){
                 throw new MalformedJsonException("Card back cardId was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey(JSON_GAME_CARD_BACK_NAMESPACE_CARD_KEY)){
+            try{
+                cardSet.cardBackTextureNameSpace = (String) json.get(JSON_GAME_CARD_BACK_NAMESPACE_CARD_KEY);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card back namespace was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
@@ -127,7 +136,7 @@ public class CardSet {
     public CardData getCardBackTextureName() {
         if(cardBackTextureName==null) return null;
         if(this.cardBackData == null){
-            this.cardBackData = new GameCardData(gameId, cardBackTextureName);
+            this.cardBackData = new GameCardData(gameId, cardBackTextureName, cardBackTextureNameSpace);
         }
         return cardBackData;
     }

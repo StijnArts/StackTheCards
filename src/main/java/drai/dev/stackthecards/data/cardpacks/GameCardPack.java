@@ -13,17 +13,18 @@ import static drai.dev.stackthecards.data.carddata.CardData.*;
 import static drai.dev.stackthecards.data.carddata.CardData.JSON_DETAIL_HEADER_KEY;
 
 public class GameCardPack extends CardPack{
-    public GameCardPack(String gameId, String packId) {
-        super(gameId, packId);
+    public GameCardPack(String gameId, String packId, String nameSpace) {
+        super(gameId, packId, nameSpace);
     }
 
-    public GameCardPack(String packId, String gameId, CardTooltipLine detailHeader, List<CardTooltipSection> hoverTooltipSections, List<CardTooltipSection> detailTooltipSections,
+    public GameCardPack(String packId, String gameId, String nameSpace, CardTooltipLine detailHeader, List<CardTooltipSection> hoverTooltipSections, List<CardTooltipSection> detailTooltipSections,
                         List<CardPackPool> pools, Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards, String packName,
-                        double weight, boolean droppedByMobs) {
-        super(packId, gameId, detailHeader, hoverTooltipSections, detailTooltipSections, pools, guaranteedItems, guaranteedCards, packName, weight, droppedByMobs);
+                        double weight, boolean droppedByMobs, boolean duplicationAllowed) {
+        super(packId, gameId, nameSpace, detailHeader, hoverTooltipSections, detailTooltipSections, pools, guaranteedItems,
+                guaranteedCards, packName, weight, droppedByMobs, duplicationAllowed);
     }
 
-    public static CardPack parse(JSONObject json, CardGame game) throws MalformedJsonException {
+    public static CardPack parse(JSONObject json, CardGame game, String nameSpace) throws MalformedJsonException {
         if(json.isEmpty() || !json.containsKey(JSON_PACK_ID_KEY)) throw new MalformedJsonException("Card pack Json was empty");
         GameCardPack cardPack;
         if(json.containsKey(JSON_PARENT_KEY)) {
@@ -34,7 +35,7 @@ public class GameCardPack extends CardPack{
             }
         } else {
             try {
-                cardPack = new GameCardPack(game.getGameId(), (String) json.get(JSON_PACK_ID_KEY));
+                cardPack = new GameCardPack(game.getGameId(), (String) json.get(JSON_PACK_ID_KEY), nameSpace);
             } catch (Exception e) {
                 throw new MalformedJsonException("Card pack id was malformed: " + e.getMessage());
             }
@@ -42,6 +43,13 @@ public class GameCardPack extends CardPack{
         if(json.containsKey(JSON_NAME_HEADER_KEY)){
             try{
                 cardPack.packName = (String) json.get(JSON_NAME_HEADER_KEY);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card pack name value was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey("canBeDuplicated")){
+            try{
+                cardPack.duplicationAllowed = (boolean) json.get("canBeDuplicated");
             } catch (Exception e){
                 throw new MalformedJsonException("Card pack name value was malformed: "+e.getMessage());
             }
@@ -144,7 +152,8 @@ public class GameCardPack extends CardPack{
 
     @Override
     public CardPack copy(String packId) {
-        return new GameCardPack(packId, this.gameId, this.detailHeader, this.hoverTooltipSections, this.detailTooltipSections, this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs);
+        return new GameCardPack(packId, this.gameId, this.nameSpace, this.detailHeader, this.hoverTooltipSections,
+                this.detailTooltipSections, this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs, this.duplicationAllowed);
     }
 
     @Override

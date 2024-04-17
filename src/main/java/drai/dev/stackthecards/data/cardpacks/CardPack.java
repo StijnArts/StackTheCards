@@ -32,6 +32,7 @@ public class CardPack {
     public static final String JSON_WEIGHT_IN_LOOT_POOL_KEY = "weightInLootPool";
     public static final String JSON_DROPPED_BY_MOBS_KEY = "droppedByMobs";
     public static final String JSON_PARENT_KEY = "parent";
+    public final String nameSpace;
     protected String packId;
     protected String gameId;
     protected String setId;
@@ -44,22 +45,25 @@ public class CardPack {
     protected String packName;
     protected double weight = 1;
     protected boolean droppedByMobs = true;
+    public boolean duplicationAllowed = true;
 
-    protected CardPack(String gameId, String packId){
+    protected CardPack(String gameId, String packId, String nameSpace){
         this.gameId = gameId;
         this.packId = packId;
+        this.nameSpace = nameSpace;
     }
-    public CardPack(String gameId, String setId, String packId) {
+    public CardPack(String gameId, String setId, String packId, String nameSpace) {
         this.packId = packId;
         this.gameId = gameId;
         this.setId = setId;
         this.packName = packId;
+        this.nameSpace = nameSpace;
     }
 
-    public CardPack(String packId, String gameId, String setId, CardTooltipLine detailHeader, List<CardTooltipSection>
+    public CardPack(String packId, String gameId, String setId, String nameSpace, CardTooltipLine detailHeader, List<CardTooltipSection>
             hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
                     Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
-                    String packName, double weight, boolean droppedByMobs) {
+                    String packName, double weight, boolean droppedByMobs, boolean duplicationAllowed) {
         this.packId = packId;
         this.gameId = gameId;
         this.setId = setId;
@@ -72,12 +76,14 @@ public class CardPack {
         this.packName = packName;
         this.weight = weight;
         this.droppedByMobs = droppedByMobs;
+        this.nameSpace = nameSpace;
+        this.duplicationAllowed = duplicationAllowed;
     }
 
-    public CardPack(String packId, String gameId, CardTooltipLine detailHeader, List<CardTooltipSection>
+    public CardPack(String packId, String gameId, String nameSpace, CardTooltipLine detailHeader, List<CardTooltipSection>
             hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
                     Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
-                    String packName, double weight, boolean droppedByMobs) {
+                    String packName, double weight, boolean droppedByMobs, boolean duplicationAllowed) {
         this.packId = packId;
         this.gameId = gameId;
         this.detailHeader = detailHeader;
@@ -89,6 +95,8 @@ public class CardPack {
         this.packName = packName;
         this.weight = weight;
         this.droppedByMobs = droppedByMobs;
+        this.nameSpace = nameSpace;
+        this.duplicationAllowed = duplicationAllowed;
     }
 
     public static CardPack getCardPack(ItemStack stack) {
@@ -113,7 +121,7 @@ public class CardPack {
         stack.getOrCreateNbt().put(STORED_CARD_PACK_DATA_KEY, nbtList);
     }
 
-    public static CardPack parse(JSONObject json, CardGame game, CardSet cardSet) throws MalformedJsonException {
+    public static CardPack parse(JSONObject json, CardGame game, CardSet cardSet, String nameSpace) throws MalformedJsonException {
         if(json.isEmpty() || !json.containsKey(JSON_PACK_ID_KEY)) throw new MalformedJsonException("Card pack Json was empty");
         CardPack cardPack;
 
@@ -125,7 +133,7 @@ public class CardPack {
             }
         } else {
             try {
-                cardPack = new CardPack(game.getGameId(), cardSet.getSetId(), (String) json.get(JSON_PACK_ID_KEY));
+                cardPack = new CardPack(game.getGameId(), cardSet.getSetId(), (String) json.get(JSON_PACK_ID_KEY), nameSpace);
             } catch (Exception e) {
                 throw new MalformedJsonException("Card pack id was malformed: " + e.getMessage());
             }
@@ -133,6 +141,13 @@ public class CardPack {
         if(json.containsKey(JSON_NAME_HEADER_KEY)){
             try{
                 cardPack.packName = (String) json.get(JSON_NAME_HEADER_KEY);
+            } catch (Exception e){
+                throw new MalformedJsonException("Card pack name value was malformed: "+e.getMessage());
+            }
+        }
+        if(json.containsKey("canBeDuplicated")){
+            try{
+                cardPack.duplicationAllowed = (boolean) json.get("canBeDuplicated");
             } catch (Exception e){
                 throw new MalformedJsonException("Card pack name value was malformed: "+e.getMessage());
             }
@@ -234,8 +249,8 @@ public class CardPack {
     }
 
     public CardPack copy(String packId) {
-        return new CardPack(packId, this.gameId, this.setId, this.detailHeader, this.hoverTooltipSections, this.detailTooltipSections,
-                this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs);
+        return new CardPack(packId, this.gameId, this.setId, this.nameSpace, this.detailHeader, this.hoverTooltipSections, this.detailTooltipSections,
+                this.pools, this.guaranteedItems, this.guaranteedCards, this.packName, this.weight, this.droppedByMobs, this.duplicationAllowed);
     }
 
     public static CardPack getRandomCardPack(boolean forMobDrops) {
@@ -316,7 +331,7 @@ public class CardPack {
     }
 
     public Identifier getModelIdentifier() {
-        if(packId!=null && !packId.equals("missing")) return new Identifier("stack_the_cards", "stc_cards/packs/"+packId);
+        if(packId!=null && !packId.equals("missing")) return new Identifier(nameSpace, "stc_cards/packs/"+packId);
 
         var cardGame = this.getCardGame();
         if(cardGame!=null) {

@@ -62,7 +62,7 @@ public class StackTheCards implements ModInitializer {
                     JSONParser jsonParser = new JSONParser();
                     try{
                         JSONObject jsonObjectGame = (JSONObject) jsonParser.parse(new InputStreamReader(gameResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-                        CardGame cardGame = CardGame.parse(jsonObjectGame);
+                        CardGame cardGame = CardGame.parse(jsonObjectGame, gameResource.getKey().getNamespace());
                         CardGameRegistry.registerGame(cardGame);
 
                         for (var formattingResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/formatting", path-> path.getPath().endsWith(".json")).entrySet()){
@@ -94,7 +94,7 @@ public class StackTheCards implements ModInitializer {
                                 for (var cardResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/sets/"+cardSet.getSetId()+"/cards", path-> path.getPath().endsWith(".json")).entrySet()){
                                     try{
                                         JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(cardResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-                                        CardData cardData = CardData.parse(jsonObjectCard, cardGame);
+                                        CardData cardData = CardData.parse(jsonObjectCard, cardGame, cardResource.getKey().getNamespace());
                                         cardData.setSet(cardSet);
                                         cardData.setGame(cardGame);
                                         cardSet.addCard(cardData);
@@ -107,7 +107,7 @@ public class StackTheCards implements ModInitializer {
                                 for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/sets/"+cardSet.getSetId()+"/parent_packs", path-> path.getPath().endsWith(".json")).entrySet()){
                                     try{
                                         JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-                                        CardPack cardPack = CardPack.parse(jsonObjectCard, cardGame, cardSet);
+                                        CardPack cardPack = CardPack.parse(jsonObjectCard, cardGame, cardSet, packResource.getKey().getNamespace());
                                         cardPack.setSet(cardSet.getSetId());
                                         cardSet.addParentPacks(cardPack);
                                     } catch (Exception e){
@@ -119,7 +119,7 @@ public class StackTheCards implements ModInitializer {
                                 for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/sets/"+cardSet.getSetId()+"/packs", path-> path.getPath().endsWith(".json")).entrySet()){
                                     try{
                                         JSONObject jsonObjectCard = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-                                        CardPack cardPack = CardPack.parse(jsonObjectCard, cardGame, cardSet);
+                                        CardPack cardPack = CardPack.parse(jsonObjectCard, cardGame, cardSet, packResource.getKey().getNamespace());
                                         cardPack.setSet(cardSet.getSetId());
                                         cardSet.addPack(cardPack);
                                     } catch (Exception e){
@@ -159,7 +159,7 @@ public class StackTheCards implements ModInitializer {
                         for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/parent_packs", path-> path.getPath().endsWith(".json")).entrySet()){
                             try{
                                 JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-                                CardPack cardPack = GameCardPack.parse(jsonObject, cardGame);
+                                CardPack cardPack = GameCardPack.parse(jsonObject, cardGame, packResource.getKey().getNamespace());
                                 cardPack.setGame(cardGame);
                                 cardGame.addParentPacks(cardPack);
                             } catch (Exception e){
@@ -171,7 +171,7 @@ public class StackTheCards implements ModInitializer {
                         for (var packResource : manager.findResources("stc_cards/"+cardGame.getGameId()+"/packs", path-> path.getPath().endsWith(".json")).entrySet()){
                             try{
                                 JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(packResource.getValue().getInputStream(), StandardCharsets.UTF_8));
-                                CardPack cardPack = GameCardPack.parse(jsonObject, cardGame);
+                                CardPack cardPack = GameCardPack.parse(jsonObject, cardGame, packResource.getKey().getNamespace());
                                 cardPack.setGame(cardGame);
                                 cardGame.addPack(cardPack);
                             } catch (Exception e){

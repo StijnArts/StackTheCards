@@ -3,8 +3,8 @@ package drai.dev.stackthecards.data.carddata;
 import drai.dev.stackthecards.data.*;
 
 public class GameCardData extends CardData{
-    public GameCardData(String gameId, String cardId) {
-        super(cardId);
+    public GameCardData(String gameId, String cardId, String nameSpace) {
+        super(cardId, nameSpace);
         this.gameId = gameId;
     }
 

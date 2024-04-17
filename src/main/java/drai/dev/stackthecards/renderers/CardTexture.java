@@ -193,7 +193,7 @@ public class CardTexture {
 
     private static NativeImage getCardTextureFromData(CardData cardData) {
         ResourceManager testResourceManager = MinecraftClient.getInstance().getResourceManager();
-        Identifier textureId = new Identifier("stack_the_cards", "stc_cards/cards/"+ cardData.getCardTextureLocation() +".png");
+        Identifier textureId = new Identifier(cardData.nameSpace, "stc_cards/cards/"+ cardData.getCardTextureLocation() +".png");
         NativeImage textureImage = null;
         try {
             Optional<Resource> resource = testResourceManager.getResource(textureId);
@@ -210,7 +210,7 @@ public class CardTexture {
 
     private NativeImage getPackTextureFromData(CardPack cardPack) {
         ResourceManager testResourceManager = MinecraftClient.getInstance().getResourceManager();
-        Identifier textureId = new Identifier("stack_the_cards", "stc_cards/packs/"+ cardPack.getPackTextureLocation() +".png");
+        Identifier textureId = new Identifier(cardPack.nameSpace, "stc_cards/packs/"+ cardPack.getPackTextureLocation() +".png");
         NativeImage textureImage = null;
         try {
             Optional<Resource> resource = testResourceManager.getResource(textureId);
