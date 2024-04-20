@@ -48,7 +48,7 @@ public class CardGame {
         if(json.isEmpty() || !json.containsKey(JSON_GAME_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         CardGame game;
         try{
-            game = new CardGame((String) json.get(JSON_GAME_ID_KEY));
+            game = new CardGame((String) json.get(JSON_GAME_ID_KEY),nameSpace);
         } catch (Exception e){
             throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
         }
@@ -135,9 +135,10 @@ public class CardGame {
         this.cardPackModel = identifier;
     }
 
-    public CardGame(String gameId){/*, CardStackingDirection cardStackingDirection, float cardStackingDistance) {*/
+    public CardGame(String gameId, String nameSpace){/*, CardStackingDirection cardStackingDirection, float cardStackingDistance) {*/
         this.gameId = gameId;
 //        addTestConnections();
+        this.nameSpace = nameSpace;
     }
 
     public String getGameId() {
@@ -256,5 +257,9 @@ public class CardGame {
 
     public CardPack getParentPack(String s) {
         return parentPacks.get(s);
+    }
+
+    public List<CardConnection> getSingleConnections() {
+        return cardConnections.values().stream().filter(connection -> connection.isSingle).collect(Collectors.toList());
     }
 }

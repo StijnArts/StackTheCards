@@ -18,8 +18,6 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
 
-import java.util.*;
-
 @Mixin(ItemFrameEntity.class)
 public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
     protected ItemFrameEntityMixin(EntityType<? extends AbstractDecorationEntity> entityType, World world) {
@@ -88,9 +86,7 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
                     if (!this.isRemoved()) {
                         if(CardConnection.checkCardConnection(currentItemstack, itemStack)){
                             this.setHeldItemStack(currentItemstack);
-                            cir.setReturnValue(ActionResult.CONSUME);
-                            return;
-                        } else if(StackTheCardsClient.shiftKeyPressed){
+                        } else if(StackTheCardsClient.shiftKeyPressed || CardConnection.checkSingleCardConnection(itemStack)){
 //                    var cardsToAttach = new ArrayList<>();
                             var oldTopCardItemStack = currentItemstack.copyWithCount(1);
                             var newTopCardItemStack = itemStack.copyWithCount(1);
@@ -186,9 +182,14 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
         var detachingCardItemstack = Card.getAsItemStack(CardConnection.removeConnection(stack));
         var connectedCards = CardConnection.getConnectedCards(stack);
         var connections = Card.getCardData(stack).getCardGame().getConnections(Card.getCardIdentifier(stack));
+        boolean shouldDrop = true;
         for (CardConnection connection : connections) {
             if(connection.matches(connectedCards) && connection.contains(connectedCards)) {
                 CardConnection.breakConnections(stack);
+                if(connection.isSingle){
+                    shouldDrop = false;
+                    break;
+                }
                 for (var card : connectedCards) {
                     CardConnection.addToConnection(stack, card, connection);
                 }
@@ -200,7 +201,7 @@ public abstract class ItemFrameEntityMixin extends AbstractDecorationEntity {
             ci.cancel();
             return true;
         }
-        dropStack(detachingCardItemstack);
+        if(shouldDrop) dropStack(detachingCardItemstack);
         ci.cancel();
         return false;
     }

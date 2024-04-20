@@ -36,7 +36,7 @@ public abstract class ItemStackMixin {
         var self  =(ItemStack) (Object) this;
         if(self.isOf(Items.CARD)){
             var tooltip = ci.getReturnValue();
-            if(StackTheCardsClient.shiftKeyPressed){
+            if(StackTheCardsClient.cardLoreKeyPressed){
                 tooltip.addAll(Card.getCardData(self).getDetailToolTips());
             } else {
                 tooltip.addAll(Card.getCardData(self).getTooltipsDescriptors());
@@ -45,7 +45,7 @@ public abstract class ItemStackMixin {
         }
         if(self.isOf(Items.CARD_PACK)){
             var tooltip = ci.getReturnValue();
-            if(StackTheCardsClient.shiftKeyPressed){
+            if(StackTheCardsClient.cardLoreKeyPressed){
                 var pack = CardPack.getCardPack(self);
                 var effect = Registries.STATUS_EFFECT.get(Identifier.tryParse(pack.getEffectIdentifier()));
                 if(effect != null){

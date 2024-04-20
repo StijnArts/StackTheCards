@@ -92,17 +92,17 @@ public class CardTexture {
 
     public static void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, RenderLayer renderLayer,
                             int layersHigh, int amountOfCardsAttached, double scale, CardGame game, double xOffset, double yOffset) {
-        draw(matrices, vertexConsumers.getBuffer(renderLayer), light, renderLayer, layersHigh, amountOfCardsAttached, scale, game, xOffset, yOffset);
+        draw(matrices, vertexConsumers.getBuffer(renderLayer), light, layersHigh, amountOfCardsAttached, scale, game.cardStackingDirection, game.cardStackingDistance, xOffset, yOffset);
     }
 
-    public static void draw(MatrixStack matrices, VertexConsumer vertexConsumer, int light, RenderLayer renderLayer,
-                            int layersHigh, int amountOfCardsAttached, double scale, CardGame game, double xOffset, double yOffset) {
-        var cardDistance = game.cardStackingDistance;
+    public static void draw(MatrixStack matrices, VertexConsumer vertexConsumer, int light,
+                            int layersHigh, int amountOfCardsAttached, double scale, CardStackingDirection cardStackingDirection, float cardStackingDistance, double xOffset, double yOffset) {
+        var cardDistance = cardStackingDistance;
         var y = 0F;
         var x = 0F;
         if(layersHigh != 0){
-            x = cardDistance * game.cardStackingDirection.xMod;
-            y = cardDistance * game.cardStackingDirection.yMod;
+            x = cardDistance * cardStackingDirection.xMod;
+            y = cardDistance * cardStackingDirection.yMod;
         }
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         matrix4f.translate(x, y, amountOfCardsAttached*0.1F);

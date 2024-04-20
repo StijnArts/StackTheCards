@@ -17,6 +17,7 @@ public class CardConnection {
     private static final String JSON_CONNECTION_ID_KEY = "connectionId";
     private static final String JSON_LAYOUT_KEY = "layout";
     private final String connectionId;
+    public boolean isSingle = false;
     private String cardGameId;
     private List<List<CardConnectionEntry>> layout = new ArrayList<>();
     private List<List<CardConnectionEntry>> layoutByColumn = new ArrayList<>();
@@ -45,15 +46,20 @@ public class CardConnection {
             try{
                 var layoutJson = (JSONArray) json.get(JSON_LAYOUT_KEY);
                 var layout = new ArrayList<List<CardConnectionEntry>>();
+                int i = 0;
+                int j = 0;
                 for (var rowJson : layoutJson) {
                     JSONArray row = (JSONArray) ((JSONObject) rowJson).get("row");
                     var rowList = new ArrayList<CardConnectionEntry>();
                     for (var entry  : row) {
                         rowList.add(CardConnectionEntry.parse((JSONObject)entry));
+                        j++;
                     }
                     layout.add(rowList);
+                    i++;
                 }
                 cardConnection.setLayout(layout);
+                cardConnection.isSingle = i == 1 && j ==1;
             } catch (Exception e){
                 throw new MalformedJsonException("Card connection layout was malformed: "+e.getMessage());
             }
@@ -88,6 +94,21 @@ public class CardConnection {
         }
 
         return maxSize;
+    }
+
+    public static boolean checkSingleCardConnection(ItemStack other) {
+        var otherCardIdentifier = Card.getCardIdentifier(other);
+        var singleConnections = Card.getCardData(other).getCardGame().getSingleConnections();
+        for (CardConnection connection : singleConnections) {
+            if(connection.matches(List.of(otherCardIdentifier))) {
+//                CardConnection.breakConnections(self);
+                for (var card : List.of(otherCardIdentifier)) {
+                    CardConnection.addToConnection(other, card, connection);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<List<CardConnectionEntry>> transposeLayout(List<List<CardConnectionEntry>> layout) {
@@ -163,6 +184,7 @@ public class CardConnection {
                 return true;
             }
         }
+
         return false;
     }
 

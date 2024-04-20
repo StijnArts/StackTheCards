@@ -370,7 +370,7 @@ public class CardPack {
     }
 
     public Text getPackNameLabel() {
-        if(!StackTheCardsClient.shiftKeyPressed){
+        if(!StackTheCardsClient.cardLoreKeyPressed){
             return Text.literal(getPackName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
         } else {
             if(detailHeader == null) return Text.literal(getPackName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));

@@ -3,7 +3,6 @@ package drai.dev.stackthecards.util;
 
 import net.fabricmc.api.*;
 import net.minecraft.client.util.*;
-import net.minecraft.recipe.*;
 import org.jetbrains.annotations.*;
 import org.lwjgl.glfw.*;
 
@@ -32,6 +31,11 @@ public final class Key {
     @Nullable
     public static Key cardLoreKey() {
             return new Key(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_LEFT_CONTROL));
+    }
+
+    @Nullable
+    public static Key cardPlacementKey() {
+        return new Key(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_LEFT_SHIFT));
     }
     @Nullable
     public static Key flipCardKey() {

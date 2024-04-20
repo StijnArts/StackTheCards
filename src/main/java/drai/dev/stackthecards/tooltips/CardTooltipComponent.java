@@ -75,7 +75,7 @@ public class CardTooltipComponent implements TooltipComponent {
     private double getCardPreviewSize() {
         double cardPreviewSizeSmall = 58;
         double cardPreviewSizeLarge = 80;
-        return StackTheCardsClient.shiftKeyPressed ? cardPreviewSizeLarge : cardPreviewSizeSmall;
+        return StackTheCardsClient.cardLoreKeyPressed ? cardPreviewSizeLarge : cardPreviewSizeSmall;
     }
 
 

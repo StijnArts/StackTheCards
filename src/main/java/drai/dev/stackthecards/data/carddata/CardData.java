@@ -221,7 +221,7 @@ public class CardData {
     }
 
     public Text getCardNameLabel() {
-        if(!StackTheCardsClient.shiftKeyPressed){
+        if(!StackTheCardsClient.cardLoreKeyPressed){
             return Text.literal(getCardName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
         } else {
             if(detailHeader == null) return Text.literal(getCardName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));

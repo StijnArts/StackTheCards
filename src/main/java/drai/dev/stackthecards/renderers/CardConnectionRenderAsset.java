@@ -73,8 +73,8 @@ public class CardConnectionRenderAsset {
                                 columnSize % 2 == 0, connectionSlot,false);
                         yOffset -= yNeighbourOffset;
                     }
-                    xOffset+=xOffsetForRow;
-                    yOffset+=yOffsetForAllCards;
+                    xOffset+=xOffsetForRow + connectionSlot.xModifier;
+                    yOffset+=yOffsetForAllCards + connectionSlot.yModifier;
                     if(containedCards.stream().anyMatch(cardIdentifier -> cardIdentifier.isEqual(connectionSlot.self))){
                         cards.add(new CardConnectionAssetEntry(xOffset, yOffset, connectionSlot.layer, connectionSlot, cardTexture));
                     }

@@ -150,6 +150,11 @@ public class StackTheCards implements ModInitializer {
                                 CardConnection connection = CardConnection.parse(jsonObjectCard, cardGame);
                                 connection.setGame(cardGame);
                                 cardGame.addConnection(connection);
+                                for (var row : connection.getLayout()) {
+                                    for (var card : row) {
+                                        System.out.println("Command for Connection testing: /give @a stack_the_cards:card{CardData:[{card_id:"+card.self.cardId+", set_id:"+card.self.setId+", game_id:pokemon_tcg}]}");
+                                    }
+                                }
                             } catch (Exception e){
                                 System.out.println("connection json file "+connectionsResource.getKey() + " was invalid: "+e.getMessage());
                             }

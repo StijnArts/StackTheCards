@@ -2,7 +2,6 @@ package drai.dev.stackthecards.client;
 
 import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.client.screen.*;
-import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.models.*;
 import drai.dev.stackthecards.registry.ItemGroups;
 import drai.dev.stackthecards.renderers.*;
@@ -12,13 +11,11 @@ import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.client.model.loading.v1.*;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.client.screen.v1.*;
-import net.fabricmc.fabric.api.resource.*;
 import net.minecraft.client.*;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.util.*;
 import net.minecraft.item.*;
 import net.minecraft.registry.*;
-import net.minecraft.resource.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
@@ -32,11 +29,12 @@ public class StackTheCardsClient implements ClientModInitializer {
     public static CardTooltipRenderer CARD_TOOLTIP_RENDERER;
     public static List<Identifier> CARD_BACK_MODELS = new ArrayList<>();
     public static List<Identifier> CARD_PACK_MODELS = new ArrayList<>();
-    public static boolean shiftKeyPressed;
+    public static boolean cardLoreKeyPressed;
     public static boolean ctrlKeyPressed;
     public static int scrollModifier = 0;
     private static ItemStack previousStack = null;
     public static boolean shiftKeyReleased = false;
+    public static boolean shiftKeyPressed = false;
 
     @Override
     public void onInitializeClient() {
@@ -66,9 +64,10 @@ public class StackTheCardsClient implements ClientModInitializer {
     }
 
     public static void updateKeys() {
-        var previousShiftKeyState = shiftKeyPressed;
-        shiftKeyPressed = isKeyPressed(Key.cardLoreKey()) || isKeyPressed(Key.rightCardLoreKey());;
-        if(previousShiftKeyState && !shiftKeyPressed) shiftKeyReleased = true;
+        var previousShiftKeyState = cardLoreKeyPressed;
+        cardLoreKeyPressed = isKeyPressed(Key.cardLoreKey()) || isKeyPressed(Key.rightCardLoreKey());
+        shiftKeyPressed = isKeyPressed(Key.cardPlacementKey());
+        if(previousShiftKeyState && !cardLoreKeyPressed) shiftKeyReleased = true;
         ctrlKeyPressed = isKeyPressed(Key.flipCardKey());
     }
 

@@ -1,6 +1,5 @@
 package drai.dev.stackthecards.renderers;
 
-import com.google.common.math.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.carddata.*;
@@ -45,8 +44,8 @@ public class CardRenderer {
                 }
                 double attachedCardsXOffset = cardGame.cardStackingDirection.xMod == 0 ? 0 : (cardGame.cardStackingDirection.xMod <0 ? connectionAsset.maxOffsetX : connectionAsset.minOffsetX);
                 double attachedCardsYOffset = cardGame.cardStackingDirection.yMod == 0 ? 0 : (cardGame.cardStackingDirection.yMod <0 ? connectionAsset.maxOffsetY : connectionAsset.minOffsetY);
-                matrices.translate(attachedCardsXOffset*cardGame.cardStackingDirection.xMod, attachedCardsYOffset*cardGame.cardStackingDirection.yMod,0);
-                drawAttachedCards(matrices, vertexConsumers, stack, light, 1, isFlipped,cardGame);
+                if(!connection.isSingle) matrices.translate(attachedCardsXOffset*cardGame.cardStackingDirection.xMod, attachedCardsYOffset*cardGame.cardStackingDirection.yMod,0);
+                drawAttachedCards(matrices, vertexConsumers, stack, light, isFlipped,cardGame, true);
             } else {
                 var cardTexture = getCardTexture(cardData, isFlipped);
                 CardTexture.draw(matrices, vertexConsumers, light, cardTexture.getRenderLayer(), 0, Card.getAttachedCards(stack).size()*-1, cardGame, 0,0);
@@ -59,6 +58,14 @@ public class CardRenderer {
             if(texture == null || cardGame == null ) return;
             if(textureManager == null) textureManager = MinecraftClient.getInstance().getTextureManager();
             CardTexture.draw(matrices, vertexConsumers, light, texture.getRenderLayer(), 0, 0, 1, cardGame, 0, 0);
+        }
+    }
+
+    private void drawAttachedCards(MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack, int light, boolean isFlipped, CardGame cardGame, boolean b) {
+        var attachedCards= Card.getAttachedCards(stack);
+        for (int i = 0; i < attachedCards.size(); i++) {
+            var attachedCardData = Card.getCardData(Card.getAsItemStack(attachedCards.get(i)));
+            CardTexture.draw(matrices, vertexConsumers, light, getCardTexture(attachedCardData, isFlipped).getRenderLayer(), i, 1, 1, cardGame, 0, 0);
         }
     }
 

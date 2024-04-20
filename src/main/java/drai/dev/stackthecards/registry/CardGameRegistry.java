@@ -10,7 +10,7 @@ public class CardGameRegistry {
     public static final CardSet MISSING_CARD_SET = new CardSet("missing");
     public static CardData MISSING_CARD_DATA = new CardData("missing", "stack_the_cards");
     public static CardPack MISSING_CARD_PACK = new CardPack("missing", "missing","missing", "stack_the_cards");
-    public static CardGame MISSING_CARD_GAME = new CardGame("missing");
+    public static CardGame MISSING_CARD_GAME = new CardGame("missing", "stack_the_cards");
     public static Map<String, CardGame> cardGames = new HashMap<>();
 
     public static Map<String, CardGame> getCardGames() {

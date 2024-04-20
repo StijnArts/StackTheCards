@@ -2,7 +2,6 @@ package drai.dev.stackthecards.renderers;
 
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.items.*;
-import net.minecraft.client.font.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.tooltip.*;
 import net.minecraft.item.*;
@@ -28,7 +27,7 @@ public class CardTooltipRenderer {
         int borderSizeX = (int) (cardSpace-2*xOffset);
         int borderSizeY = (int) (cardSpace-2*yOffset);
         context.draw(()->TooltipBackgroundRenderer.render(context, x, y, borderSizeX, borderSizeY, 400));
-        matrices.translate((float)(x -xOffset+(StackTheCardsClient.shiftKeyPressed ? 2F : 1.5F)), (float)(y -yOffset+(StackTheCardsClient.shiftKeyPressed ? 2F : 1.5F)), 500);
+        matrices.translate((float)(x -xOffset+(StackTheCardsClient.cardLoreKeyPressed ? 2F : 1.5F)), (float)(y -yOffset+(StackTheCardsClient.cardLoreKeyPressed ? 2F : 1.5F)), 500);
         cardRenderer.draw(matrices, context.getVertexConsumers(), stack, 15728880, cardScale);
     }
 }

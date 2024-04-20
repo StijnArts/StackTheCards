@@ -66,7 +66,7 @@ public class CardBinderScreenHandler extends ScreenHandler {
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
-        //TODO make shift clicking a card put it in the slot associated with the card number
+        //TODO shift clicking out of the binder inventory currently sets stack count to max
         ItemStack newStack = ItemStack.EMPTY;
         Slot clickedSlot = this.slots.get(invSlot);
         if(!(player instanceof ClientPlayerEntity)){
@@ -80,7 +80,7 @@ public class CardBinderScreenHandler extends ScreenHandler {
                 if(isBound){
                     useCardBinderQuickmove = set.getCardGame().getGameId().equalsIgnoreCase(boundIdentifier.gameId)&&set.getSetId().equalsIgnoreCase(boundIdentifier.setId);
                 }
-                if(useCardBinderQuickmove){
+                if(useCardBinderQuickmove && invSlot < 3*9){
                     var cardIndex = cardData.index;
                     if(!insertItem(originalStack, cardIndex, player)){
                         return ItemStack.EMPTY;

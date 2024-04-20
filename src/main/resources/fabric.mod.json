@@ -4,10 +4,8 @@
   "version": "${version}",
   "name": "StackTheCards",
   "description": "",
-  "authors": [],
-  "contact": {
-    "repo": "https://github.com/Stijn/StackTheCards"
-  },
+  "authors": ["Drai"],
+  "contact": {},
   "license": "All-Rights-Reserved",
   "icon": "assets/stackthecards/icon.png",
   "environment": "*",
