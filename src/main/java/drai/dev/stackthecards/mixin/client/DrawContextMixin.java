@@ -3,86 +3,57 @@ package drai.dev.stackthecards.mixin.client;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.extensions.*;
 import drai.dev.stackthecards.tooltips.*;
-import net.minecraft.client.font.*;
 import net.minecraft.client.gui.*;
-import net.minecraft.client.gui.tooltip.*;
+import net.minecraft.client.gui.screens.inventory.tooltip.*;
+import net.minecraft.world.inventory.tooltip.*;
+import org.apache.logging.log4j.core.pattern.*;
 import org.joml.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 
 import java.util.*;
 
-@Mixin(DrawContext.class)
+@Mixin(GuiGraphics.class)
 public abstract class DrawContextMixin implements DrawContextExtensions {
 
-    @Shadow @Deprecated public abstract void draw(Runnable drawCallback);
+    @Shadow @Deprecated public abstract void drawManaged(Runnable drawCallback);
 
-    @Shadow public abstract int getScaledWindowWidth();
+    @Shadow public abstract int guiWidth();
 
-    @Shadow public abstract int getScaledWindowHeight();
+    @Shadow public abstract int guiHeight();
 
-    @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/tooltip/TooltipComponent;"
-            + "drawItems(Lnet/minecraft/client/font/TextRenderer;IILnet/minecraft/client/gui/DrawContext;)V"), method =
-            "Lnet/minecraft/client/gui/DrawContext;drawTooltip("
-                    + "Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;II"
-                    + "Lnet/minecraft/client/gui/tooltip/TooltipPositioner;)V")
-    private void drawPosAwareComponent(TooltipComponent component, TextRenderer textRenderer, int x, int y,
-                                       DrawContext context) {
-        if(component instanceof CardTooltipComponent cardTooltipComponent){
-            cardTooltipComponent.drawItemsWithTooltipPosition(textRenderer, x, y, context, this.getTooltipTopYPosition(),
+    @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent;renderImage(Lnet/minecraft/client/gui/Font;IILnet/minecraft/client/gui/GuiGraphics;)V"), method =
+            "renderTooltipInternal")
+    private void drawPosAwareComponent(ClientTooltipComponent component, Font textRenderer, int x, int y,
+                                       GuiGraphics context) {
+        if(component instanceof CardTooltipComponent cardClientTooltipComponent){
+            cardClientTooltipComponent.drawItemsWithTooltipPosition(textRenderer, x, y, context, this.getTooltipTopYPosition(),
                     this.getTooltipBottomYPosition(), this.getMouseX(), this.getMouseY());
         } else {
-            component.drawItems(textRenderer, x, y, context);
+            component.renderImage(textRenderer, x, y, context);
         }
     }
 
-    @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw(Ljava/lang/Runnable;)V"), method =
-            "Lnet/minecraft/client/gui/DrawContext;drawTooltip("
-                    + "Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;II"
-                    + "Lnet/minecraft/client/gui/tooltip/TooltipPositioner;)V")
-    private void drawPosAwareComponent(DrawContext context, Runnable drawCallback, TextRenderer textRenderer, List<TooltipComponent> components, int x, int y, TooltipPositioner positioner) {
+    @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawManaged(Ljava/lang/Runnable;)V"), method =
+            "renderTooltipInternal")
+    private void drawPosAwareComponent(GuiGraphics context, Runnable drawCallback, Font textRenderer, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner) {
         int i = 0;
         int j = components.size() == 1 ? -2 : 0;
-        for (TooltipComponent tooltipComponent : components) {
-            int k = tooltipComponent.getWidth(textRenderer);
+        for (ClientTooltipComponent clientTooltipComponent : components) {
+            int k = clientTooltipComponent.getWidth(textRenderer);
             if (k > i) {
                 i = k;
             }
-            j += tooltipComponent.getHeight();
+            j += clientTooltipComponent.getHeight();
         }
         int l = i;
         int m = j;
-        Vector2ic vector2ic = positioner.getPosition(this.getScaledWindowWidth(), this.getScaledWindowHeight(), x, y, l, m);
+        Vector2ic vector2ic = positioner.positionTooltip(this.guiWidth(), this.guiHeight(), x, y, l, m);
         int n = vector2ic.x();
         int o = vector2ic.y();
-        this.draw(() -> TooltipBackgroundRenderer.render((DrawContext) (Object)this, n, o + StackTheCardsClient.getScrollModifier(), l, m, 400));
+        this.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground((GuiGraphics) (Object)this, n, o + StackTheCardsClient.getScrollModifier(), l, m, 400));
     }
 
-
-
-    /*@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/tooltip/TooltipComponent;drawText(Lnet/minecraft/client/font/TextRenderer;IILorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;)V"), method =
-            "Lnet/minecraft/client/gui/DrawContext;drawTooltip("
-                    + "Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;II"
-                    + "Lnet/minecraft/client/gui/tooltip/TooltipPositioner;)V")
-    private void modifyText(TooltipComponent component, TextRenderer textRenderer, int x, int y,
-                                       DrawContext context) {
-        if(component instanceof CardTooltipComponent cardTooltipComponent){
-            cardTooltipComponent.drawItemsWithTooltipPosition(textRenderer, x, y, context, this.getTooltipTopYPosition(),
-                    this.getTooltipBottomYPosition(), this.getMouseX(), this.getMouseY());
-        } else {
-            component.drawItems(textRenderer, x, y+StackTheCardsClient.scrollModifier, context);
-        }
-    }*/
-
-    /*@ModifyVariable(method = "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;)V", at = @At("STORE"), ordinal = 9)
-    private int injected(int n) {
-        if(StackTheCardsClient.shiftKeyPressed){
-            var newY = n + StackTheCardsClient.scrollModifier*3;
-            System.out.println("modified Y, was "+n+", is "+newY);
-            return newY;
-        }
-        return n;
-    }*/
     @Unique
     private int tooltipTopYPosition = 0;
     @Unique

@@ -1,14 +1,16 @@
 package drai.dev.stackthecards.renderers;
 
+import com.mojang.blaze3d.platform.*;
+import com.mojang.blaze3d.vertex.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import net.minecraft.client.*;
-import net.minecraft.client.render.*;
-import net.minecraft.client.texture.*;
-import net.minecraft.client.util.math.*;
-import net.minecraft.resource.*;
-import net.minecraft.util.*;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.entity.layers.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.resources.*;
+import net.minecraft.server.packs.resources.*;
 import org.joml.*;
 
 import java.io.*;
@@ -16,10 +18,12 @@ import java.lang.*;
 import java.lang.Math;
 import java.util.*;
 
+import static net.fabricmc.fabric.api.renderer.v1.material.BlendMode.CUTOUT;
+
 public class CardTexture {
     private CardData cardData;
-    private final NativeImageBackedTexture texture;
-    private final RenderLayer renderLayer;
+    private final DynamicTexture texture;
+    private final RenderType renderLayer;
     private int originalImageWidth = 0;
     private int originalImageHeight = 0;
 
@@ -27,28 +31,28 @@ public class CardTexture {
         this.cardData = cardData;
         var foundTexture = getCardTextureFromData(cardData);
         this.texture = createTexture(cardData.hasRoundedCorners(), foundTexture, this);
-        Identifier identifier = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("stc_card/"+cardData.getTextureId(), this.texture);
-        this.renderLayer = RenderLayer.getText(identifier);
+        ResourceLocation identifier = Minecraft.getInstance().getTextureManager().register("stc_card/"+cardData.getTextureId(), this.texture);
+        this.renderLayer = RenderType.text(identifier);
         this.texture.upload();
     }
 
     public CardTexture(CardPack cardPack){
         var foundTexture = getPackTextureFromData(cardPack);
         this.texture = createTexture(false, foundTexture, this);
-        Identifier identifier = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("stc_card/"+cardPack.getTextureId(), this.texture);
-        this.renderLayer = RenderLayer.getText(identifier);
+        ResourceLocation identifier = Minecraft.getInstance().getTextureManager().register("stc_card/"+cardPack.getTextureId(), this.texture);
+        this.renderLayer = RenderType.text(identifier);
         this.texture.upload();
     }
 
-    private static NativeImageBackedTexture createTexture(boolean hasRoundedCorners, NativeImage foundTexture, CardTexture texture) {
-        NativeImageBackedTexture nativeImageBackedTexture;/* = new NativeImageBackedTexture(1024, 1024, true);*/
+    private static DynamicTexture createTexture(boolean hasRoundedCorners, NativeImage foundTexture, CardTexture texture) {
+        DynamicTexture dynamicTexture;/* = new DynamicTexture(1024, 1024, true);*/
         if(foundTexture == null){
-            nativeImageBackedTexture = new NativeImageBackedTexture(16,16, true);
+            dynamicTexture = new DynamicTexture(16,16, true);
         } else {
             texture.originalImageWidth = foundTexture.getWidth();
             texture.originalImageHeight = foundTexture.getHeight();
             int sizeToMatch = Math.max(foundTexture.getWidth(), foundTexture.getHeight());
-            nativeImageBackedTexture = new NativeImageBackedTexture(sizeToMatch, sizeToMatch, true);
+            dynamicTexture = new DynamicTexture(sizeToMatch, sizeToMatch, true);
             int yOffset = (sizeToMatch- foundTexture.getHeight())/2;
             int xOffset = (sizeToMatch- foundTexture.getWidth())/2;
             for (int i = 0; i < foundTexture.getHeight(); i++) {
@@ -57,17 +61,17 @@ public class CardTexture {
                     int y = i + yOffset;
                     int x = j + xOffset;
                     try {
-                        Objects.requireNonNull(nativeImageBackedTexture.getImage()).setColor(x, y, foundTexture.getColor(j, i));
+                        Objects.requireNonNull(dynamicTexture.getPixels()).setPixelRGBA(x, y, foundTexture.getPixelRGBA(j, i));
                     } catch (Exception e){
                         System.out.println("Tried to apply color out of image bounds");
                     }
                 }
             }
             if(hasRoundedCorners) {
-                roundCorners(foundTexture, nativeImageBackedTexture, xOffset, yOffset);
+                roundCorners(foundTexture, dynamicTexture, xOffset, yOffset);
             }
         }
-        return nativeImageBackedTexture;
+        return dynamicTexture;
     }
 
     private static List<List<NativeImage>> transposeFoundTextures(List<List<NativeImage>> foundTextures) {
@@ -90,12 +94,12 @@ public class CardTexture {
             return transposedList;
     }
 
-    public static void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, RenderLayer renderLayer,
+    public static void draw(PoseStack matrices, MultiBufferSource vertexConsumers, int light, RenderType renderLayer,
                             int layersHigh, int amountOfCardsAttached, double scale, CardGame game, double xOffset, double yOffset) {
         draw(matrices, vertexConsumers.getBuffer(renderLayer), light, layersHigh, amountOfCardsAttached, scale, game.cardStackingDirection, game.cardStackingDistance, xOffset, yOffset);
     }
 
-    public static void draw(MatrixStack matrices, VertexConsumer vertexConsumer, int light,
+    public static void draw(PoseStack matrices, VertexConsumer vertexConsumer, int light,
                             int layersHigh, int amountOfCardsAttached, double scale, CardStackingDirection cardStackingDirection, float cardStackingDistance, double xOffset, double yOffset) {
         var cardDistance = cardStackingDistance;
         var y = 0F;
@@ -104,22 +108,22 @@ public class CardTexture {
             x = cardDistance * cardStackingDirection.xMod;
             y = cardDistance * cardStackingDirection.yMod;
         }
-        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
+        Matrix4f matrix4f = matrices.last().pose();
         matrix4f.translate(x, y, amountOfCardsAttached*0.1F);
 //        matrix4f Maybe rotate a little if cards attached
 
         //bottom left
-        vertexConsumer.vertex(matrix4f, (float) (0.0F + yOffset), (float) (128.0F * scale + xOffset), -0.01F).color(255, 255, 255, 255).texture(0.0F, 1.0F).light(light).next();
+        vertexConsumer.vertex(matrix4f, (float) (0.0F + yOffset), (float) (128.0F * scale + xOffset), -0.01F).color(255, 255, 255, 255).uv(0.0F, 1.0F).uv2(light).endVertex();
         //bottom right
-        vertexConsumer.vertex(matrix4f, (float) (128.0F * scale+ yOffset), (float) (128.0F * scale+ xOffset), -0.01F).color(255, 255, 255, 255).texture(1.0F, 1.0F).light(light).next();
+        vertexConsumer.vertex(matrix4f, (float) (128.0F * scale+ yOffset), (float) (128.0F * scale+ xOffset), -0.01F).color(255, 255, 255, 255).uv(1.0F, 1.0F).uv2(light).endVertex();
         //top right
-        vertexConsumer.vertex(matrix4f, (float) (128.0F * scale+ yOffset), (float) (0.0F+ xOffset), -0.01F).color(255, 255, 255, 255).texture(1.0F, 0.0F).light(light).next();
+        vertexConsumer.vertex(matrix4f, (float) (128.0F * scale+ yOffset), (float) (0.0F+ xOffset), -0.01F).color(255, 255, 255, 255).uv(1.0F, 0.0F).uv2(light).endVertex();
         //top left
-        vertexConsumer.vertex(matrix4f, (float) (0.0F+ yOffset), (float) (0.0F+ xOffset), -0.01F).color(255, 255, 255, 255).texture(0.0F, 0.0F).light(light).next();
+        vertexConsumer.vertex(matrix4f, (float) (0.0F+ yOffset), (float) (0.0F+ xOffset), -0.01F).color(255, 255, 255, 255).uv(0.0F, 0.0F).uv2(light).endVertex();
     }
 
-    public static void drawConnectedCard(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light,
-                                         RenderLayer renderLayer, int layersHigh, int amountOfCardsAttached, CardGame game, double xOffset, double yOffset, CardRotation rotation) {
+    public static void drawConnectedCard(PoseStack matrices, MultiBufferSource vertexConsumers, int light,
+                                         RenderType renderLayer, int layersHigh, int amountOfCardsAttached, CardGame game, double xOffset, double yOffset, CardRotation rotation) {
         var cardDistance = game.cardStackingDistance;
         var y = 0F;
         var x = 0F;
@@ -127,27 +131,27 @@ public class CardTexture {
             x = cardDistance * game.cardStackingDirection.xMod;
             y = cardDistance * game.cardStackingDirection.yMod;
         }
-        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
+        Matrix4f matrix4f = matrices.last().pose();
         matrix4f.translate(x, y, amountOfCardsAttached*0.1F);
 //        matrix4f Maybe rotate a little if cards attached
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(renderLayer);
 
         //bottom left
-        vertexConsumer.vertex(matrix4f, (float) (rotation.bottomLeft.getLeft() + xOffset),
-                (float) (rotation.bottomLeft.getRight() + yOffset), -0.01F).color(255, 255, 255, 255).texture(0.0F, 1.0F).light(light).next();
+        vertexConsumer.vertex(matrix4f, (float) (rotation.bottomLeft.getFirst() + xOffset),
+                (float) (rotation.bottomLeft.getSecond() + yOffset), -0.01F).color(255, 255, 255, 255).uv(0.0F, 1.0F).uv2(light).endVertex();
         //bottom right
-        vertexConsumer.vertex(matrix4f, (float) (rotation.bottomRight.getLeft() + xOffset),
-                (float) (rotation.bottomRight.getRight() + yOffset), -0.01F).color(255, 255, 255, 255).texture(1.0F, 1.0F).light(light).next();
+        vertexConsumer.vertex(matrix4f, (float) (rotation.bottomRight.getFirst() + xOffset),
+                (float) (rotation.bottomRight.getSecond() + yOffset), -0.01F).color(255, 255, 255, 255).uv(1.0F, 1.0F).uv2(light).endVertex();
         //top right
-        vertexConsumer.vertex(matrix4f, (float) (rotation.topRight.getLeft() + xOffset),
-                (float) (rotation.topRight.getRight() + yOffset), -0.01F).color(255, 255, 255, 255).texture(1.0F, 0.0F).light(light).next();
+        vertexConsumer.vertex(matrix4f, (float) (rotation.topRight.getFirst() + xOffset),
+                (float) (rotation.topRight.getSecond() + yOffset), -0.01F).color(255, 255, 255, 255).uv(1.0F, 0.0F).uv2(light).endVertex();
         //top left
-        vertexConsumer.vertex(matrix4f, (float) (rotation.topLeft.getLeft() + xOffset),
-                (float) (rotation.topLeft.getRight() + yOffset), -0.01F).color(255, 255, 255, 255).texture(0.0F, 0.0F).light(light).next();
+        vertexConsumer.vertex(matrix4f, (float) (rotation.topLeft.getFirst() + xOffset),
+                (float) (rotation.topLeft.getSecond() + yOffset), -0.01F).color(255, 255, 255, 255).uv(0.0F, 0.0F).uv2(light).endVertex();
         matrices.translate(0, 0, (amountOfCardsAttached*0.1F)*-1);
     }
 
-    private static void roundCorners(NativeImage foundTexture, NativeImageBackedTexture nativeImageBackedTexture, int xOffset, int yOffset) {
+    private static void roundCorners(NativeImage foundTexture, DynamicTexture dynamicTexture, int xOffset, int yOffset) {
         int radius = 40; // adjust the radius as needed for the rounded corners
         int xSize = foundTexture.getWidth();
         int ySize = foundTexture.getHeight();
@@ -159,7 +163,7 @@ public class CardTexture {
                     //top left corner
                     double distance = Math.sqrt(Math.pow(x - radius, 2) + Math.pow(y - radius, 2));
                     if (distance > radius && (x < radius && y < radius)) {
-                        nativeImageBackedTexture.getImage().setColor(x+xOffset, y+yOffset, 0); // Set pixel to transparent
+                        dynamicTexture.getPixels().setPixelRGBA(x+xOffset, y+yOffset, 0); // Set pixel to transparent
                     }
                 } else {
                     double distanceFromBottom = Math.pow(y - (ySize - radius), 2);
@@ -167,7 +171,7 @@ public class CardTexture {
                         //bottom left corner
                         double distance = Math.sqrt(Math.pow(x - radius, 2) + distanceFromBottom);
                         if (distance > radius && (x < radius && y > ySize-radius)) {
-                            nativeImageBackedTexture.getImage().setColor(x+xOffset, y+yOffset, 0); // Set pixel to transparent
+                            dynamicTexture.getPixels().setPixelRGBA(x+xOffset, y+yOffset, 0); // Set pixel to transparent
                         }
                     } else {
                         double distanceFromRightSide = Math.pow(x - (xSize - radius), 2);
@@ -175,14 +179,14 @@ public class CardTexture {
                             //top right corner
                             double distance = Math.sqrt(distanceFromRightSide + Math.pow(y - radius, 2));
                             if (distance > radius && (x > xSize-radius && y < radius)) {
-                                nativeImageBackedTexture.getImage().setColor(x+xOffset, y+yOffset, 0); // Set pixel to transparent
+                                dynamicTexture.getPixels().setPixelRGBA(x+xOffset, y+yOffset, 0); // Set pixel to transparent
                             }
                         } else if(y > ySize/2 && x > xSize/2){
                             //correctly placed
                             //bottom right corner
                             double distance = Math.sqrt(distanceFromRightSide + distanceFromBottom);
                             if (distance > radius && (x > xSize-radius && y > ySize-radius)) {
-                                nativeImageBackedTexture.getImage().setColor(x+xOffset, y+yOffset, 0); // Set pixel to transparent
+                                dynamicTexture.getPixels().setPixelRGBA(x+xOffset, y+yOffset, 0); // Set pixel to transparent
                             }
                         }
                     }
@@ -192,13 +196,13 @@ public class CardTexture {
     }
 
     private static NativeImage getCardTextureFromData(CardData cardData) {
-        ResourceManager testResourceManager = MinecraftClient.getInstance().getResourceManager();
-        Identifier textureId = new Identifier(cardData.nameSpace, "stc_cards/cards/"+ cardData.getCardTextureLocation() +".png");
+        ResourceManager testResourceManager = Minecraft.getInstance().getResourceManager();
+        ResourceLocation textureId = new ResourceLocation(cardData.nameSpace, "stc_cards/cards/"+ cardData.getCardTextureLocation() +".png");
         NativeImage textureImage = null;
         try {
             Optional<Resource> resource = testResourceManager.getResource(textureId);
             if(resource.isPresent()){
-                InputStream inputStream = resource.get().getInputStream();
+                InputStream inputStream = resource.get().open();
                 textureImage = NativeImage.read(inputStream);
                 inputStream.close();
             }
@@ -209,13 +213,13 @@ public class CardTexture {
     }
 
     private NativeImage getPackTextureFromData(CardPack cardPack) {
-        ResourceManager testResourceManager = MinecraftClient.getInstance().getResourceManager();
-        Identifier textureId = new Identifier(cardPack.nameSpace, "stc_cards/packs/"+ cardPack.getPackTextureLocation() +".png");
+        ResourceManager testResourceManager = Minecraft.getInstance().getResourceManager();
+        ResourceLocation textureId = new ResourceLocation(cardPack.nameSpace, "stc_cards/packs/"+ cardPack.getPackTextureLocation() +".png");
         NativeImage textureImage = null;
         try {
             Optional<Resource> resource = testResourceManager.getResource(textureId);
             if(resource.isPresent()){
-                InputStream inputStream = resource.get().getInputStream();
+                InputStream inputStream = resource.get().open();
                 textureImage = NativeImage.read(inputStream);
                 inputStream.close();
             }
@@ -228,17 +232,17 @@ public class CardTexture {
     public void close() {
         texture.close();
     }
-    public static void draw(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, RenderLayer renderLayer,
+    public static void draw(PoseStack matrices, MultiBufferSource vertexConsumers, int light, RenderType renderLayer,
                             int layersHigh, int amountOfCardsAttached, CardGame game, double xOffset, double yOffset) {
         draw(matrices, vertexConsumers, light, renderLayer, layersHigh,  amountOfCardsAttached,1, game, xOffset, yOffset);
     }
 
 
-    public RenderLayer getRenderLayer() {
+    public RenderType getRenderLayer() {
         return renderLayer;
     }
 
-    public NativeImageBackedTexture getTexture() {
+    public DynamicTexture getTexture() {
         return texture;
     }
 
@@ -251,15 +255,15 @@ public class CardTexture {
     }
 
     public double getWidth() {
-        return texture.getImage().getWidth();
+        return texture.getPixels().getWidth();
     }
 
     public double getHeight() {
-        return texture.getImage().getHeight();
+        return texture.getPixels().getHeight();
     }
 
     public double getUnit(){
-        return (double) 128/texture.getImage().getWidth();
+        return (double) 128/texture.getPixels().getWidth();
     }
 
     public double getYOffset(){

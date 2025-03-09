@@ -2,54 +2,55 @@ package drai.dev.stackthecards.items;
 
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.registry.Items;
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
-import net.minecraft.registry.*;
-import net.minecraft.sound.*;
-import net.minecraft.util.*;
+import net.minecraft.core.registries.*;
+import net.minecraft.resources.*;
+import net.minecraft.sounds.*;
 import net.minecraft.world.*;
+import net.minecraft.world.entity.player.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.*;
 
-import static drai.dev.stackthecards.data.cardpacks.CardPack.addCardPackIdentifier;
-import static drai.dev.stackthecards.items.Card.addCardIdentifier;
+import static drai.dev.stackthecards.data.cardpacks.CardPack.addCardPackResourceLocation;
+import static drai.dev.stackthecards.items.Card.addCardResourceLocation;
 
 public class CardPackItem extends Item {
-    public static final Identifier PACK_RIP_IDENTIFIER = new Identifier("stack_the_cards", "pack_rip");
-    public static SoundEvent PACK_RIP = SoundEvent.of(PACK_RIP_IDENTIFIER);
-    public CardPackItem(Settings settings) {
+    public static final ResourceLocation PACK_RIP_IDENTIFIER = new ResourceLocation("stack_the_cards", "pack_rip");
+    public static SoundEvent PACK_RIP = SoundEvent.createVariableRangeEvent(PACK_RIP_IDENTIFIER);
+    public CardPackItem(Item.Properties settings) {
         super(settings);
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack itemStack = user.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level level, Player user, InteractionHand hand) {
+        ItemStack itemStack = user.getItemInHand(hand);
         var cardPack = CardPack.getCardPack(itemStack);
         var pullResult = cardPack.pull();
         var cardsToDrop = pullResult.getPulledCards();
         var itemsToDrop = pullResult.getPulledItems();
-        if(!world.isClient){
-            world.playSound(null, user.getBlockPos(), PACK_RIP, SoundCategory.PLAYERS, 0.4f, 0.9f);
+        if(!level.isClientSide){
+            level.playSound(null, user.blockPosition(), PACK_RIP, SoundSource.PLAYERS, 0.4f, 0.9f);
         }
         for (var card : cardsToDrop) {
-            user.dropStack(Card.getAsItemStack(card), 1F);
+            user.spawnAtLocation(Card.getAsItemStack(card), 1F);
         }
         for (var item : itemsToDrop) {
-            user.dropStack(new ItemStack(Registries.ITEM.get(item)), 1F);
+            user.spawnAtLocation(new ItemStack(BuiltInRegistries.ITEM.get(item)), 1F);
         }
-        if (!user.getAbilities().creativeMode) {
-            itemStack.decrement(1);
+        if (!user.getAbilities().instabuild) {
+            itemStack.shrink(1);
         }
-        return TypedActionResult.success(itemStack);
+        return InteractionResultHolder.success(itemStack);
     }
 
-    public void playSound(PlayerEntity user, SoundEvent sound, float volume, float pitch) {
+    public void playSound(Player user, SoundEvent sound, float volume, float pitch) {
         if (!user.isSilent()) {
-            user.getWorld().playSound(null, user.getX(), user.getY(), user.getZ(), sound, user.getSoundCategory(), volume, pitch);
+            user.level().playSound(null, user.getX(), user.getY(), user.getZ(), sound, user.getSoundSource(), volume, pitch);
         }
     }
 
     public static ItemStack of(CardPack cardPack){
         var itemStack = new ItemStack(Items.CARD_PACK);
-        addCardPackIdentifier(itemStack, cardPack.getIdentifier());
+        addCardPackResourceLocation(itemStack, cardPack.getResourceLocation());
         return itemStack;
     }
 

@@ -4,6 +4,7 @@ import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.registry.*;
+import net.minecraft.resources.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
 import org.json.simple.*;
@@ -22,12 +23,12 @@ public class CardSet {
     @Nullable
     public String cardBackTextureName;
     @Nullable
-    private Identifier cardBackModel;
+    private ResourceLocation cardBackModel;
     private final Map<String, CardPack> cardPacks = new HashMap<>();
     @Nullable
     private GameCardData cardBackData;
     public Optional<Boolean> hasRoundedCorners = Optional.empty();
-    private String effectIdentifier;
+    private String effectResourceLocation;
     private String name;
     public boolean appliesEffect = true;
     private Map<String, CardPack> parentPacks = new HashMap<>();
@@ -56,7 +57,7 @@ public class CardSet {
         if(json.containsKey(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)){
             try{
                 var identifierArray = ((String) json.get(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)).split(":");
-                cardSet.setCardBackModel(new Identifier(identifierArray[0], identifierArray[1]));
+                cardSet.setCardBackModel(new ResourceLocation(identifierArray[0], identifierArray[1]));
             } catch (Exception e){
                 throw new MalformedJsonException("Card back identifier was malformed: "+e.getMessage());
             }
@@ -91,7 +92,7 @@ public class CardSet {
         }
         if(json.containsKey("effect")){
             try{
-                cardSet.effectIdentifier = (String) json.get("effect");
+                cardSet.effectResourceLocation = (String) json.get("effect");
             } catch (Exception e){
                 throw new MalformedJsonException("Card set effect was malformed: "+e.getMessage());
             }
@@ -106,7 +107,7 @@ public class CardSet {
         return cardSet;
     }
 
-    private void setCardBackModel(Identifier identifier) {
+    private void setCardBackModel(ResourceLocation identifier) {
         this.cardBackModel = identifier;
     }
 
@@ -118,7 +119,7 @@ public class CardSet {
         return CardGameRegistry.getCardGame(gameId);//cardGame;
     }
 
-    public String getSetIdentifier() {
+    public String getSetResourceLocation() {
         return getCardGame().getGameId() + "_" + setId;
     }
 
@@ -141,7 +142,7 @@ public class CardSet {
         return cardBackData;
     }
 
-    public Identifier getCardBackModel() {
+    public ResourceLocation getCardBackModel() {
         return cardBackModel;
     }
 
@@ -179,8 +180,8 @@ public class CardSet {
         return cardPacks;
     }
 
-    public String getEffectIdentifier() {
-        return effectIdentifier == null ? "" : effectIdentifier;
+    public String getEffectResourceLocation() {
+        return effectResourceLocation == null ? "" : effectResourceLocation;
     }
 
     public String getName() {

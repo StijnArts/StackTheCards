@@ -16,7 +16,7 @@
     "client.ItemFrameEntityRendererMixin",
     "client.ItemRendererMixin",
     "KeyboardMixin",
-    "OrderedTextComponentRenderer",
+    "OrderedTextComponentRendererMixin",
     "client.TooltipBackgroundRendererMixin"
   ],
   "injectors": {

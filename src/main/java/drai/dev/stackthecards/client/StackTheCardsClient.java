@@ -1,5 +1,6 @@
 package drai.dev.stackthecards.client;
 
+import com.mojang.blaze3d.platform.*;
 import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.client.screen.*;
 import drai.dev.stackthecards.models.*;
@@ -11,13 +12,14 @@ import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.client.model.loading.v1.*;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.client.screen.v1.*;
+import net.minecraft.*;
 import net.minecraft.client.*;
-import net.minecraft.client.gui.screen.ingame.*;
-import net.minecraft.client.util.*;
-import net.minecraft.item.*;
-import net.minecraft.registry.*;
-import net.minecraft.text.*;
-import net.minecraft.util.*;
+import net.minecraft.client.gui.screens.*;
+import net.minecraft.core.*;
+import net.minecraft.core.registries.*;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.item.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -27,8 +29,8 @@ import java.util.function.*;
 public class StackTheCardsClient implements ClientModInitializer {
     public static CardRenderer CARD_RENDERER;
     public static CardTooltipRenderer CARD_TOOLTIP_RENDERER;
-    public static List<Identifier> CARD_BACK_MODELS = new ArrayList<>();
-    public static List<Identifier> CARD_PACK_MODELS = new ArrayList<>();
+    public static List<ResourceLocation> CARD_BACK_MODELS = new ArrayList<>();
+    public static List<ResourceLocation> CARD_PACK_MODELS = new ArrayList<>();
     public static boolean cardLoreKeyPressed;
     public static boolean ctrlKeyPressed;
     public static int scrollModifier = 0;
@@ -40,7 +42,7 @@ public class StackTheCardsClient implements ClientModInitializer {
     public void onInitializeClient() {
         CARD_RENDERER = new CardRenderer();
         CARD_TOOLTIP_RENDERER = new CardTooltipRenderer(CARD_RENDERER);
-        HandledScreens.register(StackTheCards.CARD_BINDER_SCREEN_HANDLER, CardBinderScreen::new);
+        MenuScreens.register(StackTheCards.CARD_BINDER_SCREEN_HANDLER, CardBinderScreen::new);
         var plugin = new StackTheCardsModelLoadingPlugin();
         PreparableModelLoadingPlugin.register((resourceManager, executor) -> CompletableFuture.completedFuture(resourceManager),
                 plugin::onInitializeModelLoader);
@@ -54,13 +56,13 @@ public class StackTheCardsClient implements ClientModInitializer {
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> ScreenMouseEvents.afterMouseScroll(screen).register((_screen, x, y, horiz, vert) -> {
             scrollModifier+= vert;
         }));
-        Registry.register(Registries.ITEM_GROUP, new Identifier("stack_the_cards", "item_group"), ItemGroups.CARD_ITEM_GROUP);
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, new ResourceLocation("stack_the_cards", "item_group"), ItemGroups.CARD_ITEM_GROUP);
     }
 
     private static boolean isKeyPressed(@Nullable Key key) {
-        if (key == null || key.equals(Key.UNKNOWN_KEY) || key.get().equals(InputUtil.UNKNOWN_KEY))
+        if (key == null || key.equals(Key.UNKNOWN_KEY) || key.get().equals(InputConstants.UNKNOWN))
             return false;
-        return InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), key.get().getCode());
+        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), key.get().getValue());
     }
 
     public static void updateKeys() {
@@ -71,24 +73,24 @@ public class StackTheCardsClient implements ClientModInitializer {
         ctrlKeyPressed = isKeyPressed(Key.flipCardKey());
     }
 
-    public static void modifyCardStackTooltip(Consumer<Collection<Text>> tooltip) {
-        MutableText loreKeyHint = Text.literal("Control: ");
-        loreKeyHint.fillStyle(Style.EMPTY.withColor(Formatting.GOLD));
-        loreKeyHint.append(Text.literal("view card lore").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+    public static void modifyCardStackTooltip(Consumer<Collection<Component>> tooltip) {
+        MutableComponent loreKeyHint = Component.literal("Control: ");
+        loreKeyHint.setStyle(Style.EMPTY.withColor(ChatFormatting.GOLD));
+        loreKeyHint.append(Component.literal("view card lore").setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
         tooltip.accept(List.of(loreKeyHint));
     }
 
 
 
-    public static void modifyPackStackTooltip(Consumer<Collection<Text>> tooltip) {
-        MutableText loreKeyHint = Text.literal("Control: ");
-        loreKeyHint.fillStyle(Style.EMPTY.withColor(Formatting.GOLD));
-        loreKeyHint.append(Text.literal("view pack details").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+    public static void modifyPackStackTooltip(Consumer<Collection<Component>> tooltip) {
+        MutableComponent loreKeyHint = Component.literal("Control: ");
+        loreKeyHint.setStyle(Style.EMPTY.withColor(ChatFormatting.GOLD));
+        loreKeyHint.append(Component.literal("view pack details").setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
         tooltip.accept(List.of(loreKeyHint));
     }
 
     public static void checkToolTipForScrolling(ItemStack stack){
-        if (previousStack == null || !ItemStack.areEqual(stack, previousStack) || stack.isEmpty()) {
+        if (previousStack == null || !ItemStack.isSameItem(stack, previousStack) || stack.isEmpty()) {
             scrollModifier = 0;
             previousStack = stack;
         }

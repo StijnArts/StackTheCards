@@ -3,8 +3,8 @@ package drai.dev.stackthecards.data;
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
-import net.minecraft.item.*;
 import net.minecraft.nbt.*;
+import net.minecraft.world.item.*;
 import org.json.simple.*;
 
 import java.util.*;
@@ -68,10 +68,10 @@ public class CardConnection {
     }
 
     public static CardIdentifier removeConnection(ItemStack stack) {
-        NbtList nbtList = Card.getCardDataNBT(stack, Card.STORED_CARD_CONNECTION_KEY);
+        ListTag nbtList = Card.getCardDataNBT(stack, Card.STORED_CARD_CONNECTION_KEY);
         var poppedCard = nbtList.getCompound(nbtList.size()-1);
         nbtList.remove(nbtList.size()-1);
-        stack.getOrCreateNbt().put(Card.STORED_CARD_CONNECTION_KEY, nbtList);
+        stack.getOrCreateTag().put(Card.STORED_CARD_CONNECTION_KEY, nbtList);
         if(nbtList.size()<3){
             CardConnection.breakConnections(stack);
         }
@@ -97,12 +97,12 @@ public class CardConnection {
     }
 
     public static boolean checkSingleCardConnection(ItemStack other) {
-        var otherCardIdentifier = Card.getCardIdentifier(other);
+        var otherCardResourceLocation = Card.getCardIdentifier(other);
         var singleConnections = Card.getCardData(other).getCardGame().getSingleConnections();
         for (CardConnection connection : singleConnections) {
-            if(connection.matches(List.of(otherCardIdentifier))) {
+            if(connection.matches(List.of(otherCardResourceLocation))) {
 //                CardConnection.breakConnections(self);
-                for (var card : List.of(otherCardIdentifier)) {
+                for (var card : List.of(otherCardResourceLocation)) {
                     CardConnection.addToConnection(other, card, connection);
                 }
                 return true;
@@ -149,23 +149,23 @@ public class CardConnection {
         var currentConnection = CardConnection.getConnection(self);
         //should return identifier of *all* connected cards, including self
         var connectedCards = CardConnection.getConnectedCards(self);
-        var selfCardIdentifier = Card.getCardIdentifier(self);
-        var otherCardIdentifier = Card.getCardIdentifier(other);
-//        if(selfCardIdentifier.isEqual(CardGameRegistry.MISSING_CARD_DATA.getCardIdentifier()) || otherCardIdentifier.isEqual(CardGameRegistry.MISSING_CARD_DATA.getCardIdentifier()))
-        if(selfCardIdentifier.isEqual(otherCardIdentifier)) return true;
+        var selfCardResourceLocation = Card.getCardIdentifier(self);
+        var otherCardResourceLocation = Card.getCardIdentifier(other);
+//        if(selfCardResourceLocation.isEqual(CardGameRegistry.MISSING_CARD_DATA.getCardIdentifier()) || otherCardResourceLocation.isEqual(CardGameRegistry.MISSING_CARD_DATA.getCardIdentifier()))
+        if(selfCardResourceLocation.isEqual(otherCardResourceLocation)) return true;
         //if its already in the connection, don't add it
-        if(connectedCards.stream().anyMatch(cardIdentifier -> cardIdentifier.isEqual(otherCardIdentifier)) || selfCardIdentifier.isEqual(otherCardIdentifier)) return true;
-        //if card fits in the current connection, add it to the current one
-        if(currentConnection!=null && currentConnection.accepts(otherCardIdentifier)) {
-            CardConnection.addToConnection(self, otherCardIdentifier, currentConnection);
+        if(connectedCards.stream().anyMatch(cardResourceLocation -> cardResourceLocation.isEqual(otherCardResourceLocation)) || selfCardResourceLocation.isEqual(otherCardResourceLocation)) return true;
+        //if card canCraftInDimensions in the current connection, add it to the current one
+        if(currentConnection!=null && currentConnection.accepts(otherCardResourceLocation)) {
+            CardConnection.addToConnection(self, otherCardResourceLocation, currentConnection);
             return true;
         }
 
         //Card is not in the current connection and doesnt fit in the currentConnection,
         //so see if there is one that does fit all of the currently connected cards
         var cardsToConnect = new ArrayList<>(connectedCards);
-        cardsToConnect.add(otherCardIdentifier);
-        var connections = Card.getCardData(self).getCardGame().getConnections(selfCardIdentifier);
+        cardsToConnect.add(otherCardResourceLocation);
+        var connections = Card.getCardData(self).getCardGame().getConnections(selfCardResourceLocation);
         for (CardConnection connection : connections ) {
             if(connection.matches(cardsToConnect) && connection.contains(cardsToConnect)) {
                 CardConnection.breakConnections(self);
@@ -191,14 +191,14 @@ public class CardConnection {
     public boolean contains(List<CardIdentifier> cardsToConnect) {
             for (var identifier : getCardIdentifiers()) {
                 if(identifier==null) continue;
-                if(cardsToConnect.stream().noneMatch(cardIdentifier -> cardIdentifier.isEqual(identifier))) return false;
+                if(cardsToConnect.stream().noneMatch(cardResourceLocation -> cardResourceLocation.isEqual(identifier))) return false;
             }
             return true;
     }
 
     public boolean matches(List<CardIdentifier> cardsToConnect) {
         for (var identifier : cardsToConnect) {
-            if(getCardIdentifiers().stream().noneMatch(cardIdentifier -> cardIdentifier == null || cardIdentifier.isEqual(identifier))) return false;
+            if(getCardIdentifiers().stream().noneMatch(cardResourceLocation -> cardResourceLocation == null || cardResourceLocation.isEqual(identifier))) return false;
         }
         return true;
     }
@@ -212,7 +212,7 @@ public class CardConnection {
 //            System.out.println("found a connectedCard!");
         }
         var selfId = Card.getCardIdentifier(self);
-        if(!connectedCards.stream().anyMatch(cardIdentifier -> cardIdentifier.isEqual(selfId))) connectedCards.add(selfId);
+        if(!connectedCards.stream().anyMatch(cardResourceLocation -> cardResourceLocation.isEqual(selfId))) connectedCards.add(selfId);
         return connectedCards;
     }
 
@@ -244,8 +244,8 @@ public class CardConnection {
         return layoutByColumn;
     }
 
-    public boolean accepts(CardIdentifier cardIdentifier) {
-        return getConnectionEntry(cardIdentifier) != null;
+    public boolean accepts(CardIdentifier cardResourceLocation) {
+        return getConnectionEntry(cardResourceLocation) != null;
     }
 
     public static CardConnection getConnection(ItemStack self) {
@@ -263,20 +263,20 @@ public class CardConnection {
         return null;
     }
 
-    public static void addToConnection(ItemStack self, CardIdentifier otherCardIdentifier, CardConnection connection) {
-        var connectionEntry = connection.getConnectionEntry(otherCardIdentifier);
+    public static void addToConnection(ItemStack self, CardIdentifier otherCardResourceLocation, CardConnection connection) {
+        var connectionEntry = connection.getConnectionEntry(otherCardResourceLocation);
         assert connectionEntry != null;
-        NbtList nbtList = Card.getCardDataNBT(self, Card.STORED_CARD_CONNECTION_KEY);
+        ListTag nbtList = Card.getCardDataNBT(self, Card.STORED_CARD_CONNECTION_KEY);
         if(!nbtList.getCompound(0).contains(CONNECTION_ID)){
             nbtList.add(CardConnection.createNbt(connection));
         }
         nbtList.add(CardConnection.createNbt(connectionEntry));
-        self.getOrCreateNbt().put(Card.STORED_CARD_CONNECTION_KEY, nbtList);
+        self.getOrCreateTag().put(Card.STORED_CARD_CONNECTION_KEY, nbtList);
 //        System.out.println("added card to connection: "+ connection.connectionId);
     }
 
-    private static NbtElement createNbt(CardConnectionEntry connectionEntry) {
-        NbtCompound nbtCompound = (NbtCompound) CardIdentifier.createNbt(connectionEntry.self);
+    private static Tag createNbt(CardConnectionEntry connectionEntry) {
+        CompoundTag nbtCompound = (CompoundTag) CardIdentifier.createNbt(connectionEntry.self);
         nbtCompound.putString(CardConnectionEntry.CONNECTION_X_MODIFIER, String.valueOf(connectionEntry.xModifier));
         nbtCompound.putString(CardConnectionEntry.CONNECTION_Y_MODIFIER, String.valueOf(connectionEntry.yModifier));
         nbtCompound.putString(CardConnectionEntry.CONNECTION_DIRECTION, String.valueOf(connectionEntry.connectingDirection));
@@ -284,26 +284,26 @@ public class CardConnection {
         return nbtCompound;
     }
 
-    private static NbtElement createNbt(CardConnection connection) {
-        NbtCompound nbtCompound = new NbtCompound();
+    private static Tag createNbt(CardConnection connection) {
+        CompoundTag nbtCompound = new CompoundTag();
         nbtCompound.putString(CardConnection.CONNECTION_ID, String.valueOf(connection.connectionId));
         nbtCompound.putString(GAME_ID_KEY, String.valueOf(connection.cardGameId));
         return nbtCompound;
     }
 
-    private CardConnectionEntry getConnectionEntry(CardIdentifier cardIdentifier) {
+    private CardConnectionEntry getConnectionEntry(CardIdentifier cardResourceLocation) {
         for (var row : layout) {
             for (var column: row) {
-                if(column.self.isEqual(cardIdentifier)) return column;
+                if(column.self.isEqual(cardResourceLocation)) return column;
             }
         }
         return null;
     }
 
     public static void breakConnections(ItemStack stack) {
-        NbtList nbtList = Card.getCardDataNBT(stack, Card.STORED_CARD_CONNECTION_KEY);
+        ListTag nbtList = Card.getCardDataNBT(stack, Card.STORED_CARD_CONNECTION_KEY);
         nbtList.clear();
-        stack.removeSubNbt(Card.STORED_CARD_CONNECTION_KEY);
+        stack.removeTagKey(Card.STORED_CARD_CONNECTION_KEY);
 
     }
 

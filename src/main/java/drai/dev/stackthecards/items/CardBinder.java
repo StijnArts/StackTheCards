@@ -4,18 +4,17 @@ import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.registry.Items;
-import net.minecraft.block.*;
-import net.minecraft.client.item.*;
-import net.minecraft.entity.*;
-import net.minecraft.entity.effect.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.inventory.*;
-import net.minecraft.item.*;
-import net.minecraft.registry.*;
-import net.minecraft.screen.*;
-import net.minecraft.text.*;
-import net.minecraft.util.*;
+import net.minecraft.*;
+import net.minecraft.core.registries.*;
+import net.minecraft.locale.*;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.*;
 import net.minecraft.world.*;
+import net.minecraft.world.effect.*;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -28,54 +27,54 @@ public class CardBinder extends Item {
     public static final String CARD_BINDER_COUNT_KEY = "ItemCount";
     private final DyeColor color;
 
-    public CardBinder(DyeColor color, Settings settings) {
+    public CardBinder(DyeColor color, Item.Properties settings) {
         super(settings);
         this.color = color;
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if(!world.isClient){
-            var nbt = stack.getOrCreateNbt();
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        if(!level.isClientSide){
+            var nbt = stack.getOrCreateTag();
             var shouldApplyEffect = nbt.getInt(CARD_BINDER_SHOULD_APPLY_EFFECT_KEY) == 1;
-            var effectIdentifier = Identifier.tryParse(nbt.getString(CARD_BINDER_EFFECT_KEY));
+            var effectResourceLocation = ResourceLocation.tryParse(nbt.getString(CARD_BINDER_EFFECT_KEY));
             if(entity instanceof LivingEntity livingEntity && shouldApplyEffect){
-                if(effectIdentifier == null){
-                    effectIdentifier = new Identifier("minecraft","haste");
+                if(effectResourceLocation == null){
+                    effectResourceLocation = new ResourceLocation("minecraft","haste");
                 }
                 try{
-                    var effect = Registries.STATUS_EFFECT.get(effectIdentifier);
+                    var effect = BuiltInRegistries.MOB_EFFECT.get(effectResourceLocation);
                     if(effect!=null){
-                        livingEntity.setStatusEffect(new StatusEffectInstance(effect, 6), entity);
+                        livingEntity.addEffect(new MobEffectInstance(effect, 6), entity);
                     }
                 } catch (Exception e){
-                    System.out.println("tried to apply an effect but it wasn't found: " + effectIdentifier.toString());
+                    System.out.println("tried to apply an effect but it wasn't found: " + effectResourceLocation.toString());
                 }
             }
         }
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        var nbt = stack.getOrCreateNbt();
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag context) {
+        var nbt = stack.getOrCreateTag();
         var inventorySize = nbt.getInt(CARD_BINDER_COUNT_KEY);
-        if(inventorySize!=0) tooltip.add(Text.literal("Contains " + inventorySize + " Unique card(s)").fillStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+        if(inventorySize!=0) tooltip.add(Component.literal("Contains " + inventorySize + " Unique card(s)").setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
 
         if(nbt.contains(CARD_BINDER_RESTRICTION_KEY)){
-            var cardIdentifier = CardIdentifier.getCardIdentifier(nbt.getCompound(CARD_BINDER_RESTRICTION_KEY));
-            var text = Text.literal("Customized for " ).fillStyle(Style.EMPTY.withColor(Formatting.GRAY));
-            text.append(CardGameRegistry.getCardGame(cardIdentifier.gameId).getName()+": ").fillStyle(Style.EMPTY.withColor(Formatting.AQUA));
-            text.append(CardGameRegistry.getCardGame(cardIdentifier.gameId).getCardSet(cardIdentifier.setId).getName()+" ").fillStyle(Style.EMPTY.withColor(Formatting.AQUA));
+            var cardResourceLocation = CardIdentifier.getCardIdentifier(nbt.getCompound(CARD_BINDER_RESTRICTION_KEY));
+            var text = Component.literal("Customized for " ).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
+            text.append(CardGameRegistry.getCardGame(cardResourceLocation.gameId).getName()+": ").setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA));
+            text.append(CardGameRegistry.getCardGame(cardResourceLocation.gameId).getCardSet(cardResourceLocation.setId).getName()+" ").setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA));
             tooltip.add(text);
-            var effectIdentifier = Identifier.tryParse(nbt.getString(CARD_BINDER_EFFECT_KEY));
-            if(effectIdentifier != null){
+            var effectResourceLocation = ResourceLocation.tryParse(nbt.getString(CARD_BINDER_EFFECT_KEY));
+            if(effectResourceLocation != null){
                 try{
-                    var effect = Registries.STATUS_EFFECT.get(effectIdentifier);
+                    var effect = BuiltInRegistries.MOB_EFFECT.get(effectResourceLocation);
                     if(effect!=null){
-                        tooltip.add(Text.literal("When completed grants: " +Language.getInstance().get(effect.getTranslationKey())).fillStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                        tooltip.add(Component.literal("When completed grants: " + Language.getInstance().getOrDefault(effect.getDescriptionId())).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
                     }
                 } catch (Exception e){
-                    System.out.println("tried to apply an effect but it wasn't found: " + effectIdentifier.toString());
+                    System.out.println("tried to apply an effect but it wasn't found: " + effectResourceLocation.toString());
                 }
             }
         }
@@ -85,7 +84,7 @@ public class CardBinder extends Item {
         return new ItemStack(CardBinder.get(color));
     }
 
-    private static ItemConvertible get(DyeColor color) {
+    private static ItemLike get(DyeColor color) {
         if (color == null) {
             return Items.CARD_BINDER;
         }
@@ -141,19 +140,19 @@ public class CardBinder extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if(hand == Hand.MAIN_HAND){
-            if(!world.isClient){
-                user.openHandledScreen(new SimpleNamedScreenHandlerFactory(
-                        (id, inventory, playerEntity) -> StackTheCards.CARD_BINDER_SCREEN_HANDLER.create(id, inventory), Text.of("Card Binder")));
+    public InteractionResultHolder<ItemStack> use(Level level, Player user, InteractionHand hand) {
+        if(hand == InteractionHand.MAIN_HAND){
+            if(!level.isClientSide){
+                user.openMenu(new SimpleMenuProvider(
+                        (id, inventory, playerEntity) -> StackTheCards.CARD_BINDER_SCREEN_HANDLER.create(id, inventory), Component.literal("Card Binder")));
             }
-            return TypedActionResult.success(user.getStackInHand(hand));
+            return InteractionResultHolder.success(user.getItemInHand(hand));
         }
-        return TypedActionResult.pass(user.getStackInHand(hand));
+        return InteractionResultHolder.pass(user.getItemInHand(hand));
     }
 
-    public Identifier getModelIdentifier() {
-        return new Identifier("stack_the_cards", "item/card_binder_"+color.asString());
+    public ResourceLocation getModelResourceLocation() {
+        return new ResourceLocation("stack_the_cards", "item/card_binder_"+color.getName());
     }
 
     public DyeColor getColor() {

@@ -3,19 +3,17 @@ package drai.dev.stackthecards.items;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.registry.*;
-import net.minecraft.entity.effect.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.inventory.*;
-import net.minecraft.item.*;
+import net.minecraft.core.*;
 import net.minecraft.nbt.*;
-import net.minecraft.util.*;
-import net.minecraft.util.collection.*;
+import net.minecraft.world.*;
+import net.minecraft.world.entity.player.*;
+import net.minecraft.world.item.*;
 
 import java.util.*;
 
 import static drai.dev.stackthecards.items.CardBinder.CARD_BINDER_COUNT_KEY;
 
-public class CardBinderInventory implements Inventory {
+public class CardBinderInventory implements Container {
     public static final String CARD_BINDER_SIZE_KEY = "amount_of_slots";
     public static final String CARD_BINDER_RESTRICTION_KEY = "RestrictedTo";
     public static final String CARD_BINDER_DATA_KEY = "CardBinderData";
@@ -24,16 +22,16 @@ public class CardBinderInventory implements Inventory {
     public static final String CARD_BINDER_SHOULD_APPLY_EFFECT_KEY = "AppliesEffect";
     public static final String CARD_BINDER_EFFECT_KEY = "Effect";
     public int size;
-    private DefaultedList<ItemStack> inventory;
+    private NonNullList<ItemStack> inventory;
 
-    public CardBinderInventory(PlayerEntity player){
-        var itemStack = player.getMainHandStack();
+    public CardBinderInventory(Player player){
+        var itemStack = player.getMainHandItem();
         size = getInventorySize(itemStack);
-        inventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
+        inventory = NonNullList.withSize(size, ItemStack.EMPTY);
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return size;
     }
 
@@ -43,45 +41,45 @@ public class CardBinderInventory implements Inventory {
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         return this.inventory.get(slot);
     }
 
     @Override
-    public ItemStack removeStack(int slot, int amount) {
+    public ItemStack removeItem(int slot, int amount) {
         /*ItemStack itemStack = Inventories.splitStack(inventory, slot, amount);
         var stack = this.inventory.get(slot);
         ItemStack itemStack = Objects.requireNonNullElse(stack, ItemStack.EMPTY);
         this.inventory.set(slot, ItemStack.EMPTY);*/
-        return Inventories.splitStack(inventory, slot, amount);
+        return ContainerHelper.removeItem(inventory, slot, amount);
     }
 
     @Override
-    public ItemStack removeStack(int slot) {
-        return this.removeStack(slot, 1);
+    public ItemStack removeItemNoUpdate(int slot) {
+        return this.removeItem(slot, 1);
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         if(slot < inventory.size()){
             this.inventory.set(slot, stack);
         }
     }
 
     @Override
-    public void onOpen(PlayerEntity player) {
-        var itemStack = player.getMainHandStack();
+    public void startOpen(Player player) {
+        var itemStack = player.getMainHandItem();
 
         size = getInventorySize(itemStack);
-        var compound2 = itemStack.getOrCreateNbt().getCompound(CARD_BINDER_INVENTORY_KEY);
-        var newInventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
-        Inventories.readNbt(compound2, newInventory);
+        var compound2 = itemStack.getOrCreateTag().getCompound(CARD_BINDER_INVENTORY_KEY);
+        var newInventory = NonNullList.withSize(size, ItemStack.EMPTY);
+        ContainerHelper.loadAllItems(compound2, newInventory);
         inventory = newInventory;
     }
 
     public static int getInventorySize(ItemStack itemStack){
-        var binderSizeNbt = itemStack.getOrCreateNbt();
-        if(binderSizeNbt== null || binderSizeNbt.getSize()==0) return 120;
+        var binderSizeNbt = itemStack.getOrCreateTag();
+        if(binderSizeNbt== null || binderSizeNbt.size()==0) return 120;
         int maxSlots = binderSizeNbt.getInt(CARD_BINDER_SIZE_KEY);
         if(maxSlots == 0){
             maxSlots = 120;
@@ -91,9 +89,9 @@ public class CardBinderInventory implements Inventory {
         return maxSlots;
     }
 
-    public String getColorAffix(PlayerEntity player){
-        var itemStack = player.getMainHandStack();
-        String color = ((CardBinder)itemStack.getItem()).getColor().asString();
+    public String getColorAffix(Player player){
+        var itemStack = player.getMainHandItem();
+        String color = ((CardBinder)itemStack.getItem()).getColor().toString();
         if(color == null || color.isEmpty()){
             return "_brown";
         } else {
@@ -106,12 +104,12 @@ public class CardBinderInventory implements Inventory {
     }
 
     @Override
-    public void onClose(PlayerEntity player) {
-        var itemStack = player.getMainHandStack();
-        var nbt = new NbtCompound();
-        Inventories.writeNbt(nbt, inventory, true);
-        itemStack.removeSubNbt(CARD_BINDER_INVENTORY_KEY);
-        itemStack.getOrCreateNbt().put(CARD_BINDER_INVENTORY_KEY, nbt);
+    public void stopOpen(Player player) {
+        var itemStack = player.getMainHandItem();
+        var nbt = new CompoundTag();
+        ContainerHelper.saveAllItems(nbt, inventory, true);
+        itemStack.removeTagKey(CARD_BINDER_INVENTORY_KEY);
+        itemStack.getOrCreateTag().put(CARD_BINDER_INVENTORY_KEY, nbt);
         var appliesEffect = 0;
         var shouldApplyEffect = true;
         String effect = "";
@@ -120,73 +118,73 @@ public class CardBinderInventory implements Inventory {
         if(identifier.setId.isEmpty()){
             var game = CardGameRegistry.getCardGame(identifier.gameId);
             collectionCards = game.cards.values().stream().toList();
-            if(game.getEffectIdentifier() != null) effect = game.getEffectIdentifier();
+            if(game.getEffectResourceLocation() != null) effect = game.getEffectResourceLocation();
             shouldApplyEffect = game.appliesEffect;
         } else {
             var set = CardGameRegistry.getCardGame(identifier.gameId).getCardSet(identifier.setId);
             collectionCards = set.getCards().values().stream().toList();
-            if(set.getEffectIdentifier() != null) effect = set.getEffectIdentifier();
+            if(set.getEffectResourceLocation() != null) effect = set.getEffectResourceLocation();
             shouldApplyEffect = set.appliesEffect;
         }
         var distinctCards = inventory.stream().filter(stack -> !stack.isEmpty()).map(Card::getCardData).distinct().toList();
         var cardsInInventory = distinctCards.stream().filter(collectionCards::contains).toList();
         if(cardsInInventory.size() == collectionCards.size() && shouldApplyEffect) appliesEffect = 1;
-        itemStack.getOrCreateNbt().put(CARD_BINDER_SHOULD_APPLY_EFFECT_KEY, NbtInt.of(appliesEffect));
-        itemStack.getOrCreateNbt().put(CARD_BINDER_COUNT_KEY, NbtInt.of(distinctCards.size()));
-        itemStack.getOrCreateNbt().put(CARD_BINDER_EFFECT_KEY, NbtString.of(effect));
+        itemStack.getOrCreateTag().put(CARD_BINDER_SHOULD_APPLY_EFFECT_KEY, IntTag.valueOf(appliesEffect));
+        itemStack.getOrCreateTag().put(CARD_BINDER_COUNT_KEY, IntTag.valueOf(distinctCards.size()));
+        itemStack.getOrCreateTag().put(CARD_BINDER_EFFECT_KEY, StringTag.valueOf(effect));
     }
 
     @Override
-    public void markDirty() {
+    public void setChanged() {
 
     }
 
     public CardIdentifier getCardIdentifier(ItemStack stack){
-        return CardIdentifier.getCardIdentifier(stack.getOrCreateNbt().getCompound(CARD_BINDER_RESTRICTION_KEY));
+        return CardIdentifier.getCardIdentifier(stack.getOrCreateTag().getCompound(CARD_BINDER_RESTRICTION_KEY));
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         return true;
     }
 
     @Override
-    public void clear() {
+    public void clearContent() {
         this.inventory.clear();
     }
 
-    public DefaultedList<ItemStack> getInventory() {
+    public NonNullList<ItemStack> getInventory() {
         return inventory;
     }
 
-    public ItemStack removeStack(int inventoryIndex, int amount, PlayerEntity player) {
-        var stack = this.removeStack(inventoryIndex, amount);
-        var itemStack = player.getMainHandStack();
-        var nbt = new NbtCompound();
-        Inventories.writeNbt(nbt, inventory, true);
-        itemStack.removeSubNbt(CARD_BINDER_INVENTORY_KEY);
-        itemStack.getOrCreateNbt().put(CARD_BINDER_INVENTORY_KEY, nbt);
+    public ItemStack removeStack(int inventoryIndex, int amount, Player player) {
+        var stack = this.removeItem(inventoryIndex, amount);
+        var itemStack = player.getMainHandItem();
+        var nbt = new CompoundTag();
+        ContainerHelper.saveAllItems(nbt, inventory, true);
+        itemStack.removeTagKey(CARD_BINDER_INVENTORY_KEY);
+        itemStack.getOrCreateTag().put(CARD_BINDER_INVENTORY_KEY, nbt);
         return stack;
     }
 
-    public void setStack(int inventoryIndex, ItemStack stack, PlayerEntity player) {
-        this.setStack(inventoryIndex, stack);
-        var itemStack = player.getMainHandStack();
-        var nbt = new NbtCompound();
-        Inventories.writeNbt(nbt, inventory, true);
-        itemStack.removeSubNbt(CARD_BINDER_INVENTORY_KEY);
-        itemStack.getOrCreateNbt().put(CARD_BINDER_INVENTORY_KEY, nbt);
+    public void setStack(int inventoryIndex, ItemStack stack, Player player) {
+        this.setItem(inventoryIndex, stack);
+        var itemStack = player.getMainHandItem();
+        var nbt = new CompoundTag();
+        ContainerHelper.saveAllItems(nbt, inventory, true);
+        itemStack.removeTagKey(CARD_BINDER_INVENTORY_KEY);
+        itemStack.getOrCreateTag().put(CARD_BINDER_INVENTORY_KEY, nbt);
     }
 
-    public boolean isBound(PlayerEntity player) {
-        var itemStack = player.getMainHandStack();
-        var nbt = itemStack.getOrCreateNbt();
+    public boolean isBound(Player player) {
+        var itemStack = player.getMainHandItem();
+        var nbt = itemStack.getOrCreateTag();
         return nbt.contains(CARD_BINDER_RESTRICTION_KEY);
     }
 
-    public CardIdentifier getBoundIdentifier(PlayerEntity player){
-        var itemStack = player.getMainHandStack();
-        var nbt = itemStack.getOrCreateNbt();
+    public CardIdentifier getBoundResourceLocation(Player player){
+        var itemStack = player.getMainHandItem();
+        var nbt = itemStack.getOrCreateTag();
         return CardIdentifier.getCardIdentifier(nbt.getCompound(CARD_BINDER_RESTRICTION_KEY));
     }
 }

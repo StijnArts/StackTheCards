@@ -1,12 +1,15 @@
 package drai.dev.stackthecards.data.carddata;
 
 import com.google.gson.stream.*;
+import com.mojang.datafixers.util.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.parts.*;
-import net.minecraft.text.*;
+import net.minecraft.*;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
 import org.json.simple.*;
@@ -36,6 +39,9 @@ public class CardData {
     public List<String> cardRarityIds = new ArrayList<>();
     public String rarity;
     public int index;
+
+    public static Component NEW_LINE = Component.literal(" ");
+    public static Component TAB = Component.literal("      ");
 
     public CardData(String cardId, String nameSpace) {
 //        this.cardSet = cardSet;
@@ -147,7 +153,7 @@ public class CardData {
 //        return StackTheCardsClient.TEST;
     }
     public String getTextureId() {
-        return cardSet.getSetIdentifier() + "_" + cardId;
+        return cardSet.getSetResourceLocation() + "_" + cardId;
     }
 
     public CardIdentifier getCardIdentifier() {
@@ -163,7 +169,7 @@ public class CardData {
     }
 
     public int getWidth() {
-        return getCardImage().getRight();
+        return getCardImage().getSecond();
     }
 
     public double getYOffset() {
@@ -175,18 +181,16 @@ public class CardData {
     }
 
     public int getHeight() {
-        return getCardImage().getLeft();
+        return getCardImage().getFirst();
     }
 
-    public static Text NEW_LINE = Text.literal(" ");
-    public static Text TAB = Text.literal("      ");
-    public List<? extends Text> getDetailToolTips() {
+    public List<? extends Component> getDetailToolTips() {
         return getTexts(detailTooltipSections, this);
     }
 
     @NotNull
-    public static ArrayList<Text> getTexts(List<CardTooltipSection> sections, CardData self) {
-        var tooltips = new ArrayList<Text>();
+    public static ArrayList<Component> getTexts(List<CardTooltipSection> sections, CardData self) {
+        var tooltips = new ArrayList<Component>();
         var rarity = self.rarity;
         if(rarity == null || rarity.isEmpty() || rarity.isBlank()){
             if(self.cardRarityIds != null && self.cardRarityIds.size() > 0){
@@ -207,8 +211,8 @@ public class CardData {
         return tooltips;
     }
 
-    public static ArrayList<Text> getTexts(List<CardTooltipSection> sections) {
-        var tooltips = new ArrayList<Text>();
+    public static ArrayList<Component> getTexts(List<CardTooltipSection> sections) {
+        var tooltips = new ArrayList<Component>();
         for (int i = 0; i < sections.size(); i++) {
             var section = sections.get(i);
             tooltips.addAll(section.getText());
@@ -220,16 +224,16 @@ public class CardData {
         return tooltips;
     }
 
-    public Text getCardNameLabel() {
+    public Component getCardNameLabel() {
         if(!StackTheCardsClient.cardLoreKeyPressed){
-            return Text.literal(getCardName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
+            return Component.literal(getCardName()).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE));
         } else {
-            if(detailHeader == null) return Text.literal(getCardName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
+            if(detailHeader == null) return Component.literal(getCardName()).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE));
             return detailHeader.getTextComponent();
         }
     }
 
-    public List<Text> getTooltipsDescriptors(){
+    public List<Component> getTooltipsDescriptors(){
         return getTexts(hoverTooltipSections, this);
     }
 
@@ -249,7 +253,7 @@ public class CardData {
         return null;
     }
 
-    public Identifier getModelIdentifier() {
+    public ResourceLocation getModelResourceLocation() {
         if(cardSet!=null){
             var cardSetBackModel = this.cardSet.getCardBackModel();
             if(cardSetBackModel != null) return cardSetBackModel;
@@ -260,7 +264,7 @@ public class CardData {
             if(cardGameBackModel !=null) return cardGameBackModel;
         }
 
-        return new Identifier("stack_the_cards", "stc_cards/backs/fallback");
+        return new ResourceLocation("stack_the_cards", "stc_cards/backs/fallback");
     }
 
     public CardData getCardBackData() {
@@ -288,8 +292,8 @@ public class CardData {
         return gameId + "/" + cardSet.getSetId() + "/" + cardId;
     }
 
-    public Identifier getFallbackModel() {
-        return new Identifier("stack_the_cards", "stc_cards/backs/fallback");
+    public ResourceLocation getFallbackModel() {
+        return new ResourceLocation("stack_the_cards", "stc_cards/backs/fallback");
     }
 
     public int getCountInGroup() {

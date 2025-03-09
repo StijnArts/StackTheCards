@@ -4,6 +4,7 @@ import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.registry.*;
+import net.minecraft.resources.*;
 import net.minecraft.util.*;
 import org.json.simple.*;
 
@@ -27,7 +28,7 @@ public class CardGame {
     private String gameId;
     public CardStackingDirection cardStackingDirection = CardStackingDirection.TOP;
     public float cardStackingDistance = 18F;
-    private Identifier cardBackModel;
+    private ResourceLocation cardBackModel;
     public Map<String, CardSet> cardSets = new HashMap<>();
     public Map<String, CardConnection> cardConnections = new HashMap<>();
     public Map<String, CardData> cards = new HashMap<>();
@@ -35,11 +36,11 @@ public class CardGame {
     private String cardBackTextureName;
     private final Map<String, CardPack> cardPacks = new HashMap<>();
     private GameCardData cardBackData;
-    private Identifier cardPackModel;
+    private ResourceLocation cardPackModel;
     private String cardPackTextureName;
     private GameCardData cardPackData;
     private final Map<String, CardRarity> rarities = new HashMap<>();
-    private String effectIdentifier;
+    private String effectResourceLocation;
     private String name;
     private Map<String, CardPack> parentPacks = new HashMap<>();
     private String nameSpace;
@@ -68,7 +69,7 @@ public class CardGame {
         }
         if(json.containsKey("effect")){
             try{
-                game.effectIdentifier = (String) json.get("effect");
+                game.effectResourceLocation = (String) json.get("effect");
             } catch (Exception e){
                 throw new MalformedJsonException("Card game effect was malformed: "+e.getMessage());
             }
@@ -83,7 +84,7 @@ public class CardGame {
         if(json.containsKey(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)){
             try{
                 var identifierArray = ((String) json.get(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)).split(":");
-                game.setCardBackModel(new Identifier(identifierArray[0], identifierArray[1]));
+                game.setCardBackModel(new ResourceLocation(identifierArray[0], identifierArray[1]));
             } catch (Exception e){
                 throw new MalformedJsonException("Card back identifier was malformed: "+e.getMessage());
             }
@@ -98,7 +99,7 @@ public class CardGame {
         if(json.containsKey(JSON_GAME_CARD_PACK_ITEM_MODEL_KEY)){
             try{
                 var identifierArray = ((String) json.get(JSON_GAME_CARD_PACK_ITEM_MODEL_KEY)).split(":");
-                game.setCardPackItemModel(new Identifier(identifierArray[0], identifierArray[1]));
+                game.setCardPackItemModel(new ResourceLocation(identifierArray[0], identifierArray[1]));
             } catch (Exception e){
                 throw new MalformedJsonException("Card pack identifier was malformed: "+e.getMessage());
             }
@@ -131,7 +132,7 @@ public class CardGame {
         this.cardPackTextureName = s;
     }
 
-    private void setCardPackItemModel(Identifier identifier) {
+    private void setCardPackItemModel(ResourceLocation identifier) {
         this.cardPackModel = identifier;
     }
 
@@ -164,9 +165,9 @@ public class CardGame {
         return cardConnections;
     }
 
-    public List<CardConnection> getConnections(CardIdentifier cardIdentifier){
+    public List<CardConnection> getConnections(CardIdentifier cardResourceLocation){
         var connections = cardConnections.values().stream()
-                .filter(connection -> connection.getCardIdentifiers().stream().anyMatch(identifier -> identifier!=null && identifier.isEqual(cardIdentifier))).collect(Collectors.toList());
+                .filter(connection -> connection.getCardIdentifiers().stream().anyMatch(identifier -> identifier!=null && identifier.isEqual(cardResourceLocation))).collect(Collectors.toList());
         return connections;
     }
 
@@ -182,7 +183,7 @@ public class CardGame {
         this.cardStackingDistance = cardStackingDistance;
     }
 
-    public Identifier getCardBackModel() {
+    public ResourceLocation getCardBackModel() {
         return cardBackModel;
     }
 
@@ -193,7 +194,7 @@ public class CardGame {
         return cardBackData;
     }
 
-    public void setCardBackModel(Identifier cardBackModel) {
+    public void setCardBackModel(ResourceLocation cardBackModel) {
         this.cardBackModel = cardBackModel;
     }
 
@@ -229,7 +230,7 @@ public class CardGame {
         return cardPacks;
     }
 
-    public Identifier getCardPackModel() {
+    public ResourceLocation getCardPackModel() {
         return cardPackModel;
     }
 
@@ -243,8 +244,8 @@ public class CardGame {
         return rarities.get(rarityId);
     }
 
-    public String getEffectIdentifier() {
-        return effectIdentifier;
+    public String getEffectResourceLocation() {
+        return effectResourceLocation;
     }
 
     public String getName() {

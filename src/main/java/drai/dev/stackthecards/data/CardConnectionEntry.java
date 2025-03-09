@@ -72,21 +72,21 @@ public class CardConnectionEntry {
             try{
                 connectionEntry.xModifier = (float)(long) json.get(JSON_X_MODIFIER_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_Y_MODIFIER_KEY)){
             try{
                 connectionEntry.yModifier = (float)(long) json.get(JSON_Y_MODIFIER_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_LAYER_KEY)) {
             try {
                 connectionEntry.layer = (int)(long) json.get(JSON_LAYER_KEY);
             } catch (Exception e) {
-                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
         }
         return connectionEntry;

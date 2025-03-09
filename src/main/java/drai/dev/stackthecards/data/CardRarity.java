@@ -2,7 +2,7 @@ package drai.dev.stackthecards.data;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.tooltips.parts.*;
-import net.minecraft.text.*;
+import net.minecraft.network.chat.*;
 import org.json.simple.*;
 
 import java.util.*;
@@ -57,7 +57,7 @@ public class CardRarity {
     }
 
 
-    public List<Text> getText() {
+    public List<Component> getText() {
         return text.stream().map(text -> text.getText()).flatMap(List::stream).collect(Collectors.toList());
     }
 }

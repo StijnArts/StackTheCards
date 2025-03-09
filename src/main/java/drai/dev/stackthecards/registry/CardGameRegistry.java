@@ -22,32 +22,32 @@ public class CardGameRegistry {
         return cardGames.get(cardGameId);
     }
 
-    public static CardData getCardData(CardIdentifier cardIdentifier) {
-        if(cardIdentifier == null /*|| !CardIdentifier.isValid(cardIdentifier)*/) return MISSING_CARD_DATA;
-        if(cardIdentifier.ToList().stream().allMatch(id-> id.equals("missing"))){
+    public static CardData getCardData(CardIdentifier cardResourceLocation) {
+        if(cardResourceLocation == null /*|| !CardIdentifier.isValid(cardResourceLocation)*/) return MISSING_CARD_DATA;
+        if(cardResourceLocation.ToList().stream().allMatch(id-> id.equals("missing"))){
             return MISSING_CARD_DATA;
         }
         var cardData = MISSING_CARD_DATA;
-        var cardGame = getCardGame(cardIdentifier.gameId);
-        var gameCard = cardGame.getCards().get(cardIdentifier.cardId);
+        var cardGame = getCardGame(cardResourceLocation.gameId);
+        var gameCard = cardGame.getCards().get(cardResourceLocation.cardId);
         if(gameCard != null) cardData = gameCard;
-        var cardSet = cardGame.getCardSet(cardIdentifier.setId);
-        if(cardSet != null) cardData = cardSet.getCardData(cardIdentifier.cardId);
-        if(cardData!=MISSING_CARD_DATA) cardData.rarity = cardIdentifier.rarityId;
+        var cardSet = cardGame.getCardSet(cardResourceLocation.setId);
+        if(cardSet != null) cardData = cardSet.getCardData(cardResourceLocation.cardId);
+        if(cardData!=MISSING_CARD_DATA) cardData.rarity = cardResourceLocation.rarityId;
         return cardData;
     }
 
-    public static CardPack getPackData(CardIdentifier cardIdentifier) {
-        if(cardIdentifier == null /*|| !CardIdentifier.isValid(cardIdentifier)*/) return MISSING_CARD_PACK;
-        if(cardIdentifier.ToList().stream().allMatch(id-> id.equals("missing"))){
+    public static CardPack getPackData(CardIdentifier cardResourceLocation) {
+        if(cardResourceLocation == null /*|| !CardIdentifier.isValid(cardResourceLocation)*/) return MISSING_CARD_PACK;
+        if(cardResourceLocation.ToList().stream().allMatch(id-> id.equals("missing"))){
             return MISSING_CARD_PACK;
         }
 
-        var cardGame = getCardGame(cardIdentifier.gameId);
-        var gameCard = cardGame.getCardPacks().get(cardIdentifier.cardId);
+        var cardGame = getCardGame(cardResourceLocation.gameId);
+        var gameCard = cardGame.getCardPacks().get(cardResourceLocation.cardId);
         if(gameCard != null) return gameCard;
-        var cardSet = cardGame.getCardSet(cardIdentifier.setId);
-        if(cardSet != null) return cardSet.getCardPack(cardIdentifier.cardId);
+        var cardSet = cardGame.getCardSet(cardResourceLocation.setId);
+        if(cardSet != null) return cardSet.getCardPack(cardResourceLocation.cardId);
         return MISSING_CARD_PACK;
     }
 

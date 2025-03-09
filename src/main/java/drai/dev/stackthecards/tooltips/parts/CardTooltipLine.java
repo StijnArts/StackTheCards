@@ -2,8 +2,7 @@ package drai.dev.stackthecards.tooltips.parts;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.*;
-import net.minecraft.text.*;
-import net.minecraft.util.*;
+import net.minecraft.network.chat.*;
 import org.json.simple.*;
 
 import java.util.*;
@@ -45,7 +44,7 @@ public class CardTooltipLine {
                     part.cardTextFormatting = new CardTextFormatting();
                 }
             } catch (Exception e){
-                throw new MalformedJsonException("Text formatting id was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Component formatting id was malformed: "+e.getMessage());
             }
         } else {
             part.cardTextFormatting = new CardTextFormatting();
@@ -54,32 +53,32 @@ public class CardTooltipLine {
             try{
                 part.cardTextFormatting.isBold = (Boolean) json.get(JSON_IS_BOLD_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isBold was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Component format isBold was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_IS_ITALIC_KEY)){
             try{
                 part.cardTextFormatting.isItalic = (Boolean) json.get(JSON_IS_ITALIC_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_COLOR_KEY)){
             try{
                 part.cardTextFormatting.argbColorValue = (Integer) json.get(JSON_COLOR_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
         }
 
         return part;
     }
 
-    public Text getTextComponent(){
+    public Component getTextComponent(){
         if(lineSegments.size()==0){
-            return Text.literal(text).fillStyle(cardTextFormatting.getStyle());
+            return Component.literal(text).setStyle(cardTextFormatting.getStyle());
         } else {
-            MutableText mutableText = Text.literal("");
+            MutableComponent mutableText = Component.literal("");
             for (var lineSegment : lineSegments) {
                 mutableText.append(lineSegment.getTextComponent());
             }

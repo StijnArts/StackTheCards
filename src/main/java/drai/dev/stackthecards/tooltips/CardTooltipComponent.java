@@ -3,17 +3,18 @@ package drai.dev.stackthecards.tooltips;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.renderers.*;
-import net.minecraft.client.font.*;
 import net.minecraft.client.gui.*;
-import net.minecraft.client.gui.tooltip.*;
-import net.minecraft.client.render.*;
-import net.minecraft.item.*;
+import net.minecraft.client.gui.screens.inventory.tooltip.*;
+import net.minecraft.client.renderer.*;
+import net.minecraft.world.inventory.tooltip.*;
+import net.minecraft.world.item.*;
+import org.apache.logging.log4j.core.pattern.*;
 import org.joml.*;
 
 import java.lang.*;
 import java.lang.Math;
 
-public class CardTooltipComponent implements TooltipComponent {
+public class CardTooltipComponent implements ClientTooltipComponent {
     private CardTooltipData cardTooltipData;
     private CardTooltipRenderer cardTooltipRenderer;
 
@@ -29,19 +30,19 @@ public class CardTooltipComponent implements TooltipComponent {
     }
 
     @Override
-    public int getWidth(TextRenderer textRenderer) {
+    public int getWidth(Font font) {
         //        return Math.max(cardPreviewSize, 0);
         return 0;
     }
 
     @Override
-    public void drawText(TextRenderer textRenderer, int x, int y, Matrix4f matrix, VertexConsumerProvider.Immediate vertexConsumers) {
-        TooltipComponent.super.drawText(textRenderer, x, y, matrix, vertexConsumers);
+    public void renderText(Font textRenderer, int x, int y, Matrix4f matrix, MultiBufferSource.BufferSource vertexConsumers) {
+        ClientTooltipComponent.super.renderText(textRenderer, x, y, matrix, vertexConsumers);
 //        drawAt(cardTooltipData.getCard(),x, y, context, );
     }
 
     @Override
-    public void drawItems(TextRenderer textRenderer, int x, int y, DrawContext context) {
+    public void renderImage(Font textRenderer, int x, int y, GuiGraphics context) {
         //TooltipComponent.super.drawItems(textRenderer, x, y, context);
         var stack = cardTooltipData.getStack();
         var cardData = Card.getCardData(stack);
@@ -49,7 +50,7 @@ public class CardTooltipComponent implements TooltipComponent {
         drawAt(stack, x, y, context, offsetScale);
     }
 
-    public void drawItemsWithTooltipPosition(TextRenderer textRenderer, int x, int y, DrawContext context,
+    public void drawItemsWithTooltipPosition(Font textRenderer, int x, int y, GuiGraphics context,
                                              int tooltipTopY, int tooltipBottomY, int mouseX, int mouseY) {
         var stack = cardTooltipData.getStack();
         var cardData = Card.getCardData(stack);
@@ -57,8 +58,8 @@ public class CardTooltipComponent implements TooltipComponent {
         double offsetScale = getCardPreviewSize() / (double) cardData.getMaxSide();
         int h = (int) ((cardData.getHeight()) * offsetScale)+3;
         int w = (int) ((cardData.getWidth()) * offsetScale);
-        int screenW = context.getScaledWindowWidth();
-        int screenH = context.getScaledWindowHeight();
+        int screenW = context.guiWidth();
+        int screenH = context.guiHeight();
 
         x = Math.min(x - 4, screenW - w)+4;
         y = tooltipBottomY+4;
@@ -84,7 +85,7 @@ public class CardTooltipComponent implements TooltipComponent {
         return 0.007413793103 * getCardPreviewSize();
     }
 
-    private void drawAt(ItemStack stack, int x, int y, DrawContext context, double offsetScale) {
+    private void drawAt(ItemStack stack, int x, int y, GuiGraphics context, double offsetScale) {
         this.cardTooltipRenderer.draw(stack, x, y, context, getCardPreviewSize(), offsetScale, getCardScale());
     }
 }

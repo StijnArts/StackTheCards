@@ -1,9 +1,7 @@
 package drai.dev.stackthecards.renderers;
 
 import drai.dev.stackthecards.data.*;
-import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
-import net.minecraft.item.*;
 
 import java.util.*;
 
@@ -75,7 +73,7 @@ public class CardConnectionRenderAsset {
                     }
                     xOffset+=xOffsetForRow + connectionSlot.xModifier;
                     yOffset+=yOffsetForAllCards + connectionSlot.yModifier;
-                    if(containedCards.stream().anyMatch(cardIdentifier -> cardIdentifier.isEqual(connectionSlot.self))){
+                    if(containedCards.stream().anyMatch(cardResourceLocation -> cardResourceLocation.isEqual(connectionSlot.self))){
                         cards.add(new CardConnectionAssetEntry(xOffset, yOffset, connectionSlot.layer, connectionSlot, cardTexture));
                     }
 

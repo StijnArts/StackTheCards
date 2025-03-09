@@ -3,6 +3,7 @@ package drai.dev.stackthecards.data.cardpacks;
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.tooltips.parts.*;
+import net.minecraft.resources.*;
 import net.minecraft.util.*;
 import org.json.simple.*;
 
@@ -18,7 +19,7 @@ public class GameCardPack extends CardPack{
     }
 
     public GameCardPack(String packId, String gameId, String nameSpace, CardTooltipLine detailHeader, List<CardTooltipSection> hoverTooltipSections, List<CardTooltipSection> detailTooltipSections,
-                        List<CardPackPool> pools, Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards, String packName,
+                        List<CardPackPool> pools, Map<ResourceLocation, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards, String packName,
                         double weight, boolean droppedByMobs, boolean duplicationAllowed) {
         super(packId, gameId, nameSpace, detailHeader, hoverTooltipSections, detailTooltipSections, pools, guaranteedItems,
                 guaranteedCards, packName, weight, droppedByMobs, duplicationAllowed);
@@ -126,7 +127,7 @@ public class GameCardPack extends CardPack{
                 for (var identifier : identifierArray) {
                     var identifierAsObject = (JSONObject)identifier;
                     var identifierSplit = ((String)identifierAsObject.get("itemId")).split(":");
-                    cardPack.guaranteedItems.put(new Identifier(identifierSplit[0], identifierSplit[1]),
+                    cardPack.guaranteedItems.put(new ResourceLocation(identifierSplit[0], identifierSplit[1]),
                             (int) (long)identifierAsObject.get("amount"));
                 }
             } catch (Exception e){
@@ -167,7 +168,7 @@ public class GameCardPack extends CardPack{
     }
 
     @Override
-    public String getEffectIdentifier() {
-        return getCardGame().getEffectIdentifier();
+    public String getEffectResourceLocation() {
+        return getCardGame().getEffectResourceLocation();
     }
 }

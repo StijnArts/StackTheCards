@@ -1,21 +1,25 @@
 package drai.dev.stackthecards.data.cardpacks;
 
 import com.google.gson.stream.*;
+import com.mojang.datafixers.types.templates.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.registry.Items;
 import drai.dev.stackthecards.tooltips.parts.*;
-import net.minecraft.entity.*;
-import net.minecraft.item.*;
-import net.minecraft.loot.context.*;
+import net.minecraft.*;
 import net.minecraft.nbt.*;
-import net.minecraft.text.*;
-import net.minecraft.util.*;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.storage.loot.*;
+import net.minecraft.world.level.storage.loot.parameters.*;
 import org.json.simple.*;
 
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.*;
 
@@ -40,7 +44,7 @@ public class CardPack {
     protected List<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
     protected List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
     protected List<CardPackPool> pools = new ArrayList<>();
-    protected Map<Identifier, Integer> guaranteedItems = new HashMap<>();
+    protected Map<ResourceLocation, Integer> guaranteedItems = new HashMap<>();
     protected Map<CardIdentifier, Integer> guaranteedCards = new HashMap<>();
     protected String packName;
     protected double weight = 1;
@@ -62,7 +66,7 @@ public class CardPack {
 
     public CardPack(String packId, String gameId, String setId, String nameSpace, CardTooltipLine detailHeader, List<CardTooltipSection>
             hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
-                    Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
+                    Map<ResourceLocation, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
                     String packName, double weight, boolean droppedByMobs, boolean duplicationAllowed) {
         this.packId = packId;
         this.gameId = gameId;
@@ -82,7 +86,7 @@ public class CardPack {
 
     public CardPack(String packId, String gameId, String nameSpace, CardTooltipLine detailHeader, List<CardTooltipSection>
             hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
-                    Map<Identifier, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
+                    Map<ResourceLocation, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
                     String packName, double weight, boolean droppedByMobs, boolean duplicationAllowed) {
         this.packId = packId;
         this.gameId = gameId;
@@ -101,24 +105,24 @@ public class CardPack {
 
     public static CardPack getCardPack(ItemStack stack) {
         var cardNBTData = getCardDataNBT(stack, STORED_CARD_PACK_DATA_KEY);
-        var cardIdentifier = CardIdentifier.getCardIdentifier(cardNBTData);
-        return CardGameRegistry.getPackData(cardIdentifier);
+        var cardResourceLocation = CardIdentifier.getCardIdentifier(cardNBTData);
+        return CardGameRegistry.getPackData(cardResourceLocation);
     }
 
-    public static void addCardPackIdentifier(ItemStack stack, CardIdentifier cardIdentifier) {
-        NbtList nbtList = Card.getCardDataNBT(stack, STORED_CARD_PACK_DATA_KEY);
+    public static void addCardPackResourceLocation(ItemStack stack, CardIdentifier cardResourceLocation) {
+        ListTag nbtList = Card.getCardDataNBT(stack, STORED_CARD_PACK_DATA_KEY);
         boolean cardHasId = false;
         for(int i = 0; i < nbtList.size(); ++i) {
-            NbtCompound nbtCompound = nbtList.getCompound(i);
-            CardIdentifier cardIdentifier2 = CardIdentifier.getCardIdentifier(nbtCompound);
-            if (CardIdentifier.isValid(cardIdentifier2)) continue;
+            CompoundTag nbtCompound = nbtList.getCompound(i);
+            CardIdentifier cardResourceLocation2 = CardIdentifier.getCardIdentifier(nbtCompound);
+            if (CardIdentifier.isValid(cardResourceLocation2)) continue;
             cardHasId = true;
             break;
         }
         if (!cardHasId) {
-            nbtList.add(CardIdentifier.createNbt(cardIdentifier));
+            nbtList.add(CardIdentifier.createNbt(cardResourceLocation));
         }
-        stack.getOrCreateNbt().put(STORED_CARD_PACK_DATA_KEY, nbtList);
+        stack.getOrCreateTag().put(STORED_CARD_PACK_DATA_KEY, nbtList);
     }
 
     public static CardPack parse(JSONObject json, CardGame game, CardSet cardSet, String nameSpace) throws MalformedJsonException {
@@ -224,7 +228,7 @@ public class CardPack {
                 for (var identifier : identifierArray) {
                     var identifierAsObject = (JSONObject)identifier;
                     var identifierSplit = ((String)identifierAsObject.get("itemId")).split(":");
-                    cardPack.guaranteedItems.put(new Identifier(identifierSplit[0], identifierSplit[1]),
+                    cardPack.guaranteedItems.put(new ResourceLocation(identifierSplit[0], identifierSplit[1]),
                             (int) (long)identifierAsObject.get("amount"));
                 }
             } catch (Exception e){
@@ -269,16 +273,17 @@ public class CardPack {
         var cardPack = weightedRandom.next();
         return cardPack;
     }
+
     public static void lootPoolCardPackInjection(LootContext context, Consumer<ItemStack> consumer, int i) {
-        if(context.hasParameter(LootContextParameters.THIS_ENTITY)){
-            var thisEntity = context.get(LootContextParameters.THIS_ENTITY);
-            var spawnGroup = thisEntity.getType().getSpawnGroup();
-            if(spawnGroup == SpawnGroup.CREATURE || !spawnGroup.isPeaceful()){
+        if(context.hasParam(LootContextParams.THIS_ENTITY)){
+            var thisEntity = context.getParam(LootContextParams.THIS_ENTITY);
+            var spawnGroup = thisEntity.getType().getCategory();
+            if(spawnGroup == MobCategory.MONSTER || !spawnGroup.isFriendly()){
                 for (int k = 0; k < i; k++) {
                     int roll = ThreadLocalRandom.current().nextInt(0, 4);
                     if(roll==1){
                         var itemStack = new ItemStack(Items.CARD_PACK);
-                        CardPack.addCardPackIdentifier(itemStack, CardPack.getRandomCardPack(true).getCardIdentifier());
+                        CardPack.addCardPackResourceLocation(itemStack, CardPack.getRandomCardPack(true).getCardIdentifier());
                         consumer.accept(itemStack);
                     }
                 }
@@ -322,16 +327,16 @@ public class CardPack {
         this.setId = setId;
     }
 
-    public Collection<? extends Text> getDetailToolTips() {
+    public Collection<? extends Component> getDetailToolTips() {
         return getTexts(detailTooltipSections);
     }
 
-    public Collection<? extends Text> getTooltipsDescriptors() {
+    public Collection<? extends Component> getTooltipsDescriptors() {
         return getTexts(hoverTooltipSections);
     }
 
-    public Identifier getModelIdentifier() {
-        if(packId!=null && !packId.equals("missing")) return new Identifier(nameSpace, "stc_cards/packs/"+packId);
+    public ResourceLocation getModelResourceLocation() {
+        if(packId!=null && !packId.equals("missing")) return new ResourceLocation(nameSpace, "stc_cards/packs/"+packId);
 
         var cardGame = this.getCardGame();
         if(cardGame!=null) {
@@ -339,7 +344,7 @@ public class CardPack {
             if(cardGamePackModel !=null) return cardGamePackModel;
         }
 
-        return new Identifier("stack_the_cards", "stc_cards/packs/fallback");
+        return new ResourceLocation("stack_the_cards", "stc_cards/packs/fallback");
     }
 
     public CardGame getCardGame() {
@@ -358,22 +363,22 @@ public class CardPack {
     }
 
     public String getTextureId() {
-        return getCardSet().getSetIdentifier() + "_" + packId;
+        return getCardSet().getSetResourceLocation() + "_" + packId;
     }
 
     public String getPackTextureLocation() {
         return gameId + "/" + getCardSet().getSetId() + "/" + packId;
     }
 
-    public Identifier getFallbackModel() {
-        return new Identifier("stack_the_cards", "stc_cards/packs/fallback");
+    public ResourceLocation getFallbackModel() {
+        return new ResourceLocation("stack_the_cards", "stc_cards/packs/fallback");
     }
 
-    public Text getPackNameLabel() {
+    public Component getPackNameLabel() {
         if(!StackTheCardsClient.cardLoreKeyPressed){
-            return Text.literal(getPackName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
+            return Component.literal(getPackName()).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE));
         } else {
-            if(detailHeader == null) return Text.literal(getPackName()).fillStyle(Style.EMPTY.withColor(Formatting.WHITE));
+            if(detailHeader == null) return Component.literal(getPackName()).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE));
             return detailHeader.getTextComponent();
         }
     }
@@ -386,10 +391,10 @@ public class CardPack {
         var pullresult = new PullResult();
         for (var pool : pools) {
             var randomCollection = new RandomCollection<>();
-            pool.cardsInPool.forEach((cardIdentifier, integer) -> randomCollection.add(integer, cardIdentifier));
+            pool.cardsInPool.forEach((cardResourceLocation, integer) -> randomCollection.add(integer, cardResourceLocation));
             pool.raritiesInPool.forEach((rarity, integer) -> randomCollection.add(integer, rarity));
             pool.itemsInPool.forEach((items, integer) -> randomCollection.add(integer, items));
-//            pool.tagsInPool.forEach((cardIdentifier, integer) -> randomCollection.add(integer, cardIdentifier));
+//            pool.tagsInPool.forEach((cardResourceLocation, integer) -> randomCollection.add(integer, cardResourceLocation));
             if(randomCollection.getTotal()<1) continue;
             if(pool.cardsInPool.values().isEmpty() && pool.itemsInPool.values().isEmpty() && pool.raritiesInPool.values().isEmpty()) continue;
             var amountOfPulls = ThreadLocalRandom.current().nextInt(pool.minimumAmountOfCardsFromPool, pool.maximumAmountOfCardsFromPool+1);
@@ -420,10 +425,10 @@ public class CardPack {
 
     public void pull(PullResult pullResult, RandomCollection<Object> collection) {
         var pulledObject = collection.next();
-        if(pulledObject instanceof CardIdentifier cardIdentifier){
-            if(cardIdentifier.rarityId == null || cardIdentifier.rarityId.isEmpty())
-                cardIdentifier.rarityId = CardGameRegistry.getCardData(cardIdentifier).cardRarityIds.get(0);
-            pullResult.pulledCards.add(cardIdentifier);
+        if(pulledObject instanceof CardIdentifier cardResourceLocation){
+            if(cardResourceLocation.rarityId == null || cardResourceLocation.rarityId.isEmpty())
+                cardResourceLocation.rarityId = CardGameRegistry.getCardData(cardResourceLocation).cardRarityIds.get(0);
+            pullResult.pulledCards.add(cardResourceLocation);
         } else if(pulledObject instanceof CardRarity rarity){
             var card = rollCardInRarity(rarity);
             if(card == null){
@@ -431,7 +436,7 @@ public class CardPack {
             } else {
                 pullResult.pulledCards.add(card);
             }
-        } else if(pulledObject instanceof Identifier identifier){
+        } else if(pulledObject instanceof ResourceLocation identifier){
             pullResult.pulledItems.add(identifier);
         }
     }
@@ -440,15 +445,15 @@ public class CardPack {
         return getCardSet().getCards().size();
     }
 
-    public String getEffectIdentifier() {
-        return getCardGame().getCardSet(this.getSetId()).getEffectIdentifier();
+    public String getEffectResourceLocation() {
+        return getCardGame().getCardSet(this.getSetId()).getEffectResourceLocation();
     }
 
     public int getOrdering() {
         return getCardSet().getOrdering();
     }
 
-    public CardIdentifier getIdentifier() {
+    public CardIdentifier getResourceLocation() {
         return new CardIdentifier(gameId, setId, packId, "");
     }
 }

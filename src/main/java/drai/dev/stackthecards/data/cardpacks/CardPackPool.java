@@ -2,6 +2,7 @@ package drai.dev.stackthecards.data.cardpacks;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.*;
+import net.minecraft.resources.*;
 import net.minecraft.util.*;
 import org.json.simple.*;
 
@@ -22,9 +23,9 @@ public class CardPackPool {
     public int poolPullChancePercent = 100;
     public Map<CardIdentifier, Integer> cardsInPool = new HashMap<>();
     public Map<CardRarity, Integer> raritiesInPool = new HashMap<>();
-    public Map<Identifier, Integer> itemsInPool = new HashMap<>();
+    public Map<ResourceLocation, Integer> itemsInPool = new HashMap<>();
     private final CardPack cardPack;
-//    public Map<Identifier, Integer> tagsInPool = new HashMap<>();
+//    public Map<ResourceLocation, Integer> tagsInPool = new HashMap<>();
 
     public CardPackPool(int minimumAmountOfCardsFromPool, CardPack cardPack){
         this.minimumAmountOfCardsFromPool = minimumAmountOfCardsFromPool;
@@ -96,7 +97,7 @@ public class CardPackPool {
                 for (var identifier : identifierArray) {
                     var identifierAsObject = (JSONObject)identifier;
                     var identifierSplit = ((String)identifierAsObject.get("itemId")).split(":");
-                    pool.itemsInPool.put(new Identifier(identifierSplit[0], identifierSplit[1]),
+                    pool.itemsInPool.put(new ResourceLocation(identifierSplit[0], identifierSplit[1]),
                             (int) (long)identifierAsObject.get("weight"));
                 }
             } catch (Exception e){
@@ -109,7 +110,7 @@ public class CardPackPool {
 //                for (var identifier : identifierArray) {
 //                    var identifierAsObject = (JSONObject)identifier;
 //                    var identifierSplit = ((String)identifierAsObject.get("itemId")).split(":");
-//                    pool.tagsInPool.put(new Identifier(identifierSplit[0], identifierSplit[1]),
+//                    pool.tagsInPool.put(new ResourceLocation(identifierSplit[0], identifierSplit[1]),
 //                            (int) (long)identifierAsObject.get("weight")));
 //                }
 //            } catch (Exception e){

@@ -2,9 +2,10 @@ package drai.dev.stackthecards.registry;
 
 import drai.dev.stackthecards.items.*;
 import net.fabricmc.fabric.api.item.v1.*;
-import net.minecraft.item.*;
-import net.minecraft.registry.*;
-import net.minecraft.util.*;
+import net.minecraft.core.*;
+import net.minecraft.core.registries.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.item.*;
 
 public class Items {
     public static final Card CARD = registerItem(new Card(new FabricItemSettings()),"card");
@@ -27,7 +28,7 @@ public class Items {
     public static final CardBinder PURPLE_CARD_BINDER = registerItem(new CardBinder(DyeColor.PURPLE, new FabricItemSettings().maxCount(1)), "card_binder_purple");;
 
     public static <T extends Item> T registerItem(T item, String name){
-        Registry.register(Registries.ITEM, new Identifier("stack_the_cards", name), item);
+        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("stack_the_cards", name), item);
         return item;
     }
 

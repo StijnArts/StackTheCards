@@ -4,27 +4,25 @@ import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.items.*;
-import net.minecraft.inventory.*;
-import net.minecraft.item.*;
-import net.minecraft.recipe.*;
-import net.minecraft.recipe.book.*;
-import net.minecraft.registry.*;
-import net.minecraft.util.*;
-import net.minecraft.util.collection.*;
-import net.minecraft.world.*;
+import net.minecraft.core.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.inventory.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.*;
 
 import static drai.dev.stackthecards.items.CardBinderInventory.*;
 
-public class CardBinderRemoveCustomizationRecipe extends SpecialCraftingRecipe {
-    public CardBinderRemoveCustomizationRecipe(Identifier id, CraftingRecipeCategory category) {
+public class CardBinderRemoveCustomizationRecipe extends CustomRecipe {
+    public CardBinderRemoveCustomizationRecipe(ResourceLocation id, CraftingBookCategory category) {
         super(id, category);
     }
 
     @Override
-    public boolean matches(RecipeInputInventory inventory, World world) {
+    public boolean matches(CraftingContainer inventory, Level level) {
         int i = 0;
-        for (int k = 0; k < inventory.size(); ++k) {
-            ItemStack itemStack = inventory.getStack(k);
+        for (int k = 0; k < inventory.getContainerSize(); ++k) {
+            ItemStack itemStack = inventory.getItem(k);
             if (itemStack.isEmpty()) continue;
             if (itemStack.getItem() instanceof CardBinder) {
                 ++i;
@@ -38,20 +36,20 @@ public class CardBinderRemoveCustomizationRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, DynamicRegistryManager registryManager) {
+    public ItemStack assemble(CraftingContainer inventory, RegistryAccess registryManager) {
         ItemStack cardBinder = ItemStack.EMPTY;
-        for (int i = 0; i < inventory.size(); ++i) {
-            ItemStack iterativeItemstack = inventory.getStack(i);
+        for (int i = 0; i < inventory.getContainerSize(); ++i) {
+            ItemStack iterativeItemstack = inventory.getItem(i);
             if (iterativeItemstack.isEmpty()) continue;
             Item item = iterativeItemstack.getItem();
             if (!(item instanceof CardBinder)) continue;
             cardBinder = iterativeItemstack;
         }
         var itemStackResult = cardBinder.copy();
-        if(cardBinder.hasNbt()){
-            itemStackResult.setNbt(cardBinder.getNbt().copy());
+        if(cardBinder.hasTag()){
+            itemStackResult.setTag(cardBinder.getTag().copy());
         }
-        var nbt = itemStackResult.getOrCreateNbt();
+        var nbt = itemStackResult.getOrCreateTag();
         nbt.remove(CARD_BINDER_SIZE_KEY);
         nbt.remove(CARD_BINDER_RESTRICTION_KEY);
         nbt.remove(CARD_BINDER_EFFECT_KEY);
@@ -60,7 +58,7 @@ public class CardBinderRemoveCustomizationRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public boolean fits(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return true;
     }
 

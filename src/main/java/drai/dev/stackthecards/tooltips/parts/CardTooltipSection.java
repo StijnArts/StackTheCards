@@ -2,7 +2,7 @@ package drai.dev.stackthecards.tooltips.parts;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.*;
-import net.minecraft.text.*;
+import net.minecraft.network.chat.*;
 import org.json.simple.*;
 
 import java.util.*;
@@ -14,7 +14,7 @@ public class CardTooltipSection {
     private final List<CardTooltipLine> parts = new ArrayList<>();
     public boolean noLineBreak = false;
 
-    public List<Text> getText() {
+    public List<Component> getText() {
         return parts.stream().map(CardTooltipLine::getTextComponent).collect(Collectors.toList());
     }
 
@@ -29,7 +29,7 @@ public class CardTooltipSection {
             try{
                 section.noLineBreak = (boolean) json.get(JSON_NO_NEW_LINE_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text no new line break was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Component no new line break was malformed: "+e.getMessage());
             }
         }
         return section;

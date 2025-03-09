@@ -1,8 +1,8 @@
 package drai.dev.stackthecards.data;
 
 import com.google.gson.stream.*;
-import net.minecraft.text.*;
-import net.minecraft.util.*;
+import net.minecraft.*;
+import net.minecraft.network.chat.*;
 import org.json.simple.*;
 
 public class CardTextFormatting {
@@ -12,7 +12,7 @@ public class CardTextFormatting {
     public static final String JSON_COLOR_KEY = "argbColorHex";
     public String formatId = "";
     public boolean isItalic = false;
-    public int argbColorValue = Formatting.WHITE.getColorValue();
+    public int argbColorValue = ChatFormatting.WHITE.getColor();
     public boolean isBold = false;
 
     public Style getStyle(){
@@ -32,27 +32,27 @@ public class CardTextFormatting {
         try{
             format = new CardTextFormatting((String) json.get(JSON_FORMAT_ID_KEY));
         } catch (Exception e){
-            throw new MalformedJsonException("Text format id was malformed: "+e.getMessage());
+            throw new MalformedJsonException("Component format id was malformed: "+e.getMessage());
         }
         if(json.containsKey(JSON_IS_BOLD_KEY)){
             try{
                 format.isBold = (Boolean) json.get(JSON_IS_BOLD_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isBold was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Component format isBold was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_IS_ITALIC_KEY)){
             try{
                 format.isItalic = (Boolean) json.get(JSON_IS_ITALIC_KEY);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format isItalic was malformed: "+e.getMessage());
+                throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
         }
         if(json.containsKey(JSON_COLOR_KEY)){
             try{
                 format.argbColorValue =  Integer.parseUnsignedInt((String) json.get(JSON_COLOR_KEY), 16);
             } catch (Exception e){
-                throw new MalformedJsonException("Text format color value was malformed:" + e.toString());
+                throw new MalformedJsonException("Component format color value was malformed:" + e.toString());
             }
         }
         return format;

@@ -1,7 +1,7 @@
 package drai.dev.stackthecards.extensions;
 
 /**
- * Provides access to the {@link net.minecraft.client.gui.DrawContext} methods added by the mod.
+ * Provides access to the {@link net.minecraft.client.gui.GuiGraphics} methods added by the mod.
  */
 public interface DrawContextExtensions {
   void setTooltipTopYPosition(int topY);

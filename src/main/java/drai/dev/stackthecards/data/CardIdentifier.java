@@ -1,7 +1,6 @@
 package drai.dev.stackthecards.data;
 
 import net.minecraft.nbt.*;
-import net.minecraft.server.command.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -29,22 +28,22 @@ public class CardIdentifier {
         this.setId = "missing";
     }
 
-    public static NbtElement createNbt(CardIdentifier cardIdentifier) {
-        NbtCompound nbtCompound = new NbtCompound();
-        nbtCompound.putString(CARD_ID_KEY, String.valueOf(cardIdentifier.cardId));
-        nbtCompound.putString(SET_ID_KEY, String.valueOf(cardIdentifier.setId));
-        nbtCompound.putString(GAME_ID_KEY, String.valueOf(cardIdentifier.gameId));
-        nbtCompound.putString(RARITY_ID_KEY, String.valueOf(cardIdentifier.rarityId));
+    public static Tag createNbt(CardIdentifier CardIdentifier) {
+        CompoundTag nbtCompound = new CompoundTag();
+        nbtCompound.putString(CARD_ID_KEY, String.valueOf(CardIdentifier.cardId));
+        nbtCompound.putString(SET_ID_KEY, String.valueOf(CardIdentifier.setId));
+        nbtCompound.putString(GAME_ID_KEY, String.valueOf(CardIdentifier.gameId));
+        nbtCompound.putString(RARITY_ID_KEY, String.valueOf(CardIdentifier.rarityId));
         return nbtCompound;
     }
 
-    public static CardIdentifier getCardIdentifier(NbtList nbtList) {
+    public static CardIdentifier getCardIdentifier(ListTag nbtList) {
         var gameId = "";
         var setId = "";
         var cardId = "";
         var rarityId = "";
         for (int i = 0; i < nbtList.size(); i++) {
-            NbtCompound nbtCompound = nbtList.getCompound(i);
+            CompoundTag nbtCompound = nbtList.getCompound(i);
             if(nbtCompound.contains(GAME_ID_KEY)) gameId = nbtCompound.getString(GAME_ID_KEY);
             if(nbtCompound.contains(SET_ID_KEY)) setId = nbtCompound.getString(SET_ID_KEY);
             if(nbtCompound.contains(CARD_ID_KEY)) cardId = nbtCompound.getString(CARD_ID_KEY);
@@ -57,19 +56,19 @@ public class CardIdentifier {
         return new CardIdentifier();
     }
 
-    public static List<CardIdentifier> getCardIdentifiers(NbtList list){
-        var cardIdentifiers = new ArrayList<CardIdentifier>();
+    public static List<CardIdentifier> getCardIdentifiers(ListTag list){
+        var CardIdentifiers = new ArrayList<CardIdentifier>();
         for (int i = 0; i < list.size(); i++) {
-            NbtCompound nbtCompound = list.getCompound(i);
+            CompoundTag nbtCompound = list.getCompound(i);
             CardIdentifier identifier = tryParse(nbtCompound.getString(GAME_ID_KEY), nbtCompound.getString(SET_ID_KEY), nbtCompound.getString(CARD_ID_KEY), nbtCompound.getString(RARITY_ID_KEY));
             if(identifier != null){
-                cardIdentifiers.add(identifier);
+                CardIdentifiers.add(identifier);
             }
         }
-        return cardIdentifiers;
+        return CardIdentifiers;
     }
 
-    public static CardIdentifier getCardIdentifier(NbtCompound nbtCompound) {
+    public static CardIdentifier getCardIdentifier(CompoundTag nbtCompound) {
         var identifier = tryParse(nbtCompound.getString(GAME_ID_KEY), nbtCompound.getString(SET_ID_KEY), nbtCompound.getString(CARD_ID_KEY), nbtCompound.getString(RARITY_ID_KEY));
         if(identifier == null) return new CardIdentifier();
         return identifier;
@@ -80,16 +79,16 @@ public class CardIdentifier {
         return new CardIdentifier(gameId, setId, cardId, rarityId);
     }
 
-    public static boolean isValid(CardIdentifier cardIdentifier) {
-        return cardIdentifier.cardId.equalsIgnoreCase("missing") ||
-                cardIdentifier.gameId.equalsIgnoreCase("missing");
+    public static boolean isValid(CardIdentifier CardIdentifier) {
+        return CardIdentifier.cardId.equalsIgnoreCase("missing") ||
+                CardIdentifier.gameId.equalsIgnoreCase("missing");
     }
 
     public boolean isEqual(CardIdentifier other){
-        return areEqual(this, other);
+        return isSameItem(this, other);
     }
 
-    public static boolean areEqual(CardIdentifier identifier1, CardIdentifier identifier2){
+    public static boolean isSameItem(CardIdentifier identifier1, CardIdentifier identifier2){
         if(identifier1 == null || identifier2 == null) return false;
         var sameGame = identifier1.gameId.equalsIgnoreCase(identifier2.gameId);
         var sameSet = identifier1.setId.equalsIgnoreCase(identifier2.setId);

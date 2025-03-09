@@ -1,9 +1,9 @@
 package drai.dev.stackthecards.extensions;
 
-import net.minecraft.item.*;
-import net.minecraft.util.collection.*;
+import net.minecraft.core.*;
+import net.minecraft.world.item.*;
 
 public interface ScreenHandlerExtensions {
-    DefaultedList<ItemStack> getTrackedStacks();
-    DefaultedList<ItemStack> getPreviouslyTrackedStacks();
+    NonNullList<ItemStack> getTrackedStacks();
+    NonNullList<ItemStack> getPreviouslyTrackedStacks();
 }
