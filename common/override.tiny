@@ -1,0 +1,4 @@
+v1	official	intermediary	named
+# Override mappings to resolve conflicts
+METHOD	chi/gU	getInventory	getInventory
+METHOD	fhy/m	renderHotbar	renderHotbar

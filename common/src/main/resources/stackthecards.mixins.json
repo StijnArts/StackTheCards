@@ -1,0 +1,26 @@
+{
+  "required": true,
+  "package": "drai.dev.stackthecards.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "mixins": [
+    "ItemFrameEntityMixin",
+    "ItemStackMixin",
+    "LootPoolMixin"
+  ],
+  "client": [
+    "client.BakedModelManagerMixin",
+    "client.DrawContextMixin",
+    "client.HandledScreenMixin",
+    "client.HeldItemRendererMixin",
+    "client.ItemFrameEntityRendererMixin",
+    "client.ItemRendererMixin",
+    "client.KeyboardMixin",
+    "client.ClientTextTooltipRendererMixin",
+    "client.TooltipBackgroundRendererMixin",
+    "client.ClientTextTooltipAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

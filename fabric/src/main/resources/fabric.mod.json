@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "stackthecards",
+  "version": "${version}",
+  "name": "Stack The Cards",
+  "description": "",
+  "authors": [
+    ""
+  ],
+  "contact": {
+    "homepage": ""
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/stackthecards/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "drai.dev.stackthecards.fabric.StackTheCardsFabric"
+    ],
+    "client": [
+      "drai.dev.stackthecards.fabric.client.StackTheCardsFabricClient"
+    ]
+  },
+  "mixins": [
+    "stackthecards.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "architectury": ">=13.0.8",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
