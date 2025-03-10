@@ -6,8 +6,6 @@ import drai.dev.stackthecards.tooltips.*;
 import drai.dev.stackthecards.tooltips.restrict.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screens.inventory.tooltip.*;
-import net.minecraft.world.inventory.tooltip.*;
-import org.apache.logging.log4j.core.pattern.*;
 import org.joml.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;

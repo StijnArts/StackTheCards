@@ -1,7 +1,7 @@
 package drai.dev.stackthecards.items;
 
 import drai.dev.stackthecards.data.cardpacks.*;
-import drai.dev.stackthecards.registry.StackTheCardsItems;
+import drai.dev.stackthecards.registry.*;
 import net.minecraft.core.registries.*;
 import net.minecraft.resources.*;
 import net.minecraft.sounds.*;

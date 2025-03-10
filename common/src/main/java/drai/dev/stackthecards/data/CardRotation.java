@@ -2,10 +2,8 @@ package drai.dev.stackthecards.data;
 
 import com.mojang.datafixers.util.*;
 import com.mojang.serialization.*;
-import io.netty.buffer.*;
 import net.minecraft.network.*;
 import net.minecraft.network.codec.*;
-import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;

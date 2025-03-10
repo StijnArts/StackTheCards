@@ -1,9 +1,7 @@
 package drai.dev.stackthecards.items;
 
 import drai.dev.stackthecards.*;
-import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.registry.*;
-import drai.dev.stackthecards.registry.StackTheCardsItems;
 import net.minecraft.*;
 import net.minecraft.core.registries.*;
 import net.minecraft.locale.*;
@@ -15,11 +13,8 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.*;
-import org.jetbrains.annotations.*;
 
 import java.util.*;
-
-import static drai.dev.stackthecards.items.CardBinderInventory.*;
 
 public class CardBinder extends Item {
 

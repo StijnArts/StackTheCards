@@ -3,7 +3,7 @@ package drai.dev.stackthecards.mixin;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.items.*;
-import drai.dev.stackthecards.registry.StackTheCardsItems;
+import drai.dev.stackthecards.registry.*;
 import net.minecraft.network.syncher.*;
 import net.minecraft.sounds.*;
 import net.minecraft.world.*;
@@ -44,10 +44,10 @@ public abstract class ItemFrameEntityMixin extends HangingEntity {
             if (!value.isEmpty()) {
                 value = value.copyWithCount(1);
             }
-            if(StackTheCardsClient.ctrlKeyPressed){
-                Card.toggleCardFlipped(value);
+//            if(StackTheCardsClient.ctrlKeyPressed){
+//                Card.toggleCardFlipped(value);
 //                System.out.println("flipped the card");
-            }
+//            }
             this.setSharedFlag(5, true);
 
             this.onItemChanged(value);
@@ -72,9 +72,12 @@ public abstract class ItemFrameEntityMixin extends HangingEntity {
         boolean bl = !currentItemstack.isEmpty();
         boolean isClient = this.level().isClientSide;
         if(!this.fixed && !isClient && bl){
+//            boolean isSprinting = player.isSprinting();
+            boolean isCrouching = player.isCrouching();
             if(currentItemstack.is(StackTheCardsItems.CARD)) {
                 if(itemStack.isEmpty() || !itemStack.is(StackTheCardsItems.CARD)){
-                    if(StackTheCardsClient.ctrlKeyPressed){
+                    if(/*StackTheCardsClient.ctrlKeyPressed*/isCrouching){
+                        Card.toggleCardFlipped(currentItemstack);
                         this.setItem(currentItemstack);
 //                        System.out.println("flipped the card");
                         cir.setReturnValue(InteractionResult.CONSUME);
@@ -83,7 +86,7 @@ public abstract class ItemFrameEntityMixin extends HangingEntity {
                     if (!this.isRemoved()) {
                         if(CardConnection.checkCardConnection(currentItemstack, itemStack)){
                             this.setItem(currentItemstack);
-                        } else if(StackTheCardsClient.shiftKeyPressed || CardConnection.checkSingleCardConnection(itemStack)){
+                        } else if(isCrouching || CardConnection.checkSingleCardConnection(itemStack)){
 //                    var cardsToAttach = new ArrayList<>();
                             var oldTopCardItemStack = currentItemstack.copyWithCount(1);
                             var newTopCardItemStack = itemStack.copyWithCount(1);

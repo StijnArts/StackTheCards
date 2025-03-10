@@ -5,8 +5,6 @@ import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.*;
 import drai.dev.stackthecards.data.components.*;
 import drai.dev.stackthecards.items.*;
-import drai.dev.stackthecards.registry.*;
-import io.netty.buffer.*;
 import net.minecraft.network.*;
 import net.minecraft.network.codec.*;
 import net.minecraft.world.item.*;
@@ -22,20 +20,38 @@ public class CardConnectionEntry {
     public static final String JSON_X_MODIFIER_KEY = "xTranslationModifier";
     public static final String JSON_Y_MODIFIER_KEY = "yTranslationModifier";
     public static final String JSON_LAYER_KEY = "layer";
-//    public static final String CONNECTION_X_MODIFIER = "connection_x_mod";
-//    public static final String CONNECTION_Y_MODIFIER = "connection_y_mod";
-//    public static final String CONNECTION_DIRECTION = "connection_direction";
-//    public static final String CONNECTION_ROTATION = "connection_rotation";
     public static final CardConnectionEntry EMPTY = new CardConnectionEntry(null, 0, 0, 0,null, null);
     public CardIdentifier self = new CardIdentifier();
-    //1F to move it one whole block over
-    //xmodifier is from the center of the block
     public float xModifier= 0;
     public float yModifier = 0;
     public int layer = 0;
-    //attachmentdirection if up then remove all y-offset calcs, do y-offset again, if
     public CardConnectingDirection connectingDirection = CardConnectingDirection.BOTTOM;
     public CardRotation rotation = CardRotation.UPRIGHT;
+
+    public static final StreamCodec<FriendlyByteBuf, CardConnectionEntry> SYNC_CODEC = new StreamCodec<FriendlyByteBuf, CardConnectionEntry>() {
+        @Override
+        public void encode(FriendlyByteBuf buffer, CardConnectionEntry value) {
+            CardIdentifier.STREAM_CODEC.encode(buffer, value.self);
+            ByteBufCodecs.FLOAT.encode(buffer, value.xModifier);
+            ByteBufCodecs.FLOAT.encode(buffer, value.yModifier);
+            ByteBufCodecs.INT.encode(buffer, value.layer);
+            CardConnectingDirection.STREAM_CODEC.encode(buffer, value.connectingDirection);
+            CardRotation.STREAM_CODEC.encode(buffer, value.rotation);
+        }
+
+        @Override
+        public CardConnectionEntry decode(FriendlyByteBuf buffer) {
+            CardIdentifier self = CardIdentifier.STREAM_CODEC.decode(buffer);
+            float xModifier = ByteBufCodecs.FLOAT.decode(buffer);
+            float yModifier = ByteBufCodecs.FLOAT.decode(buffer);
+            int layer = ByteBufCodecs.INT.decode(buffer);
+            CardConnectingDirection connectingDirection = CardConnectingDirection.STREAM_CODEC.decode(buffer);
+            CardRotation rotation = CardRotation.STREAM_CODEC.decode(buffer);
+
+            return new CardConnectionEntry(self, xModifier, yModifier, layer, connectingDirection, rotation);
+        }
+    };
+
 
     public CardConnectionEntry(CardIdentifier self, float xModifier, float yModifier, int layer, CardConnectingDirection connectingDirection, CardRotation rotation) {
         this.self = self;

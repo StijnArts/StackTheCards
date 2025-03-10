@@ -1,10 +1,12 @@
 package drai.dev.stackthecards.client.screen;
 
+import dev.architectury.platform.*;
 import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.items.*;
-import drai.dev.stackthecards.registry.StackTheCardsItems;
+import drai.dev.stackthecards.registry.*;
+import net.fabricmc.api.*;
 import net.minecraft.client.player.*;
 import net.minecraft.world.entity.player.*;
 import net.minecraft.world.inventory.*;
@@ -67,8 +69,8 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
     public @NotNull ItemStack quickMoveStack(Player player, int invSlot) {
         //TODO shift clicking out of the binder inventory currently sets stack count to max
         ItemStack newStack = ItemStack.EMPTY;
-        Slot clickedSlot = this.slots.get(invSlot);
-        if(!(player instanceof LocalPlayer)){
+        if(Platform.getEnv()== EnvType.SERVER){
+            Slot clickedSlot = this.slots.get(invSlot);
             if (clickedSlot.hasItem() && clickedSlot.getItem().is(StackTheCardsItems.CARD)) {
 
                 ItemStack originalStack = clickedSlot.getItem();

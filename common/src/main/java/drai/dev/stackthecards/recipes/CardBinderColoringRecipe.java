@@ -2,8 +2,6 @@ package drai.dev.stackthecards.recipes;
 
 import drai.dev.stackthecards.items.*;
 import net.minecraft.core.*;
-import net.minecraft.resources.*;
-import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.*;

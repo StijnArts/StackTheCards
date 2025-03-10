@@ -2,7 +2,9 @@ package drai.dev.stackthecards.tooltips.parts;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.*;
+import net.minecraft.network.*;
 import net.minecraft.network.chat.*;
+import net.minecraft.network.codec.*;
 import org.json.simple.*;
 
 import java.util.*;
@@ -11,8 +13,21 @@ import java.util.stream.*;
 public class CardTooltipSection {
     private static final String JSON_SECTION_KEY = "parts";
     private static final String JSON_NO_NEW_LINE_KEY = "noNewLine";
-    private final List<CardTooltipLine> parts = new ArrayList<>();
+    private List<CardTooltipLine> parts = new ArrayList<>();
     public boolean noLineBreak = false;
+
+    public static final StreamCodec<FriendlyByteBuf, CardTooltipSection> SYNC_CODEC = StreamCodec.composite(
+            ByteBufCodecs.collection(ArrayList::new, CardTooltipLine.SYNC_CODEC), CardTooltipSection::getParts,
+            ByteBufCodecs.BOOL, CardTooltipSection::isNoLineBreak,
+            CardTooltipSection::new);
+
+    public CardTooltipSection() {
+    }
+
+    public CardTooltipSection(List<CardTooltipLine> parts, boolean noLineBreak) {
+        this.parts = parts;
+        this.noLineBreak = noLineBreak;
+    }
 
     public List<Component> getText() {
         return parts.stream().map(CardTooltipLine::getTextComponent).collect(Collectors.toList());
@@ -33,5 +48,13 @@ public class CardTooltipSection {
             }
         }
         return section;
+    }
+
+    public List<CardTooltipLine> getParts() {
+        return parts;
+    }
+
+    public boolean isNoLineBreak() {
+        return noLineBreak;
     }
 }

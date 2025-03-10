@@ -9,7 +9,6 @@ import net.minecraft.world.item.*;
 import java.util.*;
 
 import static drai.dev.stackthecards.registry.StackTheCardsItems.*;
-import static drai.dev.stackthecards.registry.StackTheCardsItems.PURPLE_CARD_BINDER;
 
 public class ItemGroups {
     public static final CreativeModeTab CARD_ITEM_GROUP = cardCreativeModeTab(getBuilder());
@@ -44,8 +43,7 @@ public class ItemGroups {
                     CardGameRegistry.cardGames.values().forEach(game -> {
                         var cardPacks = game.cardSets.values().stream().map(set -> set.getCardPacks().values()).flatMap(Collection::stream)
                                 .sorted(Comparator.comparingInt(CardPack::getOrdering)).toList();
-                        for (var cardPack :
-                                cardPacks) {
+                        for (var cardPack : cardPacks) {
                             entries.accept(CardPackItem.of(cardPack));
                         }
                     });

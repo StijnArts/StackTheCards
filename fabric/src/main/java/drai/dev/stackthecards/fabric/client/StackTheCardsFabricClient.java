@@ -2,16 +2,12 @@ package drai.dev.stackthecards.fabric.client;
 
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.client.screen.*;
-import drai.dev.stackthecards.fabric.*;
 import drai.dev.stackthecards.tooltips.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.*;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.client.screen.v1.*;
 import net.minecraft.client.gui.screens.*;
-import net.minecraft.core.*;
-import net.minecraft.core.registries.*;
-import net.minecraft.resources.*;
 
 import java.util.concurrent.*;
 

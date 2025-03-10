@@ -9,7 +9,9 @@ import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.parts.*;
 import net.minecraft.*;
 import net.minecraft.client.resources.model.*;
+import net.minecraft.network.*;
 import net.minecraft.network.chat.*;
+import net.minecraft.network.codec.*;
 import net.minecraft.resources.*;
 import org.jetbrains.annotations.*;
 import org.json.simple.*;
@@ -28,17 +30,97 @@ public class CardData {
     public static final String JSON_NAME_HEADER_KEY = "name";
     public String nameSpace;
     //    private static CardSet TEST_CARD_SET = new CardSet();
-    protected CardSet cardSet = new CardSet("missing");
+    protected transient CardSet cardSet = new CardSet("missing");
     protected String cardId;
     protected String gameId = "missing";
-    private Optional<Boolean> hasRoundedCorners = Optional.empty();
-    private final List<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
-    private final List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
+    private boolean hasRoundedCorners = false;
+    private ArrayList<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
+    private ArrayList<CardTooltipSection> detailTooltipSections = new ArrayList<>();
     private CardTooltipLine detailHeader;
     public String cardName = "Missing Card Data";
-    public List<String> cardRarityIds = new ArrayList<>();
+    public ArrayList<String> cardRarityIds = new ArrayList<>();
     public String rarity;
     public int index;
+
+    public static final StreamCodec<FriendlyByteBuf, CardData> SYNC_CODEC = new StreamCodec<FriendlyByteBuf, CardData>() {
+        @Override
+        public void encode(FriendlyByteBuf buffer, CardData value) {
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.nameSpace);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.cardId);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.gameId);
+            ByteBufCodecs.BOOL.encode(buffer, value.hasRoundedCorners);
+
+            if (CardTooltipSection.SYNC_CODEC == null) {
+                throw new IllegalStateException("CardTooltipSection.SYNC_CODEC is null!");
+            }
+
+            ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC)
+                    .encode(buffer, value.hoverTooltipSections);
+            ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC)
+                    .encode(buffer,
+                            value.detailTooltipSections);
+
+            ByteBufCodecs.optional(CardTooltipLine.SYNC_CODEC)
+                    .encode(buffer, Optional.of(value.detailHeader)); // detailHeader is nullable
+
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.cardName);
+            ByteBufCodecs.collection(ArrayList::new, ByteBufCodecs.STRING_UTF8)
+                    .encode(buffer, value.cardRarityIds);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.rarity);
+            ByteBufCodecs.INT.encode(buffer, value.index);
+        }
+
+        @Override
+        public CardData decode(FriendlyByteBuf buffer) {
+            String nameSpace = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            String cardId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            String gameId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            boolean hasRoundedCorners = ByteBufCodecs.BOOL.decode(buffer);
+
+            ArrayList<CardTooltipSection> hoverTooltipSections =
+                    ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC).decode(buffer);
+            ArrayList<CardTooltipSection> detailTooltipSections =
+                    ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC).decode(buffer);
+
+            CardTooltipLine detailHeader = ByteBufCodecs.optional(CardTooltipLine.SYNC_CODEC).decode(buffer).orElse(null);
+
+            String cardName = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            ArrayList<String> cardRarityIds =
+                    ByteBufCodecs.collection(ArrayList::new, ByteBufCodecs.STRING_UTF8).decode(buffer);
+            String rarity = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            int index = ByteBufCodecs.INT.decode(buffer);
+
+            return new CardData(nameSpace, cardId, gameId, hasRoundedCorners,
+                    hoverTooltipSections, detailTooltipSections, detailHeader,
+                    cardName, cardRarityIds, rarity, index);
+        }
+    };
+
+    public CardData(
+            String nameSpace,
+            String cardId,
+            String gameId,
+            boolean hasRoundedCorners,
+            ArrayList<CardTooltipSection> hoverTooltipSections,
+            ArrayList<CardTooltipSection> detailTooltipSections,
+            CardTooltipLine detailHeader,
+            String cardName,
+            ArrayList<String> cardRarityIds,
+            String rarity,
+            int index
+    ) {
+        this.nameSpace = nameSpace;
+        this.cardId = cardId;
+        this.gameId = gameId;
+        this.hasRoundedCorners = hasRoundedCorners;
+        this.hoverTooltipSections = hoverTooltipSections;
+        this.detailTooltipSections = detailTooltipSections;
+        this.detailHeader = detailHeader;
+        this.cardName = cardName;
+        this.cardRarityIds = cardRarityIds;
+        this.rarity = rarity;
+        this.index = index;
+    }
 
     public static Component NEW_LINE = Component.literal(" ");
     public static Component TAB = Component.literal("      ");
@@ -140,7 +222,7 @@ public class CardData {
     }
 
     private void setHasRoundedCorners(boolean b) {
-        this.hasRoundedCorners = Optional.of(b);
+        this.hasRoundedCorners = b;
     }
 
     public CardSet getCardSet() {
@@ -198,7 +280,7 @@ public class CardData {
             }
         }
         if(rarity!=null){
-            tooltips.addAll(CardGameRegistry.getCardGame(self.gameId).getRarity(rarity).getText());
+            tooltips.addAll(CardGameRegistry.getCardGame(self.gameId).getRarity(rarity).getTextAsComponents());
         }
         for (int i = 0; i < sections.size(); i++) {
             var section = sections.get(i);
@@ -238,7 +320,10 @@ public class CardData {
     }
 
     public boolean hasRoundedCorners() {
-        return hasRoundedCorners.orElseGet(() -> getCardSet().hasRoundedCorners.orElseGet(() -> getCardGame().hasRoundedCorners.orElse(false)));
+        if(hasRoundedCorners) return hasRoundedCorners;
+        if(getCardSet().hasRoundedCorners) return hasRoundedCorners;
+        if(getCardGame().hasRoundedCorners) return hasRoundedCorners;
+        return false;
 
     }
 
@@ -261,7 +346,7 @@ public class CardData {
         var cardGame = this.getCardGame();
         if(cardGame!=null) {
             var cardGameBackModel = cardGame.getCardBackModel();
-            if(cardGameBackModel !=null) return new ModelResourceLocation(cardGameBackModel, "");
+            if(cardGameBackModel != null) return new ModelResourceLocation(cardGameBackModel, "");
         }
 
         return new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath("stack_the_cards", "stc_cards/backs/fallback"), "");
@@ -298,5 +383,54 @@ public class CardData {
 
     public int getCountInGroup() {
         return getCardSet().getCards().size();
+    }
+
+    public String getNameSpace() {
+        return nameSpace;
+    }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public boolean isHasRoundedCorners() {
+        return hasRoundedCorners;
+    }
+
+    public List<CardTooltipSection> getHoverTooltipSections() {
+        return hoverTooltipSections;
+    }
+
+    public List<CardTooltipSection> getDetailTooltipSections() {
+        return detailTooltipSections;
+    }
+
+    public CardTooltipLine getDetailHeader() {
+        return detailHeader;
+    }
+
+    public List<String> getCardRarityIds() {
+        return cardRarityIds;
+    }
+
+    public String getRarity() {
+        return rarity;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public static Component getNewLine() {
+        return NEW_LINE;
+    }
+
+    public static Component getTAB() {
+        return TAB;
+    }
+
+    public void relink(CardGame value, CardSet set) {
+        setSet(set);
+        setGame(value);
     }
 }

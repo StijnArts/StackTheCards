@@ -1,6 +1,5 @@
 package drai.dev.stackthecards.tooltips.restrict;
 
-import net.minecraft.nbt.*;
 import net.minecraft.network.chat.*;
 import net.minecraft.util.*;
 

@@ -7,7 +7,6 @@ import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
-import drai.dev.stackthecards.registry.StackTheCardsItems;
 import net.fabricmc.api.*;
 import net.minecraft.client.*;
 import net.minecraft.client.renderer.*;

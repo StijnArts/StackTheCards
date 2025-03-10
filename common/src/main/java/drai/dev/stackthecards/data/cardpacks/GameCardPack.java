@@ -16,8 +16,8 @@ public class GameCardPack extends CardPack{
         super(gameId, packId, nameSpace);
     }
 
-    public GameCardPack(String packId, String gameId, String nameSpace, CardTooltipLine detailHeader, List<CardTooltipSection> hoverTooltipSections, List<CardTooltipSection> detailTooltipSections,
-                        List<CardPackPool> pools, Map<ResourceLocation, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards, String packName,
+    public GameCardPack(String packId, String gameId, String nameSpace, CardTooltipLine detailHeader, ArrayList<CardTooltipSection> hoverTooltipSections, ArrayList<CardTooltipSection> detailTooltipSections,
+                        ArrayList<CardPackPool> pools, HashMap<ResourceLocation, Integer> guaranteedItems, HashMap<CardIdentifier, Integer> guaranteedCards, String packName,
                         double weight, boolean droppedByMobs, boolean duplicationAllowed) {
         super(packId, gameId, nameSpace, detailHeader, hoverTooltipSections, detailTooltipSections, pools, guaranteedItems,
                 guaranteedCards, packName, weight, droppedByMobs, duplicationAllowed);

@@ -4,12 +4,11 @@ import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.registry.*;
 import net.minecraft.core.*;
-import net.minecraft.resources.*;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.*;
 import net.minecraft.world.item.*;
 
-import java.util.List;
+import java.util.*;
 
 public class CardBinderInventory implements Container {
     public int size;

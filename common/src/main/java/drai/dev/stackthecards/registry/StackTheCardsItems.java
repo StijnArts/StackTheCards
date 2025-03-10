@@ -2,12 +2,11 @@ package drai.dev.stackthecards.registry;
 
 import dev.architectury.registry.registries.*;
 import drai.dev.stackthecards.items.*;
-import net.minecraft.core.*;
 import net.minecraft.core.registries.*;
 import net.minecraft.resources.*;
 import net.minecraft.world.item.*;
 
-import static drai.dev.stackthecards.StackTheCards.MOD_ID;
+import static drai.dev.stackthecards.StackTheCards.*;
 
 public class StackTheCardsItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(MOD_ID, Registries.ITEM);

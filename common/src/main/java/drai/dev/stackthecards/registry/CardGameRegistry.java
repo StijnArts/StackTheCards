@@ -3,6 +3,8 @@ package drai.dev.stackthecards.registry;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
+import net.minecraft.network.*;
+import net.minecraft.network.codec.*;
 
 import java.util.*;
 
@@ -58,4 +60,42 @@ public class CardGameRegistry {
     public static void registerGame(CardGame cardGame) {
         cardGames.put(cardGame.getGameId(), cardGame);
     }
+
+    public static RegistryFriendlyByteBuf toBuffer(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
+        SYNC_CODEC.encode(registryFriendlyByteBuf, new CardGameRegistryMessage(cardGames));
+        return registryFriendlyByteBuf;
+    }
+
+    public static void fromBuffer(RegistryFriendlyByteBuf buf) {
+        var message = SYNC_CODEC.decode(buf);
+        cardGames = message.cardGames;
+        relinkObjects();
+    }
+
+    public static final StreamCodec<FriendlyByteBuf, CardGameRegistryMessage> SYNC_CODEC = StreamCodec.composite(
+            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, CardGame.SYNC_CODEC), CardGameRegistryMessage::getCardGames,
+            CardGameRegistryMessage::new);
+
+    private static void relinkObjects() {
+        cardGames.forEach((key, value) -> {
+            value.getParentPacks().values().forEach(pack -> pack.relink(value));
+            value.getCardSets().values().forEach(cardSet -> cardSet.relink(value));
+            value.getCardPacks().values().forEach(pack -> pack.relink(value));
+        });
+    }
+
+    public static class CardGameRegistryMessage {
+
+        Map<String, CardGame> cardGames = new HashMap<>();
+
+        public CardGameRegistryMessage(Map<String, CardGame> cardGames) {
+            this.cardGames = cardGames;
+        }
+
+        public Map<String, CardGame> getCardGames() {
+            return cardGames;
+        }
+    }
 }
+
+

@@ -2,7 +2,9 @@ package drai.dev.stackthecards.data;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.tooltips.parts.*;
+import net.minecraft.network.*;
 import net.minecraft.network.chat.*;
+import net.minecraft.network.codec.*;
 import org.json.simple.*;
 
 import java.util.*;
@@ -15,6 +17,19 @@ public class CardRarity {
     public String rarityId;
     public String rarityName;
     private List<CardTooltipSection> text = new ArrayList<>();
+
+
+    public static final StreamCodec<FriendlyByteBuf,CardRarity> SYNC_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8, CardRarity::getRarityId,
+            ByteBufCodecs.STRING_UTF8, CardRarity::getRarityName,
+            ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC), CardRarity::getText,
+            CardRarity::new);
+
+    public CardRarity(String rarityId, String rarityName, List<CardTooltipSection> text) {
+        this.rarityId = rarityId;
+        this.rarityName = rarityName;
+        this.text = text;
+    }
 
     public CardRarity(String rarityId) {
         this.rarityId = rarityId;
@@ -55,7 +70,19 @@ public class CardRarity {
     }
 
 
-    public List<Component> getText() {
+    public List<Component> getTextAsComponents() {
         return text.stream().map(text -> text.getText()).flatMap(List::stream).collect(Collectors.toList());
+    }
+
+    public String getRarityId() {
+        return rarityId;
+    }
+
+    public String getRarityName() {
+        return rarityName;
+    }
+
+    public List<CardTooltipSection> getText() {
+        return text;
     }
 }

@@ -1,21 +1,25 @@
 package drai.dev.stackthecards.client;
 
 import com.mojang.blaze3d.platform.*;
+import dev.architectury.networking.*;
+import drai.dev.stackthecards.network.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.util.*;
-import net.fabricmc.api.*;
 import net.minecraft.*;
 import net.minecraft.client.*;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.*;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.*;
+import net.minecraft.world.entity.player.*;
 import net.minecraft.world.item.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
 import java.util.function.*;
+
+import static drai.dev.stackthecards.network.StackTheCardsNetworking.*;
 
 public class StackTheCardsClient {
     public static CardRenderer CARD_RENDERER;
@@ -34,6 +38,11 @@ public class StackTheCardsClient {
         CARD_TOOLTIP_RENDERER = new CardTooltipRenderer(CARD_RENDERER);
         ItemGroups.touch();
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath("stack_the_cards", "item_group"), ItemGroups.CARD_ITEM_GROUP);
+        NetworkManager.registerReceiver(NetworkManager.Side.S2C, SYNC_REGISTRY_ID, (buf, context) -> {
+            Player player = context.getPlayer();
+            // Logic
+            StackTheCardsNetworking.syncRegistryFromServer(player, buf);
+        });
     }
 
     private static boolean isKeyPressed(@Nullable Key key) {

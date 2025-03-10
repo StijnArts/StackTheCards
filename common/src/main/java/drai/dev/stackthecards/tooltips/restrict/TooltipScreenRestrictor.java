@@ -4,8 +4,6 @@ import drai.dev.stackthecards.mixin.client.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screens.inventory.tooltip.*;
 import net.minecraft.network.chat.*;
-import net.minecraft.world.inventory.tooltip.*;
-import org.apache.logging.log4j.core.pattern.*;
 
 import java.util.*;
 

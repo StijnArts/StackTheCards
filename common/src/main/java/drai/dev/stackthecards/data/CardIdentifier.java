@@ -4,14 +4,13 @@ import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.*;
 import drai.dev.stackthecards.registry.*;
 import io.netty.buffer.*;
-import net.minecraft.nbt.*;
 import net.minecraft.network.codec.*;
 import net.minecraft.world.item.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-import static drai.dev.stackthecards.data.components.StackTheCardsComponentTypes.CARD_IDENTIFIER_COMPONENT;
+import static drai.dev.stackthecards.data.components.StackTheCardsComponentTypes.*;
 
 public class CardIdentifier {
 

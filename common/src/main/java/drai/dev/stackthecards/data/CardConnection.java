@@ -6,7 +6,7 @@ import com.mojang.serialization.codecs.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
 import io.netty.buffer.*;
-import net.minecraft.nbt.*;
+import net.minecraft.network.*;
 import net.minecraft.network.codec.*;
 import net.minecraft.world.item.*;
 import org.json.simple.*;
@@ -14,19 +14,51 @@ import org.json.simple.*;
 import java.util.*;
 import java.util.stream.*;
 
-import static drai.dev.stackthecards.data.CardIdentifier.*;
-import static drai.dev.stackthecards.data.components.StackTheCardsComponentTypes.CARD_CONNECTION_COMPONENT;
+import static drai.dev.stackthecards.data.components.StackTheCardsComponentTypes.*;
 
 public class CardConnection {
     private static final String JSON_CONNECTION_ID_KEY = "connectionId";
     private static final String JSON_LAYOUT_KEY = "layout";
-    private final String connectionId;
+    public final String connectionId;
     public boolean isSingle = false;
-    private String cardGameId = "";
-    private List<List<CardConnectionEntry>> layout = new ArrayList<>();
-    private List<List<CardConnectionEntry>> layoutByColumn = new ArrayList<>();
+    public String cardGameId = "";
+    public ArrayList<ArrayList<CardConnectionEntry>> layout = new ArrayList<>();
+    public ArrayList<ArrayList<CardConnectionEntry>> layoutByColumn = new ArrayList<>();
 
-    public CardConnection(String connectionId, String cardGame, List<List<CardConnectionEntry>> layout) {
+    public static final StreamCodec<FriendlyByteBuf, CardConnection> SYNC_CODEC = new StreamCodec<FriendlyByteBuf, CardConnection>() {
+        @Override
+        public void encode(FriendlyByteBuf buffer, CardConnection value) {
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.connectionId);
+            ByteBufCodecs.BOOL.encode(buffer, value.isSingle);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.cardGameId);
+
+            // Encode `layout` as List<List<CardConnectionEntry>>
+            ByteBufCodecs.collection(ArrayList::new,
+                    ByteBufCodecs.collection(ArrayList::new, CardConnectionEntry.SYNC_CODEC)
+            ).encode(buffer, value.layout);
+        }
+
+        @Override
+        public CardConnection decode(FriendlyByteBuf buffer) {
+            String connectionId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            boolean isSingle = ByteBufCodecs.BOOL.decode(buffer);
+            String cardGameId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+
+            // Decode `layout` as List<List<CardConnectionEntry>>
+            ArrayList<ArrayList<CardConnectionEntry>> layout = ByteBufCodecs.collection(ArrayList::new,
+                    ByteBufCodecs.collection(ArrayList::new, CardConnectionEntry.SYNC_CODEC)
+            ).decode(buffer);
+
+            return new CardConnection(connectionId, isSingle, cardGameId, layout);
+        }
+    };
+
+    public CardConnection(String connectionId, boolean isSingle, String cardGameId, ArrayList<ArrayList<CardConnectionEntry>> layout) {
+        this(connectionId, cardGameId, layout);
+        this.isSingle = isSingle;
+    }
+
+    public CardConnection(String connectionId, String cardGame, ArrayList<ArrayList<CardConnectionEntry>> layout) {
         this.connectionId = connectionId;
         this.cardGameId = cardGame;
         this.layout = layout;
@@ -49,7 +81,7 @@ public class CardConnection {
         if(json.containsKey(JSON_LAYOUT_KEY)){
             try{
                 var layoutJson = (JSONArray) json.get(JSON_LAYOUT_KEY);
-                var layout = new ArrayList<List<CardConnectionEntry>>();
+                var layout = new ArrayList<ArrayList<CardConnectionEntry>>();
                 int i = 0;
                 int j = 0;
                 for (var rowJson : layoutJson) {
@@ -71,7 +103,7 @@ public class CardConnection {
         return cardConnection;
     }
 
-    public static int getMaxColumnSize(List<List<CardConnectionEntry>> column) {
+    public static int getMaxColumnSize(ArrayList<ArrayList<CardConnectionEntry>> column) {
         if (column.isEmpty()) {
             return 0; // Return null if the input list is empty
         }
@@ -104,16 +136,16 @@ public class CardConnection {
         return false;
     }
 
-    private List<List<CardConnectionEntry>> transposeLayout(List<List<CardConnectionEntry>> layout) {
+    private ArrayList<ArrayList<CardConnectionEntry>> transposeLayout(ArrayList<ArrayList<CardConnectionEntry>> layout) {
         // Determine the number of rows and columns
         int numRows = layout.size();
         int numCols = layout.isEmpty() ? 0 : getMaxRowSize(layout);
 
         // Create a new list to hold the transposed data
-        List<List<CardConnectionEntry>> transposedList = new ArrayList<>(numCols);
+        ArrayList<ArrayList<CardConnectionEntry>> transposedList = new ArrayList<>(numCols);
         for (int col = 0; col < numCols; col++) {
             // Create a new column
-            List<CardConnectionEntry> transposedColumn = new ArrayList<>(numRows);
+            ArrayList<CardConnectionEntry> transposedColumn = new ArrayList<>(numRows);
             for (int row = 0; row < numRows; row++) {
                 List<CardConnectionEntry> currentRow = layout.get(row);
                 // If the current row has fewer elements than the current column index, pad it with nulls
@@ -130,7 +162,7 @@ public class CardConnection {
         return transposedList;
     }
 
-    private int getMaxRowSize(List<List<CardConnectionEntry>> layout) {
+    private int getMaxRowSize(ArrayList<ArrayList<CardConnectionEntry>> layout) {
         int maxRowSize = 0;
         for (List<CardConnectionEntry> row : layout) {
             maxRowSize = Math.max(maxRowSize, row.size());
@@ -145,7 +177,7 @@ public class CardConnection {
         var selfCardResourceLocation = Card.getCardIdentifier(self);
         var otherCardResourceLocation = Card.getCardIdentifier(other);
 //        if(selfCardResourceLocation.isEqual(CardGameRegistry.MISSING_CARD_DATA.getCardIdentifier()) || otherCardResourceLocation.isEqual(CardGameRegistry.MISSING_CARD_DATA.getCardIdentifier()))
-        if(selfCardResourceLocation.isEqual(otherCardResourceLocation)) return true;
+        if(selfCardResourceLocation.isEqual(otherCardResourceLocation)) return false;
         //if its already in the connection, don't add it
         if(connectedCards.stream().anyMatch(cardResourceLocation -> cardResourceLocation.isEqual(otherCardResourceLocation)) || selfCardResourceLocation.isEqual(otherCardResourceLocation)) return true;
         //if card canCraftInDimensions in the current connection, add it to the current one
@@ -215,7 +247,7 @@ public class CardConnection {
         return connection.getLayoutByColumn().get(j);
     }
 
-    public List<List<CardConnectionEntry>> getLayoutByColumn() {
+    public ArrayList<ArrayList<CardConnectionEntry>> getLayoutByColumn() {
         return layoutByColumn;
     }
 
@@ -303,7 +335,7 @@ public class CardConnection {
         return CardGameRegistry.getCardGame(cardGameId);
     }
 
-    public List<List<CardConnectionEntry>> getLayout() {
+    public ArrayList<ArrayList<CardConnectionEntry>> getLayout() {
         return layout;
     }
 
@@ -311,7 +343,7 @@ public class CardConnection {
         this.cardGameId = cardGame.getGameId();
     }
 
-    public void setLayout(List<List<CardConnectionEntry>> layout) {
+    public void setLayout(ArrayList<ArrayList<CardConnectionEntry>> layout) {
         this.layout = layout;
         this.layoutByColumn = transposeLayout(layout);
     }

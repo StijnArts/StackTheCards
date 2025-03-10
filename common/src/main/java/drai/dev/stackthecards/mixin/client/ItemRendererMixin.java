@@ -1,6 +1,5 @@
 package drai.dev.stackthecards.mixin.client;
 
-import dev.architectury.injectables.annotations.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
@@ -10,12 +9,11 @@ import net.minecraft.client.resources.model.*;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.*;
-import org.jetbrains.annotations.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
 
-import static drai.dev.stackthecards.models.StackTheCardsModelLoader.getBakedModel;
+import static drai.dev.stackthecards.models.StackTheCardsModelLoader.*;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {

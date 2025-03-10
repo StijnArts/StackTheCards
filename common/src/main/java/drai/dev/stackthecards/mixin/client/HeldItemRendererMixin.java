@@ -3,7 +3,7 @@ package drai.dev.stackthecards.mixin.client;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.*;
 import drai.dev.stackthecards.client.*;
-import drai.dev.stackthecards.registry.StackTheCardsItems;
+import drai.dev.stackthecards.registry.*;
 import net.minecraft.client.*;
 import net.minecraft.client.player.*;
 import net.minecraft.client.renderer.*;

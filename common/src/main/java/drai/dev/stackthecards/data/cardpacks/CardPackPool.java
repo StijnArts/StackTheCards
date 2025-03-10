@@ -2,6 +2,8 @@ package drai.dev.stackthecards.data.cardpacks;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.*;
+import net.minecraft.network.*;
+import net.minecraft.network.codec.*;
 import net.minecraft.resources.*;
 import org.json.simple.*;
 
@@ -16,15 +18,51 @@ public class CardPackPool {
     private static final String JSON_POOL_CARDS_KEY = "cards";
     private static final String JSON_POOL_RARITIES_KEY = "rarities";
     private static final String JSON_POOL_ITEMS_KEY = "items";
-    private static final String JSON_POOL_TAGS_KEY = "tags";
     public int minimumAmountOfCardsFromPool = 0;
     public int maximumAmountOfCardsFromPool = 0;
     public int poolPullChancePercent = 100;
-    public Map<CardIdentifier, Integer> cardsInPool = new HashMap<>();
-    public Map<CardRarity, Integer> raritiesInPool = new HashMap<>();
-    public Map<ResourceLocation, Integer> itemsInPool = new HashMap<>();
-    private final CardPack cardPack;
-//    public Map<ResourceLocation, Integer> tagsInPool = new HashMap<>();
+    public HashMap<CardIdentifier, Integer> cardsInPool = new HashMap<>();
+    public HashMap<CardRarity, Integer> raritiesInPool = new HashMap<>();
+    public HashMap<ResourceLocation, Integer> itemsInPool = new HashMap<>();
+    public transient CardPack cardPack;
+
+    public static final StreamCodec<FriendlyByteBuf, CardPackPool> SYNC_CODEC = new StreamCodec<FriendlyByteBuf, CardPackPool>() {
+        @Override
+        public void encode(FriendlyByteBuf buffer, CardPackPool value) {
+            ByteBufCodecs.INT.encode(buffer, value.minimumAmountOfCardsFromPool);
+            ByteBufCodecs.INT.encode(buffer, value.maximumAmountOfCardsFromPool);
+            ByteBufCodecs.INT.encode(buffer, value.poolPullChancePercent);
+
+            ByteBufCodecs.map(HashMap::new, CardIdentifier.STREAM_CODEC, ByteBufCodecs.INT).encode(buffer, value.cardsInPool);
+            ByteBufCodecs.map(HashMap::new, CardRarity.SYNC_CODEC, ByteBufCodecs.INT).encode(buffer, value.raritiesInPool);
+            ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.INT).encode(buffer, value.itemsInPool);
+        }
+
+        @Override
+        public CardPackPool decode(FriendlyByteBuf buffer) {
+            int minimumAmountOfCardsFromPool = ByteBufCodecs.INT.decode(buffer);
+            int maximumAmountOfCardsFromPool = ByteBufCodecs.INT.decode(buffer);
+            int poolPullChancePercent = ByteBufCodecs.INT.decode(buffer);
+
+            HashMap<CardIdentifier, Integer> cardsInPool = ByteBufCodecs.map(HashMap::new, CardIdentifier.STREAM_CODEC, ByteBufCodecs.INT).decode(buffer);
+            HashMap<CardRarity, Integer> raritiesInPool = ByteBufCodecs.map(HashMap::new, CardRarity.SYNC_CODEC, ByteBufCodecs.INT).decode(buffer);
+            HashMap<ResourceLocation, Integer> itemsInPool = ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.INT).decode(buffer);
+
+            return new CardPackPool(itemsInPool, raritiesInPool, cardsInPool, poolPullChancePercent, maximumAmountOfCardsFromPool, minimumAmountOfCardsFromPool);
+        }
+    };
+
+
+    public CardPackPool(HashMap<ResourceLocation, Integer> itemsInPool,
+                        HashMap<CardRarity, Integer> raritiesInPool, HashMap<CardIdentifier, Integer> cardsInPool,
+                        int poolPullChancePercent, int maximumAmountOfCardsFromPool, int minimumAmountOfCardsFromPool) {
+        this.itemsInPool = itemsInPool;
+        this.raritiesInPool = raritiesInPool;
+        this.cardsInPool = cardsInPool;
+        this.poolPullChancePercent = poolPullChancePercent;
+        this.maximumAmountOfCardsFromPool = maximumAmountOfCardsFromPool;
+        this.minimumAmountOfCardsFromPool = minimumAmountOfCardsFromPool;
+    }
 
     public CardPackPool(int minimumAmountOfCardsFromPool, CardPack cardPack){
         this.minimumAmountOfCardsFromPool = minimumAmountOfCardsFromPool;
@@ -119,5 +157,7 @@ public class CardPackPool {
         return pool;
     }
 
-
+    public void setCardPack(CardPack cardPack) {
+        this.cardPack = cardPack;
+    }
 }

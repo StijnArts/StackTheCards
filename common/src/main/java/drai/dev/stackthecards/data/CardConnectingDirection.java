@@ -1,7 +1,6 @@
 package drai.dev.stackthecards.data;
 
 import com.mojang.serialization.*;
-import io.netty.buffer.*;
 import net.minecraft.network.*;
 import net.minecraft.network.codec.*;
 
@@ -31,17 +30,6 @@ public enum CardConnectingDirection {
             CardConnectingDirection::name
     );
 
-//    public static final Codec<CardConnectingDirection> CODEC = Codec.STRING.comapFlatMap(
-//            name -> {
-//                try {
-//                    return DataResult.success(CardConnectingDirection.valueOf(name.toUpperCase()));
-//                } catch (IllegalArgumentException e) {
-//                    return DataResult.error(() -> "Unknown CardType: " + name);
-//                }
-//            },
-//            CardConnectingDirection::name // Convert back to String
-//    );
-
     public static final StreamCodec<FriendlyByteBuf, CardConnectingDirection> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public CardConnectingDirection decode(FriendlyByteBuf buf) {
@@ -53,9 +41,4 @@ public enum CardConnectingDirection {
             buf.writeEnum(value);
         }
     };
-
-//    public static final StreamCodec<ByteBuf, CardConnectingDirection> STREAM_CODEC = StreamCodec.of(
-//            (buf, type) -> buf.writeCharSequence(type.name(), java.nio.charset.StandardCharsets.UTF_8), // Store as string
-//            buf -> CardConnectingDirection.valueOf(buf.readCharSequence(10, java.nio.charset.StandardCharsets.UTF_8).toString()) // Read as string
-//    );
 }

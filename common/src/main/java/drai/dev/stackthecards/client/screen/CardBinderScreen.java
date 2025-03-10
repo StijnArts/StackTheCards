@@ -1,6 +1,5 @@
 package drai.dev.stackthecards.client.screen;
 
-import com.mojang.blaze3d.systems.*;
 import com.mojang.blaze3d.vertex.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.items.*;

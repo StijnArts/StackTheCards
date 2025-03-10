@@ -4,14 +4,11 @@ import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.items.*;
 import net.minecraft.core.*;
-import net.minecraft.resources.*;
-import net.minecraft.world.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.*;
 
 import static drai.dev.stackthecards.StackTheCards.*;
-import static drai.dev.stackthecards.items.CardBinderInventory.*;
 
 public class CardBinderCustomizationRecipe extends CustomRecipe {
     public CardBinderCustomizationRecipe(CraftingBookCategory category) {

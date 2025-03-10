@@ -3,14 +3,13 @@ package drai.dev.stackthecards.data.cardpacks;
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
-import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
-import drai.dev.stackthecards.registry.StackTheCardsItems;
 import drai.dev.stackthecards.tooltips.parts.*;
 import net.minecraft.*;
 import net.minecraft.client.resources.model.*;
-import net.minecraft.nbt.*;
+import net.minecraft.network.*;
 import net.minecraft.network.chat.*;
+import net.minecraft.network.codec.*;
 import net.minecraft.resources.*;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.*;
@@ -24,8 +23,7 @@ import java.util.function.*;
 
 import static drai.dev.stackthecards.data.CardConnectionEntry.*;
 import static drai.dev.stackthecards.data.carddata.CardData.*;
-import static drai.dev.stackthecards.data.components.StackTheCardsComponentTypes.CARD_PACK_DATA_COMPONENT;
-import static drai.dev.stackthecards.items.Card.*;
+import static drai.dev.stackthecards.data.components.StackTheCardsComponentTypes.*;
 
 public class CardPack {
     protected static final String JSON_PACK_ID_KEY = "packId";
@@ -41,15 +39,90 @@ public class CardPack {
     protected String gameId;
     protected String setId;
     protected CardTooltipLine detailHeader;
-    protected List<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
-    protected List<CardTooltipSection> detailTooltipSections = new ArrayList<>();
-    protected List<CardPackPool> pools = new ArrayList<>();
-    protected Map<ResourceLocation, Integer> guaranteedItems = new HashMap<>();
-    protected Map<CardIdentifier, Integer> guaranteedCards = new HashMap<>();
+    protected ArrayList<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
+    protected ArrayList<CardTooltipSection> detailTooltipSections = new ArrayList<>();
+    protected ArrayList<CardPackPool> pools = new ArrayList<>();
+    protected HashMap<ResourceLocation, Integer> guaranteedItems = new HashMap<>();
+    protected HashMap<CardIdentifier, Integer> guaranteedCards = new HashMap<>();
     protected String packName;
     protected double weight = 1;
     protected boolean droppedByMobs = true;
     public boolean duplicationAllowed = true;
+
+    public static final StreamCodec<FriendlyByteBuf, CardPack> SYNC_CODEC = new StreamCodec<FriendlyByteBuf, CardPack>() {
+        @Override
+        public void encode(FriendlyByteBuf buffer, CardPack value) {
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.nameSpace);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.packId);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.gameId);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.setId);
+
+            ByteBufCodecs.optional(CardTooltipLine.SYNC_CODEC).encode(buffer, Optional.ofNullable(value.detailHeader));
+
+            ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC).encode(buffer, value.hoverTooltipSections);
+            ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC).encode(buffer, value.detailTooltipSections);
+            ByteBufCodecs.collection(ArrayList::new, CardPackPool.SYNC_CODEC).encode(buffer, value.pools);
+
+            ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.INT).encode(buffer, value.guaranteedItems);
+            ByteBufCodecs.map(HashMap::new, CardIdentifier.STREAM_CODEC, ByteBufCodecs.INT).encode(buffer, value.guaranteedCards);
+
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.packName);
+            ByteBufCodecs.DOUBLE.encode(buffer, value.weight);
+            ByteBufCodecs.BOOL.encode(buffer, value.droppedByMobs);
+            ByteBufCodecs.BOOL.encode(buffer, value.duplicationAllowed);
+        }
+
+        @Override
+        public CardPack decode(FriendlyByteBuf buffer) {
+            String nameSpace = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            String packId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            String gameId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            String setId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+
+            CardTooltipLine detailHeader = ByteBufCodecs.optional(CardTooltipLine.SYNC_CODEC).decode(buffer).orElse(null);
+
+            ArrayList<CardTooltipSection> hoverTooltipSections = ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC).decode(buffer);
+            ArrayList<CardTooltipSection> detailTooltipSections = ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC).decode(buffer);
+            ArrayList<CardPackPool> pools = ByteBufCodecs.collection(ArrayList::new, CardPackPool.SYNC_CODEC).decode(buffer);
+
+            HashMap<ResourceLocation, Integer> guaranteedItems = ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.INT).decode(buffer);
+            HashMap<CardIdentifier, Integer> guaranteedCards = ByteBufCodecs.map(HashMap::new, CardIdentifier.STREAM_CODEC, ByteBufCodecs.INT).decode(buffer);
+
+            String packName = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            double weight = ByteBufCodecs.DOUBLE.decode(buffer);
+            boolean droppedByMobs = ByteBufCodecs.BOOL.decode(buffer);
+            boolean duplicationAllowed = ByteBufCodecs.BOOL.decode(buffer);
+
+            return new CardPack(packId, gameId, setId, nameSpace, detailHeader, hoverTooltipSections, detailTooltipSections, pools,
+                    guaranteedItems, guaranteedCards, packName, weight, droppedByMobs, duplicationAllowed);
+        }
+    };
+
+    public CardPack(String packId, String gameId, String setId, String nameSpace, CardTooltipLine detailHeader, ArrayList<CardTooltipSection>
+                            hoverTooltipSections, ArrayList<CardTooltipSection> detailTooltipSections, ArrayList<CardPackPool> pools,
+                    HashMap<ResourceLocation, Integer> guaranteedItems, HashMap<CardIdentifier, Integer> guaranteedCards,
+                    String packName, double weight, boolean droppedByMobs, boolean duplicationAllowed) {
+        this.packId = packId;
+        this.gameId = gameId;
+        this.setId = setId;
+        this.detailHeader = detailHeader;
+        this.hoverTooltipSections = hoverTooltipSections;
+        this.detailTooltipSections = detailTooltipSections;
+        this.pools = pools;
+        this.guaranteedItems = guaranteedItems;
+        this.guaranteedCards = guaranteedCards;
+        this.packName = packName;
+        this.weight = weight;
+        this.droppedByMobs = droppedByMobs;
+        this.nameSpace = nameSpace;
+        this.duplicationAllowed = duplicationAllowed;
+    }
+
+    public void relink(CardGame value) {
+        setGame(value);
+        pools.forEach(cardPackPool -> cardPackPool.setCardPack(this));
+    }
+
 
     public static class CardPackData{
 
@@ -68,29 +141,9 @@ public class CardPack {
         this.nameSpace = nameSpace;
     }
 
-    public CardPack(String packId, String gameId, String setId, String nameSpace, CardTooltipLine detailHeader, List<CardTooltipSection>
-            hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
-                    Map<ResourceLocation, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
-                    String packName, double weight, boolean droppedByMobs, boolean duplicationAllowed) {
-        this.packId = packId;
-        this.gameId = gameId;
-        this.setId = setId;
-        this.detailHeader = detailHeader;
-        this.hoverTooltipSections = hoverTooltipSections;
-        this.detailTooltipSections = detailTooltipSections;
-        this.pools = pools;
-        this.guaranteedItems = guaranteedItems;
-        this.guaranteedCards = guaranteedCards;
-        this.packName = packName;
-        this.weight = weight;
-        this.droppedByMobs = droppedByMobs;
-        this.nameSpace = nameSpace;
-        this.duplicationAllowed = duplicationAllowed;
-    }
-
-    public CardPack(String packId, String gameId, String nameSpace, CardTooltipLine detailHeader, List<CardTooltipSection>
-            hoverTooltipSections, List<CardTooltipSection> detailTooltipSections, List<CardPackPool> pools,
-                    Map<ResourceLocation, Integer> guaranteedItems, Map<CardIdentifier, Integer> guaranteedCards,
+    public CardPack(String packId, String gameId, String nameSpace, CardTooltipLine detailHeader, ArrayList<CardTooltipSection>
+            hoverTooltipSections, ArrayList<CardTooltipSection> detailTooltipSections, ArrayList<CardPackPool> pools,
+                    HashMap<ResourceLocation, Integer> guaranteedItems, HashMap<CardIdentifier, Integer> guaranteedCards,
                     String packName, double weight, boolean droppedByMobs, boolean duplicationAllowed) {
         this.packId = packId;
         this.gameId = gameId;
@@ -333,7 +386,7 @@ public class CardPack {
         var cardGame = this.getCardGame();
         if(cardGame!=null) {
             var cardGamePackModel = cardGame.getCardPackModel();
-            if(cardGamePackModel !=null) return cardGamePackModel;
+            if(cardGamePackModel!=null) return cardGamePackModel;
         }
 
         return new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath("stack_the_cards", "stc_cards/packs/fallback"), "");

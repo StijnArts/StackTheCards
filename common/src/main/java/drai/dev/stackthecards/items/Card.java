@@ -6,8 +6,6 @@ import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.components.*;
 import drai.dev.stackthecards.registry.*;
-import drai.dev.stackthecards.registry.StackTheCardsItems;
-import io.netty.buffer.*;
 import net.minecraft.network.*;
 import net.minecraft.network.codec.*;
 import net.minecraft.world.item.*;

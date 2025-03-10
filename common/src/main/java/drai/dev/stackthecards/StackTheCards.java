@@ -1,15 +1,20 @@
 package drai.dev.stackthecards;
 
+import dev.architectury.event.events.common.*;
+import dev.architectury.platform.*;
 import dev.architectury.registry.*;
 import drai.dev.stackthecards.client.screen.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.components.*;
 import drai.dev.stackthecards.items.*;
+import drai.dev.stackthecards.network.*;
 import drai.dev.stackthecards.recipes.*;
 import drai.dev.stackthecards.registry.*;
+import net.fabricmc.api.*;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.*;
 import net.minecraft.resources.*;
+import net.minecraft.server.level.*;
 import net.minecraft.server.packs.*;
 import net.minecraft.world.flag.*;
 import net.minecraft.world.inventory.*;
@@ -42,5 +47,16 @@ public final class StackTheCards {
         StackTheCardsItems.touch();
         StackTheCardsItems.register();
         Registry.register(BuiltInRegistries.SOUND_EVENT, CardPackItem.PACK_RIP_IDENTIFIER, CardPackItem.PACK_RIP);
+        if(Platform.getEnv() == EnvType.SERVER) {
+            StackTheCardsNetworking.registerPackets();
+            PlayerEvent.PLAYER_JOIN.register(player -> {
+                if (player instanceof ServerPlayer serverPlayer) {
+//                StackTheCardsNetworking.CHANNEL.sendToPlayer(serverPlayer);
+                    StackTheCardsNetworking.syncRegistryToClient(serverPlayer);
+                }
+            });
+        }
+
+//        StackTheCardsNetworking.CHANNEL.register(CardGameRegistryMessage.class, CardGameRegistryMessage::encode, CardGameRegistryMessage::new, CardGameRegistryMessage::apply);
     }
 }

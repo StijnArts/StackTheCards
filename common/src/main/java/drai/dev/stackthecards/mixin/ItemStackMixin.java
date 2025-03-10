@@ -4,7 +4,7 @@ import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.items.*;
-import drai.dev.stackthecards.registry.StackTheCardsItems;
+import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.tooltips.*;
 import net.minecraft.*;
 import net.minecraft.core.registries.*;

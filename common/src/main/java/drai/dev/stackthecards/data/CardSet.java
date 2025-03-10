@@ -4,6 +4,9 @@ import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.carddata.*;
 import drai.dev.stackthecards.data.cardpacks.*;
 import drai.dev.stackthecards.registry.*;
+import joptsimple.internal.*;
+import net.minecraft.network.*;
+import net.minecraft.network.codec.*;
 import net.minecraft.resources.*;
 import org.jetbrains.annotations.*;
 import org.json.simple.*;
@@ -17,22 +20,102 @@ public class CardSet {
     private static final String JSON_SET_ID_KEY = "setId";
     private static final String JSON_GAME_CARD_BACK_NAMESPACE_CARD_KEY = "cardBackTextureNameSpace";
     public String gameId;
-    private final String setId;
-    private final Map<String, CardData> cards = new HashMap<>();
+    public final String setId;
+    public HashMap<String, CardData> cards = new HashMap<>();
     @Nullable
-    public String cardBackTextureName;
+    public String cardBackTextureName  = Strings.EMPTY;
     @Nullable
-    private ResourceLocation cardBackModel;
-    private final Map<String, CardPack> cardPacks = new HashMap<>();
+    public String cardBackModel = Strings.EMPTY;
+    public HashMap<String, CardPack> cardPacks = new HashMap<>();
     @Nullable
-    private GameCardData cardBackData;
-    public Optional<Boolean> hasRoundedCorners = Optional.empty();
-    private String effectResourceLocation;
-    private String name;
+    public GameCardData cardBackData;
+    public boolean hasRoundedCorners = false;
+    public String effectResourceLocation;
+    public String name;
     public boolean appliesEffect = true;
-    private Map<String, CardPack> parentPacks = new HashMap<>();
-    private int ordering = 0;
-    private String cardBackTextureNameSpace;
+    public HashMap<String, CardPack> parentPacks = new HashMap<>();
+    public int ordering = 0;
+    public String cardBackTextureNameSpace;
+
+    public static final StreamCodec<FriendlyByteBuf, CardSet> SYNC_CODEC = new StreamCodec<>() {
+
+        @Override
+        public void encode(FriendlyByteBuf buffer, CardSet value) {
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.setId);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.gameId);
+
+            ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).encode(buffer, Optional.ofNullable(value.cardBackTextureName));
+            ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).encode(buffer, Optional.ofNullable(value.cardBackModel));
+            ByteBufCodecs.optional(CardData.SYNC_CODEC).encode(buffer, Optional.ofNullable(value.cardBackData));
+
+            ByteBufCodecs.BOOL.encode(buffer, value.hasRoundedCorners);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.effectResourceLocation);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.name);
+            ByteBufCodecs.BOOL.encode(buffer, value.appliesEffect);
+
+            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, CardPack.SYNC_CODEC)
+                    .encode(buffer, value.parentPacks);
+
+            ByteBufCodecs.INT.encode(buffer, value.ordering);
+            ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).encode(buffer, Optional.ofNullable(value.cardBackTextureNameSpace));
+
+            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, CardPack.SYNC_CODEC)
+                    .encode(buffer, value.cardPacks);
+
+            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, CardData.SYNC_CODEC)
+                    .encode(buffer, value.cards);
+        }
+
+        @Override
+        public CardSet decode(FriendlyByteBuf buffer) {
+            String setId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            String gameId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+
+            String cardBackTextureName = ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).decode(buffer).orElse(null);
+            String cardBackModel = ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).decode(buffer).orElse(null);
+            CardData cardBackData = ByteBufCodecs.optional(CardData.SYNC_CODEC).decode(buffer).orElse(null);
+
+            boolean hasRoundedCorners = ByteBufCodecs.BOOL.decode(buffer);
+            String effectResourceLocation = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            String name = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            boolean appliesEffect = ByteBufCodecs.BOOL.decode(buffer);
+
+            HashMap<String, CardPack> parentPacks = ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, CardPack.SYNC_CODEC)
+                    .decode(buffer);
+
+            int ordering = ByteBufCodecs.INT.decode(buffer);
+            String cardBackTextureNameSpace = ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).decode(buffer).orElse(null);
+
+            HashMap<String, CardPack> packs = ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, CardPack.SYNC_CODEC)
+                    .decode(buffer);
+            HashMap<String, CardData> cards = ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, CardData.SYNC_CODEC)
+                    .decode(buffer);
+
+            return new CardSet(setId, gameId, cardBackTextureName, cardBackModel, (GameCardData) cardBackData,
+                    hasRoundedCorners, effectResourceLocation, name, appliesEffect,
+                    parentPacks, ordering, cardBackTextureNameSpace, packs, cards);
+        }
+    };
+
+    public CardSet(String setId, String gameId, @Nullable String cardBackTextureName, @Nullable String cardBackModel,
+                   @Nullable GameCardData cardBackData, boolean hasRoundedCorners, String effectResourceLocation,
+                   String name, boolean appliesEffect, HashMap<String, CardPack> parentPacks, int ordering, String cardBackTextureNameSpace,
+                   HashMap<String, CardPack> packs, HashMap<String, CardData> cards) {
+        this.setId = setId;
+        this.gameId = gameId;
+        this.cardBackTextureName = cardBackTextureName;
+        this.cardBackModel = cardBackModel;
+        this.cardBackData = cardBackData;
+        this.hasRoundedCorners = hasRoundedCorners;
+        this.effectResourceLocation = effectResourceLocation;
+        this.name = name;
+        this.appliesEffect = appliesEffect;
+        this.parentPacks = parentPacks;
+        this.ordering = ordering;
+        this.cardBackTextureNameSpace = cardBackTextureNameSpace;
+        this.cardPacks = packs;
+        this.cards = cards;
+    }
 
     public CardSet(String cardSetId) {
         this.setId = cardSetId;
@@ -84,7 +167,8 @@ public class CardSet {
         }
         if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
             try{
-                cardSet.hasRoundedCorners = Optional.of((boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY));
+                var hasRoundedCorners = (boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY);
+                cardSet.hasRoundedCorners = hasRoundedCorners;
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }
@@ -107,7 +191,7 @@ public class CardSet {
     }
 
     private void setCardBackModel(ResourceLocation identifier) {
-        this.cardBackModel = identifier;
+        this.cardBackModel = identifier.toString();
     }
 
     private void setCardBackTextureName(String cardBackTextureName) {
@@ -142,7 +226,8 @@ public class CardSet {
     }
 
     public ResourceLocation getCardBackModel() {
-        return cardBackModel;
+        if(cardBackModel==null || cardBackModel.isEmpty()) return null;
+        return ResourceLocation.parse(cardBackModel);
     }
 
     public String getSetId() {
@@ -193,5 +278,36 @@ public class CardSet {
 
     public CardPack getParentPack(String id) {
         return parentPacks.get(id);
+    }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public @Nullable GameCardData getCardBackData() {
+        return cardBackData;
+    }
+
+    public boolean isHasRoundedCorners() {
+        return hasRoundedCorners;
+    }
+
+    public boolean isAppliesEffect() {
+        return appliesEffect;
+    }
+
+    public Map<String, CardPack> getParentPacks() {
+        return parentPacks;
+    }
+
+    public String getCardBackTextureNameSpace() {
+        return cardBackTextureNameSpace;
+    }
+
+    public void relink(CardGame value) {
+        cards.values().forEach(cardData -> cardData.relink(value, this));
+        cardPacks.values().forEach(cardData -> cardData.relink(value));
+        parentPacks.values().forEach(cardData -> cardData.relink(value));
+        if(cardBackData != null) cardBackData.relink(value, this);
     }
 }

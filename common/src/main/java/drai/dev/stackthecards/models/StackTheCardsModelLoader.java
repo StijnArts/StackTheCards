@@ -6,12 +6,8 @@ import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.*;
 import net.minecraft.server.packs.resources.*;
 import org.jetbrains.annotations.*;
-import org.spongepowered.asm.mixin.*;
 
-import java.util.*;
-
-import static drai.dev.stackthecards.client.StackTheCardsClient.CARD_BACK_MODELS;
-import static drai.dev.stackthecards.client.StackTheCardsClient.CARD_PACK_MODELS;
+import static drai.dev.stackthecards.client.StackTheCardsClient.*;
 
 public class StackTheCardsModelLoader {
 

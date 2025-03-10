@@ -2,7 +2,9 @@ package drai.dev.stackthecards.data;
 
 import com.google.gson.stream.*;
 import net.minecraft.*;
+import net.minecraft.network.*;
 import net.minecraft.network.chat.*;
+import net.minecraft.network.codec.*;
 import org.json.simple.*;
 
 public class CardTextFormatting {
@@ -14,6 +16,20 @@ public class CardTextFormatting {
     public boolean isItalic = false;
     public int argbColorValue = ChatFormatting.WHITE.getColor();
     public boolean isBold = false;
+
+    public static final StreamCodec<FriendlyByteBuf, CardTextFormatting> SYNC_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8, CardTextFormatting::getFormatId,
+            ByteBufCodecs.BOOL, CardTextFormatting::isItalic,
+            ByteBufCodecs.INT, CardTextFormatting::getArgbColorValue,
+            ByteBufCodecs.BOOL, CardTextFormatting::isBold,
+            CardTextFormatting::new);
+
+    public CardTextFormatting(String formatId, boolean isItalic, int argbColorValue, boolean isBold) {
+        this.formatId = formatId;
+        this.isItalic = isItalic;
+        this.argbColorValue = argbColorValue;
+        this.isBold = isBold;
+    }
 
     public Style getStyle(){
         return Style.EMPTY.withItalic(isItalic).withBold(isBold).withColor(argbColorValue);
@@ -56,5 +72,21 @@ public class CardTextFormatting {
             }
         }
         return format;
+    }
+
+    public String getFormatId() {
+        return formatId;
+    }
+
+    public boolean isItalic() {
+        return isItalic;
+    }
+
+    public int getArgbColorValue() {
+        return argbColorValue;
+    }
+
+    public boolean isBold() {
+        return isBold;
     }
 }

@@ -4,12 +4,9 @@ import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.data.components.*;
-import io.netty.buffer.*;
 import net.minecraft.core.*;
-import net.minecraft.nbt.*;
 import net.minecraft.network.*;
 import net.minecraft.network.codec.*;
-import net.minecraft.resources.*;
 import net.minecraft.world.item.*;
 
 import java.util.*;

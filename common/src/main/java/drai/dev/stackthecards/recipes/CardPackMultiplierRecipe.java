@@ -1,16 +1,14 @@
 package drai.dev.stackthecards.recipes;
 
 import drai.dev.stackthecards.data.cardpacks.*;
-import drai.dev.stackthecards.data.components.*;
 import drai.dev.stackthecards.items.*;
 import net.minecraft.core.*;
-import net.minecraft.resources.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.*;
 
 import static drai.dev.stackthecards.StackTheCards.*;
-import static drai.dev.stackthecards.data.components.StackTheCardsComponentTypes.CARD_PACK_DATA_COMPONENT;
+import static drai.dev.stackthecards.data.components.StackTheCardsComponentTypes.*;
 
 public class CardPackMultiplierRecipe extends CustomRecipe {
     public CardPackMultiplierRecipe(CraftingBookCategory category) {

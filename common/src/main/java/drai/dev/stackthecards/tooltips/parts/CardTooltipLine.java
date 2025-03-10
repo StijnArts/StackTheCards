@@ -2,7 +2,9 @@ package drai.dev.stackthecards.tooltips.parts;
 
 import com.google.gson.stream.*;
 import drai.dev.stackthecards.data.*;
+import net.minecraft.network.*;
 import net.minecraft.network.chat.*;
+import net.minecraft.network.codec.*;
 import org.json.simple.*;
 
 import java.util.*;
@@ -18,6 +20,56 @@ public class CardTooltipLine {
 
     public CardTooltipLine(String text) {
         this.text = text;
+    }
+
+    public static final StreamCodec<FriendlyByteBuf, CardTooltipLine> SYNC_CODEC = new StreamCodec<FriendlyByteBuf, CardTooltipLine>() {
+
+        @Override
+        public void encode(FriendlyByteBuf buffer, CardTooltipLine value) {
+            // Encode the card text formatting
+            CardTextFormatting.SYNC_CODEC.encode(buffer, value.cardTextFormatting);
+
+            // Encode the text
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.text);
+
+            // Encode the line segments recursively
+            // Start by writing the size of the lineSegments list
+            buffer.writeInt(value.lineSegments.size());
+
+            // Then encode each line segment
+            for (CardTooltipLine lineSegment : value.lineSegments) {
+                encode(buffer, lineSegment);  // Recursive call for lineSegments
+            }
+        }
+
+        @Override
+        public CardTooltipLine decode(FriendlyByteBuf buffer) {
+            // Decode the card text formatting
+            CardTextFormatting cardTextFormatting = CardTextFormatting.SYNC_CODEC.decode(buffer);
+
+            // Decode the text
+            String text = ByteBufCodecs.STRING_UTF8.decode(buffer);
+
+            // Decode the line segments recursively
+            // First, read the size of the list
+            int lineSegmentCount = buffer.readInt();
+            List<CardTooltipLine> lineSegments = new ArrayList<>();
+
+            // Then decode each line segment
+            for (int i = 0; i < lineSegmentCount; i++) {
+                lineSegments.add(decode(buffer));  // Recursive call for lineSegments
+            }
+
+            // Return a new CardTooltipLine object
+            return new CardTooltipLine(cardTextFormatting, text, lineSegments);
+        }
+    };
+
+
+    public CardTooltipLine(CardTextFormatting cardTextFormatting, String text, List<CardTooltipLine> lineSegments) {
+        this.cardTextFormatting = cardTextFormatting;
+        this.text = text;
+        this.lineSegments = lineSegments;
     }
 
     public CardTooltipLine() {
@@ -84,5 +136,17 @@ public class CardTooltipLine {
             }
             return mutableText;
         }
+    }
+
+    public CardTextFormatting getCardTextFormatting() {
+        return cardTextFormatting;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public List<CardTooltipLine> getLineSegments() {
+        return lineSegments;
     }
 }
