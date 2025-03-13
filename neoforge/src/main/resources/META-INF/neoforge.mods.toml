@@ -4,7 +4,7 @@ loaderVersion = "[2,)"
 license = "All Rights Reserved"
 
 [[mods]]
-modId = "stackthecards"
+modId = "stack_the_cards"
 version = "${version}"
 displayName = "Stack The Cards"
 authors = ""
@@ -13,21 +13,21 @@ description = '''
 '''
 #logoFile = ""
 #mixinConfigs = "stackthecards.mixin.json"
-[[dependencies.stackthecards]]
+[[dependencies.stack_the_cards]]
 modId = "neoforge"
 type = "required"
 versionRange = "[21,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.stackthecards]]
+[[dependencies.stack_the_cards]]
 modId = "minecraft"
 type = "required"
 versionRange = "[1.21.1,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.stackthecards]]
+[[dependencies.stack_the_cards]]
 modId = "architectury"
 type = "required"
 versionRange = "[13.0.8,)"

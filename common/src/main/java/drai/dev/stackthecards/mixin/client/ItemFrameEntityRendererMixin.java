@@ -20,7 +20,7 @@ public abstract class ItemFrameEntityRendererMixin<T extends ItemFrame> {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"), cancellable = true)
     private void renderInterceptForCardItems(T itemFrameEntity, float f, float g, PoseStack poseStack, MultiBufferSource vertexConsumerProvider, int i, CallbackInfo ci){
         ItemStack itemStack = itemFrameEntity.getItem();
-        if(!itemStack.isEmpty() && (itemStack.is(StackTheCardsItems.CARD)||itemStack.is(StackTheCardsItems.CARD_PACK))){
+        if(!itemStack.isEmpty() && (itemStack.is(StackTheCardsItems.CARD.get())||itemStack.is(StackTheCardsItems.CARD_PACK.get()))){
             boolean bl = itemFrameEntity.isInvisible();
             if (bl) {
                 poseStack.translate(0.0F, 0.0F, 0.5F);
@@ -37,7 +37,7 @@ public abstract class ItemFrameEntityRendererMixin<T extends ItemFrame> {
             poseStack.scale(0.0078125F, 0.0078125F, 0.0078125F);
             poseStack.translate(-64.0F, -64.0F, 0.0F);
             poseStack.translate(0.0F, 0.0F, -1.0F);
-            if(itemStack.is(StackTheCardsItems.CARD_PACK)) {
+            if(itemStack.is(StackTheCardsItems.CARD_PACK.get())) {
                 poseStack.scale(0.5F,0.5F,0.5F);
                 poseStack.translate(64F,64F,3F);
             }

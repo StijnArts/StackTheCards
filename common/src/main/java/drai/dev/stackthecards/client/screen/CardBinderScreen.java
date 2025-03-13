@@ -3,6 +3,7 @@ package drai.dev.stackthecards.client.screen;
 import com.mojang.blaze3d.vertex.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.items.*;
+import drai.dev.stackthecards.network.*;
 import net.fabricmc.api.*;
 import net.minecraft.*;
 import net.minecraft.client.gui.*;
@@ -10,30 +11,37 @@ import net.minecraft.client.gui.screens.inventory.*;
 import net.minecraft.core.*;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.*;
+import net.minecraft.server.level.*;
 import net.minecraft.world.entity.player.*;
 import net.minecraft.world.item.*;
 import org.lwjgl.glfw.*;
 
+import static drai.dev.stackthecards.client.screen.CardBinderScreenHandler.getBinderItem;
 import static drai.dev.stackthecards.items.CardBinder.*;
+import static drai.dev.stackthecards.network.StackTheCardsNetworking.isIntegratedServer;
 
-@Environment(EnvType.CLIENT)
+//@Environment(EnvType.CLIENT)
 public class CardBinderScreen extends AbstractContainerScreen<CardBinderScreenHandler> {
     private final NonNullList<ItemStack> inventory;
-
-    public CardBinderScreen(CardBinderScreenHandler handler, Inventory playerInventory, Component text){
-        super(handler, playerInventory, text);
-        var cardBinderInventory = new CardBinderInventory(playerInventory.player);
-        this.inventory = cardBinderInventory.getInventory();
-        BINDER_TEXTURE = ResourceLocation.fromNamespaceAndPath("stack_the_cards", "textures/gui/binder"+cardBinderInventory.getColorAffix(playerInventory.player)+".png");
-        BINDER_CARD_SLOT = ResourceLocation.fromNamespaceAndPath("stack_the_cards", "textures/gui/binder_slot.png");
-        BINDER_TIES = ResourceLocation.fromNamespaceAndPath("stack_the_cards", "textures/gui/binder_binds.png");
-    }
+    private ItemStack binderItem;
+    private Player clientPlayer;
     public final ResourceLocation BINDER_TEXTURE;
     public final ResourceLocation BINDER_CARD_SLOT;
     public final ResourceLocation BINDER_TIES;
 
     public PageButton nextPageButton;
     public PageButton previousPageButton;
+
+    public CardBinderScreen(CardBinderScreenHandler handler, Inventory playerInventory, Component text){
+        super(handler, playerInventory, text);
+        var cardBinderInventory = new CardBinderInventory(playerInventory.player);
+        this.inventory = cardBinderInventory.getInventory();
+        this.clientPlayer = playerInventory.player;
+        binderItem = getBinderItem(clientPlayer);
+        BINDER_TEXTURE = ResourceLocation.fromNamespaceAndPath("stack_the_cards", "textures/gui/binder"+cardBinderInventory.getColorAffix(playerInventory.player)+".png");
+        BINDER_CARD_SLOT = ResourceLocation.fromNamespaceAndPath("stack_the_cards", "textures/gui/binder_slot.png");
+        BINDER_TIES = ResourceLocation.fromNamespaceAndPath("stack_the_cards", "textures/gui/binder_binds.png");
+    }
 
     @Override
     protected void init() {
@@ -87,6 +95,11 @@ public class CardBinderScreen extends AbstractContainerScreen<CardBinderScreenHa
         this.renderTooltip(context, mouseX, mouseY);
     }
 
+    @Override
+    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
+
+    }
+
     private void drawCardSlot(GuiGraphics context, PoseStack poseStack, int i, int page, int j, CardBinderScreenHandler.CardItemSlot slot, int slotIndex) {
 
         int x = 54 * i + (132 * page) + this.leftPos+9;
@@ -100,13 +113,8 @@ public class CardBinderScreen extends AbstractContainerScreen<CardBinderScreenHa
             StackTheCardsClient.CARD_RENDERER.draw(poseStack, context.bufferSource(), stack1, 15728880, 52/(float)128);
         }
         poseStack.scale(0.5f,0.5f, 0);
-        context.drawString(font, Component.literal(slotIndex % MAX_CARDS_PER_PAGE + MAX_CARDS_PER_PAGE * StackTheCardsClient.PAGE_INDEX + 1 + ""),
+        context.drawString(font, Component.literal(slotIndex % MAX_CARDS_PER_PAGE + MAX_CARDS_PER_PAGE * getIndex() + 1 + ""),
                 74, 110, ChatFormatting.BLACK.getColor(), false);
-    }
-
-    @Override
-    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-
     }
 
     private int getPageCount() {
@@ -115,7 +123,8 @@ public class CardBinderScreen extends AbstractContainerScreen<CardBinderScreenHa
     }
 
     protected void addPageButtons() {
-        StackTheCardsClient.PAGE_INDEX = Math.min(StackTheCardsClient.PAGE_INDEX, this.getPageCount() - 1);
+        CardBinder.setIndex(binderItem, Math.min(CardBinder.getIndex(binderItem, clientPlayer), this.getPageCount() - 1), clientPlayer);
+        updateServer();
         int i = (this.width - 256) / 2;
         int j = 2;
         this.nextPageButton = this.addRenderableWidget(new PageButton(i + 233, 175, true, button -> this.goToNextPage(), true));
@@ -124,23 +133,41 @@ public class CardBinderScreen extends AbstractContainerScreen<CardBinderScreenHa
     }
 
     protected void goToPreviousPage() {
-        if (StackTheCardsClient.PAGE_INDEX > 0) {
-            --StackTheCardsClient.PAGE_INDEX;
+        if (getIndex() > 0) {
+            decrementPageIndex();
+            updateServer();
         }
         this.updatePageButtons();
     }
 
+
     protected void goToNextPage() {
-        if (StackTheCardsClient.PAGE_INDEX < this.getPageCount() - 1) {
-            ++StackTheCardsClient.PAGE_INDEX;
+        if (getIndex() < this.getPageCount() - 1) {
+            incrementPageIndex();
+            updateServer();
         }
         this.updatePageButtons();
+    }
+    private void updateServer() {
+        if(!isIntegratedServer()) StackTheCardsNetworking.updateBinderIndex(clientPlayer, binderItem);
     }
 
     private void updatePageButtons() {
         this.menu.checkEnabledSlots();
-        this.nextPageButton.visible = StackTheCardsClient.PAGE_INDEX < this.getPageCount() - 1;
-        this.previousPageButton.visible = StackTheCardsClient.PAGE_INDEX > 0;
+        this.nextPageButton.visible = getIndex() < this.getPageCount() - 1;
+        this.previousPageButton.visible = getIndex() > 0;
+    }
+
+    private void decrementPageIndex() {
+        CardBinder.decrementIndex(binderItem, clientPlayer);
+    }
+
+    private void incrementPageIndex() {
+        CardBinder.incrementIndex(binderItem, clientPlayer);
+    }
+
+    private int getIndex() {
+        return CardBinder.getIndex(binderItem, clientPlayer);
     }
 
     @Override

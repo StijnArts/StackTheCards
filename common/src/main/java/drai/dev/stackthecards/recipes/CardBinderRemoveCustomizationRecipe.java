@@ -57,6 +57,6 @@ public class CardBinderRemoveCustomizationRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return StackTheCards.BINDER_REMOVE_CUSTOM;
+        return StackTheCards.BINDER_REMOVE_CUSTOM.get();
     }
 }

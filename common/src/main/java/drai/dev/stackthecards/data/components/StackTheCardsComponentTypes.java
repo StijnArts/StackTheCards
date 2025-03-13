@@ -1,11 +1,13 @@
 package drai.dev.stackthecards.data.components;
 
+import com.mojang.serialization.*;
 import dev.architectury.registry.registries.*;
 import drai.dev.stackthecards.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.items.*;
 import net.minecraft.core.component.*;
 import net.minecraft.core.registries.*;
+import net.minecraft.network.codec.*;
 
 import java.util.function.*;
 
@@ -18,11 +20,11 @@ public class StackTheCardsComponentTypes {
 
     public static final RegistrySupplier<DataComponentType<CardIdentifier>> CARD_IDENTIFIER_COMPONENT = register("card_identifier_component",
             builder -> builder.persistent(CardIdentifier.CODEC)
-                    .networkSynchronized(CardIdentifier.STREAM_CODEC));/*
+                    .networkSynchronized(CardIdentifier.STREAM_CODEC));
 
-    public static final RegistrySupplier<DataComponentType<CardConnectionEntry.CardConnectionEntryData>> CARD_CONNECTION_ENTRY_COMPONENT = register("card_connection_data_component",
-            builder -> builder.persistent(CardConnectionEntry.CODEC)
-                    .networkSynchronized(CardConnectionEntry.STREAM_CODEC));*/
+    public static final RegistrySupplier<DataComponentType<Integer>> CARD_BINDER_PAGE_INDEX = register("card_connection_page_index",
+            builder -> builder.persistent(Codec.INT)
+                    .networkSynchronized(ByteBufCodecs.INT));
 
     public static final RegistrySupplier<DataComponentType<CardConnection.CardConnectionData>> CARD_CONNECTION_COMPONENT = register("card_connection_component",
             builder -> builder.persistent(CardConnection.CODEC)

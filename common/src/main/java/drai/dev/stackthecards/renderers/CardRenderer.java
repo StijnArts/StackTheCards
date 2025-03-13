@@ -16,7 +16,7 @@ import net.minecraft.world.item.*;
 import java.util.*;
 import java.util.stream.*;
 
-@Environment(EnvType.CLIENT)
+//@Environment(EnvType.CLIENT)
 public class CardRenderer {
     TextureManager textureManager = getTextureManager();
     private final HashMap<CardData, CardTexture> cardTextures = new HashMap<>();
@@ -26,7 +26,7 @@ public class CardRenderer {
     public void draw(PoseStack poseStack, MultiBufferSource vertexConsumers, ItemStack stack, int light){
         CardGame cardGame = null;
         CardTexture texture = null;
-        if(stack.is(StackTheCardsItems.CARD)){
+        if(stack.is(StackTheCardsItems.CARD.get())){
             var cardData = Card.getCardData(stack);
             cardGame = cardData.getCardSet().getCardGame();
             if(textureManager == null) textureManager = Minecraft.getInstance().getTextureManager();
@@ -50,7 +50,7 @@ public class CardRenderer {
                 CardTexture.draw(poseStack, vertexConsumers, light, cardTexture.getRenderLayer(), 0, Card.getAttachedCards(stack).size()*-1, cardGame, 0,0);
                 drawAttachedCards(poseStack, vertexConsumers, stack, light, 1, isFlipped,cardGame);
             }
-        } else if(stack.is(StackTheCardsItems.CARD_PACK)){
+        } else if(stack.is(StackTheCardsItems.CARD_PACK.get())){
             var cardPack = CardPack.getCardPack(stack);
             cardGame = CardGameRegistry.getCardGame(cardPack.getGameId());
             texture = getCardPackTexture(cardPack);
@@ -71,11 +71,11 @@ public class CardRenderer {
     public void draw(PoseStack matrices, MultiBufferSource vertexConsumers, ItemStack stack, int light, double scale){
         CardGame cardGame = null;
         CardTexture texture = null;
-        if(stack.is(StackTheCardsItems.CARD)){
+        if(stack.is(StackTheCardsItems.CARD.get())){
             var cardData = Card.getCardData(stack);
             cardGame = cardData.getCardSet().getCardGame();
             texture = getCardTexture(cardData, false);
-        } else if(stack.is(StackTheCardsItems.CARD_PACK)){
+        } else if(stack.is(StackTheCardsItems.CARD_PACK.get())){
             var cardPack = CardPack.getCardPack(stack);
             cardGame = CardGameRegistry.getCardGame(cardPack.getGameId());
             texture = getCardPackTexture(cardPack);

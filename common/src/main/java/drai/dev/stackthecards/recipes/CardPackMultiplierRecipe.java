@@ -51,6 +51,6 @@ public class CardPackMultiplierRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return PACK_MULTIPLYING_RECIPE;
+        return PACK_MULTIPLYING_RECIPE.get();
     }
 }

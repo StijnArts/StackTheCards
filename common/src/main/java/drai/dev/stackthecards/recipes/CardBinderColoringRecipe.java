@@ -65,6 +65,6 @@ public class CardBinderColoringRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return BINDER_COLORING;
+        return BINDER_COLORING.get();
     }
 }

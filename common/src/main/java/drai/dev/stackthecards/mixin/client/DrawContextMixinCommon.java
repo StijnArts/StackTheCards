@@ -1,5 +1,6 @@
 package drai.dev.stackthecards.mixin.client;
 
+import com.mojang.blaze3d.vertex.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.extensions.*;
 import drai.dev.stackthecards.tooltips.*;
@@ -14,13 +15,15 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 import java.util.*;
 
 @Mixin(GuiGraphics.class)
-public abstract class DrawContextMixin implements DrawContextExtensions {
+public abstract class DrawContextMixinCommon implements DrawContextExtensions {
 
     @Shadow @Deprecated public abstract void drawManaged(Runnable drawCallback);
 
     @Shadow public abstract int guiWidth();
 
     @Shadow public abstract int guiHeight();
+
+    @Shadow protected abstract void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner);
 
     @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent;renderImage(Lnet/minecraft/client/gui/Font;IILnet/minecraft/client/gui/GuiGraphics;)V"), method =
             "renderTooltipInternal")
@@ -61,13 +64,26 @@ public abstract class DrawContextMixin implements DrawContextExtensions {
 
     @Inject(method =            "renderTooltipInternal", at = @At(value = "HEAD"))
     public void fix(Font textRenderer, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, CallbackInfo ci) {
-        TooltipScreenRestrictor.newFix(components, textRenderer, x, guiWidth());
+        TooltipScreenRestrictor.fix(components, textRenderer, x, guiWidth());
     }
 
-    @ModifyVariable(method =    "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V"), index = 11)
-    public int modifyRenderX(int value, Font textRenderer, List<ClientTooltipComponent> components, int x) {
-        return TooltipScreenRestrictor.shouldFlip(components, textRenderer, x);
-    }
+    /*@Inject(method = "renderTooltipInternal",
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V"),
+            cancellable = true)
+    private void injectRenderTooltip(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, CallbackInfo ci) {
+        int newX = TooltipScreenRestrictor.shouldFlip(list, font, i);
+
+        // Re-run the method with the modified X position
+        this.renderTooltipInternal(font, list, newX, j, clientTooltipPositioner);
+
+        // Cancel the original call to avoid double rendering
+        ci.cancel();
+    }*/
+
+//    @ModifyVariable(method =    "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V"), index = 11)
+//    public int modifyRenderX(int value, Font textRenderer, List<ClientTooltipComponent> components, int x) {
+//        return TooltipScreenRestrictor.shouldFlip(components, textRenderer, x);
+//    }
 
     @Unique
     private int tooltipTopYPosition = 0;

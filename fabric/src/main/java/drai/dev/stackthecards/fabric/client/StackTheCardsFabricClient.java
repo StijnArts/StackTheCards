@@ -21,7 +21,7 @@ public final class StackTheCardsFabricClient implements ClientModInitializer {
         StackTheCardsClient.initClient();
         registerModelLoadingPlugin();
         // This entrypoint is suitable for setting up client-specific logic, such as rendering.
-        MenuScreens.register(CARD_BINDER_SCREEN_HANDLER, CardBinderScreen::new);
+        MenuScreens.register(CARD_BINDER_SCREEN_HANDLER.get(), CardBinderScreen::new);
         TooltipComponentCallback.EVENT.register(data -> {
             if (data instanceof CardTooltipData previewData)
                 return new CardTooltipComponent(previewData);

@@ -6,7 +6,7 @@ import net.fabricmc.api.*;
 import org.jetbrains.annotations.*;
 import org.lwjgl.glfw.*;
 
-@Environment(EnvType.CLIENT)
+//@Environment(EnvType.CLIENT)
 public final class Key {
     public static final Key UNKNOWN_KEY = new Key(InputConstants.UNKNOWN);
 

@@ -321,9 +321,8 @@ public class CardData {
 
     public boolean hasRoundedCorners() {
         if(hasRoundedCorners) return hasRoundedCorners;
-        if(getCardSet().hasRoundedCorners) return hasRoundedCorners;
-        if(getCardGame().hasRoundedCorners) return hasRoundedCorners;
-        return false;
+        if(getCardSet().hasRoundedCorners) return true;
+        return getCardGame().hasRoundedCorners;
 
     }
 

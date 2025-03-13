@@ -56,7 +56,7 @@ public class Card extends Item {
     }
 
     public static ItemStack getAsItemStack(CardIdentifier cardResourceLocation) {
-        var itemStack = new ItemStack(StackTheCardsItems.CARD);
+        var itemStack = new ItemStack(StackTheCardsItems.CARD.get());
         if(cardResourceLocation.rarityId.equalsIgnoreCase("missing"))
             cardResourceLocation.rarityId = CardGameRegistry.getCardData(cardResourceLocation).rarity;
         cardResourceLocation.setCardIdentifier(itemStack);

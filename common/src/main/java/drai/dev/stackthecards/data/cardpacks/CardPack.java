@@ -327,7 +327,7 @@ public class CardPack {
                 for (int k = 0; k < i; k++) {
                     int roll = ThreadLocalRandom.current().nextInt(0, 4);
                     if(roll==1){
-                        var itemStack = new ItemStack(StackTheCardsItems.CARD_PACK);
+                        var itemStack = new ItemStack(StackTheCardsItems.CARD_PACK.get());
                         CardPack.addCardPackResourceLocation(itemStack, CardPack.getRandomCardPack(true).getCardIdentifier());
                         consumer.accept(itemStack);
                     }

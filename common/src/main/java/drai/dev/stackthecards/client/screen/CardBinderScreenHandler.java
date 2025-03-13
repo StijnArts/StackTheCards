@@ -1,13 +1,9 @@
 package drai.dev.stackthecards.client.screen;
 
-import dev.architectury.platform.*;
 import drai.dev.stackthecards.*;
-import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
-import net.fabricmc.api.*;
-import net.minecraft.client.player.*;
 import net.minecraft.world.entity.player.*;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.*;
@@ -16,19 +12,21 @@ import org.jetbrains.annotations.*;
 import java.util.*;
 
 public class CardBinderScreenHandler extends AbstractContainerMenu {
-    private final CardBinderInventory inventory;
+    private final CardBinderInventory cardBinderInventory;
     public final List<CardItemSlot> cardSlots = new ArrayList<>();
     @Nullable
     private CardIdentifier boundResourceLocation;
-    private boolean isBound;
+    private final boolean isBound;
+    private ItemStack binderItem;
 
     public CardBinderScreenHandler(int syncId, Inventory playerInventory) {
-        super(StackTheCards.CARD_BINDER_SCREEN_HANDLER, syncId);
-        this.inventory = new CardBinderInventory(playerInventory.player);
-        inventory.startOpen(playerInventory.player);
-        this.isBound = inventory.isBound(playerInventory.player);
+        super(StackTheCards.CARD_BINDER_SCREEN_HANDLER.get(), syncId);
+        this.cardBinderInventory = new CardBinderInventory(playerInventory.player);
+        cardBinderInventory.startOpen(playerInventory.player);
+        binderItem = getBinderItem(playerInventory.player);
+        this.isBound = cardBinderInventory.isBound(playerInventory.player);
         if(isBound){
-            boundResourceLocation = inventory.getBoundResourceLocation(playerInventory.player);
+            boundResourceLocation = cardBinderInventory.getBoundResourceLocation(playerInventory.player);
         }
         //This will place the slot in the correct locations for a 3x3 Grid. The slots exist on both server and client!
         //This will not render the background of the slots however, this is the Screens job
@@ -45,7 +43,7 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
         for (int page = 0; page < 2; page++) {
             for (int j = 0; j < 2; ++j) {
                 for (int i = 0; i < 2; i++) {
-                    var slot = new CardItemSlot(inventory, slotIndex, 27 + i * 54 + page*132, 68 + j * 73, playerInventory.player, isBound, boundResourceLocation);
+                    var slot = new CardItemSlot(cardBinderInventory, slotIndex, 27 + i * 54 + page*132, 68 + j * 73, playerInventory.player, isBound, boundResourceLocation);
                     this.addSlot(slot);
                     cardSlots.add(slot);
                     slotIndex++;
@@ -54,9 +52,18 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
         }
     }
 
+
+    public static @Nullable ItemStack getBinderItem(Player player) {
+        var mainHandItem = player.getMainHandItem();
+        if(mainHandItem.getItem() instanceof CardBinder) return mainHandItem;
+        var offHandItem = player.getOffhandItem();
+        if(offHandItem.getItem() instanceof CardBinder) return offHandItem;
+        return null;
+    }
+
     @Override
     public void removed(Player player) {
-        inventory.stopOpen(player);
+        cardBinderInventory.stopOpen(player);
         super.removed(player);
     }
 
@@ -69,10 +76,9 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
     public @NotNull ItemStack quickMoveStack(Player player, int invSlot) {
         //TODO shift clicking out of the binder inventory currently sets stack count to max
         ItemStack newStack = ItemStack.EMPTY;
-        if(Platform.getEnv()== EnvType.SERVER){
-            Slot clickedSlot = this.slots.get(invSlot);
-            if (clickedSlot.hasItem() && clickedSlot.getItem().is(StackTheCardsItems.CARD)) {
-
+        Slot clickedSlot = this.slots.get(invSlot);
+        if(!player.isLocalPlayer()){
+            if (clickedSlot.hasItem() && clickedSlot.getItem().is(StackTheCardsItems.CARD.get())) {
                 ItemStack originalStack = clickedSlot.getItem();
                 newStack = originalStack.copy();
                 boolean useCardBinderQuickmove = false;
@@ -98,7 +104,7 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
                         clickedSlot.setChanged();
                     }
                 } else {
-                    if (invSlot < 3*9 ? !super.moveItemStackTo(originalStack, 3*9, this.slots.size(), false) : !super.moveItemStackTo(originalStack, 0, 3*9, false)) {
+                    if (moveItem(invSlot, originalStack)) {
                         return ItemStack.EMPTY;
                     }
                     if (originalStack.isEmpty()) {
@@ -113,6 +119,12 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
         return newStack;
     }
 
+    private boolean moveItem(int invSlot, ItemStack originalStack) {
+        boolean b = invSlot < 3 * 9;
+        if(b) return !super.moveItemStackTo(originalStack, 3 * 9, this.slots.size(), false);
+        return !super.moveItemStackTo(originalStack, 0, 3 * 9, false);
+    }
+
     public static boolean isSameCard(ItemStack stack1, ItemStack stack2) {
         return CardIdentifier.isSameItem(CardIdentifier.getCardIdentifier(stack1), CardIdentifier.getCardIdentifier(stack2));
     }
@@ -123,7 +135,7 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
         int i = index;
         if (stack.isStackable()) {
             while (!stack.isEmpty() && i == index) {
-                itemStack = inventory.getItem(i);
+                itemStack = cardBinderInventory.getItem(i);
                 var canStack = isSameCard(stack, itemStack);
                 if (!itemStack.isEmpty() && canStack) {
                     int j = itemStack.getCount() + stack.getCount();
@@ -143,13 +155,13 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
         if (!stack.isEmpty()) {
             i = index;
             while (index == i) {
-                itemStack = inventory.getItem(i);
+                itemStack = cardBinderInventory.getItem(i);
 
                 if (itemStack.isEmpty()) {
                     if (stack.getCount() > 64) {
-                        inventory.setStack(i, stack.split(64), player);
+                        cardBinderInventory.setStack(i, stack.split(64), player);
                     } else {
-                        inventory.setStack(i, stack.split(stack.getCount()), player);
+                        cardBinderInventory.setStack(i, stack.split(stack.getCount()), player);
                     }
                     bl = true;
                     break;
@@ -162,7 +174,7 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return this.inventory.stillValid(player);
+        return this.cardBinderInventory.stillValid(player);
     }
 
     public void checkEnabledSlots() {
@@ -177,12 +189,14 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
         private boolean isBound;
         private CardIdentifier boundResourceLocation;
         private Player player;
+        private ItemStack binderItem;
 
         public CardItemSlot(CardBinderInventory inventory, int index, int x, int y, Player player, boolean isBound, @Nullable CardIdentifier boundResourceLocation) {
             super(inventory, index, x, y);
             this.player = player;
             this.isBound = isBound;
             this.boundResourceLocation = boundResourceLocation;
+            binderItem = getBinderItem(player);
             this.checkEnabled();
         }
 
@@ -217,14 +231,15 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
 
         public int getInventoryIndex(){
             var index = getContainerSlot();
-            var inventoryIndex = index % cardsPerPage + cardsPerPage * StackTheCardsClient.PAGE_INDEX;
+            var pageIndex = CardBinder.getIndex(binderItem, player);
+            var inventoryIndex = index % cardsPerPage + cardsPerPage * pageIndex;
             return inventoryIndex;
         }
 
         @Override
         public boolean mayPlace(ItemStack stack) {
             if(!enabled) return false;
-            if(!stack.is(StackTheCardsItems.CARD)) return false;
+            if(!stack.is(StackTheCardsItems.CARD.get())) return false;
             if(!isBound) return true;
             var data = Card.getCardData(stack);
             var set = data.getCardSet();

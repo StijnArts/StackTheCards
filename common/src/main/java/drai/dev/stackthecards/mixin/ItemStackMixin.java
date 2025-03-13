@@ -28,15 +28,15 @@ public abstract class ItemStackMixin {
     @Inject(at = @At("HEAD"), method = "getTooltipImage", cancellable = true)
     private void onGetTooltipData(CallbackInfoReturnable<Optional<TooltipComponent>> ci) {
         ItemStack self = (ItemStack) (Object) this;
-        if (self.is(StackTheCardsItems.CARD) || self.is(StackTheCardsItems.CARD_PACK))
+        if (self.is(StackTheCardsItems.CARD.get()) || self.is(StackTheCardsItems.CARD_PACK.get()))
             ci.setReturnValue(Optional.of(
                     CardTooltipData.of(self)));
     }
 
     @Inject(at = @At("HEAD"), method = "isSameItemSameComponents", cancellable = true)
     private static void onGetTooltipData(ItemStack itemStack, ItemStack itemStack2, CallbackInfoReturnable<Boolean> cir) {
-        if ((itemStack.is(StackTheCardsItems.CARD)/* || itemStack.is(StackTheCardsItems.CARD_PACK)*/)
-                && (itemStack2.is(StackTheCardsItems.CARD)/* || itemStack2.is(StackTheCardsItems.CARD_PACK)*/)){
+        if ((itemStack.is(StackTheCardsItems.CARD.get())/* || itemStack.is(StackTheCardsItems.CARD_PACK.get())*/)
+                && (itemStack2.is(StackTheCardsItems.CARD.get())/* || itemStack2.is(StackTheCardsItems.CARD_PACK.get())*/)){
             cir.setReturnValue(CardIdentifier.isSameItem(CardIdentifier.getCardIdentifier(itemStack), CardIdentifier.getCardIdentifier(itemStack2)));
         }
     }
@@ -44,7 +44,7 @@ public abstract class ItemStackMixin {
     @Inject(at = @At("RETURN"), method = "getTooltipLines")
     private void onGetTooltip(Item.TooltipContext tooltipContext, Player player, TooltipFlag tooltipFlag, CallbackInfoReturnable<List<Component>> ci) {
         var self  =(ItemStack) (Object) this;
-        if(self.is(StackTheCardsItems.CARD)){
+        if(self.is(StackTheCardsItems.CARD.get())){
             var tooltip = ci.getReturnValue();
             if(StackTheCardsClient.cardLoreKeyPressed){
                 tooltip.addAll(Card.getCardData(self).getDetailToolTips());
@@ -53,7 +53,7 @@ public abstract class ItemStackMixin {
                 StackTheCardsClient.modifyCardStackTooltip(tooltip::addAll);
             }
         }
-        if(self.is(StackTheCardsItems.CARD_PACK)){
+        if(self.is(StackTheCardsItems.CARD_PACK.get())){
             var tooltip = ci.getReturnValue();
             if(StackTheCardsClient.cardLoreKeyPressed){
                 var pack = CardPack.getCardPack(self);
@@ -79,9 +79,9 @@ public abstract class ItemStackMixin {
     @Inject(method = "getHoverName", at = @At("HEAD"), cancellable = true)
     private void customCardName(CallbackInfoReturnable<Component> cir){
         var self  =(ItemStack) (Object) this;
-        if(self.is(StackTheCardsItems.CARD)){
+        if(self.is(StackTheCardsItems.CARD.get())){
             cir.setReturnValue(Card.getCardData(self).getCardNameLabel());
-        } else if (self.is(StackTheCardsItems.CARD_PACK)){
+        } else if (self.is(StackTheCardsItems.CARD_PACK.get())){
             cir.setReturnValue(CardPack.getCardPack(self).getPackNameLabel());
         }
     }

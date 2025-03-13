@@ -40,7 +40,7 @@ public abstract class ItemFrameEntityMixin extends HangingEntity {
 
     @Inject(method = "setItem(Lnet/minecraft/world/item/ItemStack;Z)V", at = @At("HEAD"), cancellable = true)
     private void setCardItem(ItemStack value, boolean update, CallbackInfo ci){
-        if(value.is(StackTheCardsItems.CARD)){
+        if(value.is(StackTheCardsItems.CARD.get())){
             if (!value.isEmpty()) {
                 value = value.copyWithCount(1);
             }
@@ -74,8 +74,8 @@ public abstract class ItemFrameEntityMixin extends HangingEntity {
         if(!this.fixed && !isClient && bl){
 //            boolean isSprinting = player.isSprinting();
             boolean isCrouching = player.isCrouching();
-            if(currentItemstack.is(StackTheCardsItems.CARD)) {
-                if(itemStack.isEmpty() || !itemStack.is(StackTheCardsItems.CARD)){
+            if(currentItemstack.is(StackTheCardsItems.CARD.get())) {
+                if(itemStack.isEmpty() || !itemStack.is(StackTheCardsItems.CARD.get())){
                     if(/*StackTheCardsClient.ctrlKeyPressed*/isCrouching){
                         Card.toggleCardFlipped(currentItemstack);
                         this.setItem(currentItemstack);
@@ -117,7 +117,7 @@ public abstract class ItemFrameEntityMixin extends HangingEntity {
         ItemStack currentItemstack = this.getItem();
         boolean bl = !currentItemstack.isEmpty();
         if(bl){
-            if(currentItemstack.is(StackTheCardsItems.CARD)) {
+            if(currentItemstack.is(StackTheCardsItems.CARD.get())) {
                 var pickedStack = currentItemstack.copy();
                 Card.removeAttachedCards(pickedStack);
                 CardConnection.breakConnections(pickedStack);
@@ -134,7 +134,7 @@ public abstract class ItemFrameEntityMixin extends HangingEntity {
             return;
         }
         ItemStack stack = this.getItem();
-        if(stack.is(StackTheCardsItems.CARD)){
+        if(stack.is(StackTheCardsItems.CARD.get())){
             var attachedCards = Card.getAttachedCards(stack);
             if(alwaysDrop){
                 for (var attachedCard: attachedCards) {

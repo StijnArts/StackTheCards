@@ -13,7 +13,6 @@ import java.util.*;
 public class CardBinderInventory implements Container {
     public int size;
     private NonNullList<ItemStack> inventory;
-
     public CardBinderInventory(Player player){
         var itemStack = player.getMainHandItem();
         var data = CardBinderData.getOrCreate(itemStack);

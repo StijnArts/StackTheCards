@@ -10,7 +10,7 @@
   ],
   "client": [
     "client.BakedModelManagerMixin",
-    "client.DrawContextMixin",
+    "client.DrawContextMixinCommon",
     "client.HandledScreenMixin",
     "client.HeldItemRendererMixin",
     "client.ItemFrameEntityRendererMixin",

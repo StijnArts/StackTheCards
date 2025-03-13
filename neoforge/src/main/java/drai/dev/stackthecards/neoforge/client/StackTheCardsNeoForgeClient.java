@@ -30,16 +30,12 @@ import static drai.dev.stackthecards.StackTheCards.MOD_ID;
 
 @EventBusSubscriber(modid = StackTheCards.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class StackTheCardsNeoForgeClient {
-
+    public static boolean hasBeenInitialized = false;
     @SubscribeEvent
     public static void onClientSetup(final FMLClientSetupEvent event) {
+        if (hasBeenInitialized) return;
         StackTheCardsClient.initClient();
-    }
-
-    @SubscribeEvent
-    public static void onScreenInit(ScreenEvent.MouseScrolled event) {
-        // Register mouse scroll event when a screen is initialized
-        StackTheCardsClient.scrollModifier+= (int) event.getScrollDeltaY();
+        hasBeenInitialized = true;
     }
 
     @SubscribeEvent
@@ -48,8 +44,8 @@ public class StackTheCardsNeoForgeClient {
     }
 
     @SubscribeEvent
-    private void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(StackTheCards.CARD_BINDER_SCREEN_HANDLER, CardBinderScreen::new);
+    private static void registerScreens(RegisterMenuScreensEvent event) {
+        event.register(StackTheCards.CARD_BINDER_SCREEN_HANDLER.get(), CardBinderScreen::new);
     }
 
     @SubscribeEvent
@@ -66,8 +62,8 @@ public class StackTheCardsNeoForgeClient {
     public static void registerAdditional(ModelEvent.RegisterAdditional event) {
         // The model id, relative to `assets/<namespace>/models/<path>.json`
 
-        StackTheCardsClient.CARD_BACK_MODELS.forEach(model->event.register(new ModelResourceLocation(model, "")));
-        StackTheCardsClient.CARD_PACK_MODELS.forEach(model->event.register(new ModelResourceLocation(model, "")));
+        StackTheCardsClient.CARD_BACK_MODELS.forEach(model->event.register(ModelResourceLocation.standalone(model)));
+        StackTheCardsClient.CARD_PACK_MODELS.forEach(model->event.register(ModelResourceLocation.standalone(model)));
 //        event.register(new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath("examplemod", "block/example_unused_model")));
     }
 }

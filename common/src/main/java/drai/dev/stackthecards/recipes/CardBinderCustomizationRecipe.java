@@ -86,6 +86,6 @@ public class CardBinderCustomizationRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return CUSTOM_BINDER;
+        return CUSTOM_BINDER.get();
     }
 }

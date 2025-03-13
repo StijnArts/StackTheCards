@@ -10,11 +10,11 @@ import net.minecraft.world.entity.player.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.*;
 
+import static drai.dev.stackthecards.StackTheCards.PACK_RIP;
 import static drai.dev.stackthecards.data.cardpacks.CardPack.*;
 
 public class CardPackItem extends Item {
     public static final ResourceLocation PACK_RIP_IDENTIFIER = ResourceLocation.fromNamespaceAndPath("stack_the_cards", "pack_rip");
-    public static SoundEvent PACK_RIP = SoundEvent.createVariableRangeEvent(PACK_RIP_IDENTIFIER);
     public CardPackItem(Item.Properties settings) {
         super(settings);
     }
@@ -27,7 +27,7 @@ public class CardPackItem extends Item {
         var cardsToDrop = pullResult.getPulledCards();
         var itemsToDrop = pullResult.getPulledItems();
         if(!level.isClientSide){
-            level.playSound(null, user.blockPosition(), PACK_RIP, SoundSource.PLAYERS, 0.4f, 0.9f);
+            level.playSound(null, user.blockPosition(), PACK_RIP.get(), SoundSource.PLAYERS, 0.4f, 0.9f);
         }
         for (var card : cardsToDrop) {
             user.spawnAtLocation(Card.getAsItemStack(card), 1F);
@@ -48,7 +48,7 @@ public class CardPackItem extends Item {
     }
 
     public static ItemStack of(CardPack cardPack){
-        var itemStack = new ItemStack(StackTheCardsItems.CARD_PACK);
+        var itemStack = new ItemStack(StackTheCardsItems.CARD_PACK.get());
         addCardPackResourceLocation(itemStack, cardPack.getResourceLocation());
         return itemStack;
     }

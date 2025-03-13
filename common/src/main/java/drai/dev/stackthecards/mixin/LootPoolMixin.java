@@ -23,8 +23,8 @@ public class LootPoolMixin {
     private NumberProvider bonusRolls;
 
     @Inject(at = @At(value = "TAIL"), method = "addRandomItems")
-    private void onKey(Consumer<ItemStack> lootConsumer, LootContext lootContext, CallbackInfo ci, @Local(ordinal = 1) Consumer<ItemStack> consumer) {
-        lootPoolCardPackInjection(lootContext, consumer, this.rolls.getInt(lootContext) + Mth.floor(this.bonusRolls.getFloat(lootContext) * lootContext.getLuck()));
+    private void onKey(Consumer<ItemStack> lootConsumer, LootContext lootContext, CallbackInfo ci) {
+        lootPoolCardPackInjection(lootContext, lootConsumer, this.rolls.getInt(lootContext) + Mth.floor(this.bonusRolls.getFloat(lootContext) * lootContext.getLuck()));
     }
 
 

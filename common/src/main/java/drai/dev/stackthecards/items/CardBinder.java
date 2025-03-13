@@ -1,6 +1,8 @@
 package drai.dev.stackthecards.items;
 
 import drai.dev.stackthecards.*;
+import drai.dev.stackthecards.client.*;
+import drai.dev.stackthecards.data.components.*;
 import drai.dev.stackthecards.registry.*;
 import net.minecraft.*;
 import net.minecraft.core.registries.*;
@@ -16,6 +18,8 @@ import net.minecraft.world.level.*;
 
 import java.util.*;
 
+import static drai.dev.stackthecards.network.StackTheCardsNetworking.isIntegratedServer;
+
 public class CardBinder extends Item {
 
     public static final int MAX_CARDS_PER_PAGE = 8;
@@ -24,6 +28,30 @@ public class CardBinder extends Item {
     public CardBinder(DyeColor color, Item.Properties settings) {
         super(settings);
         this.color = color;
+    }
+
+    public static int getOrCreate(ItemStack stack) {
+        var data = stack.get(StackTheCardsComponentTypes.CARD_BINDER_PAGE_INDEX.get());
+        if (data == null) return 0;
+        return data;
+    }
+
+    public static int getIndex(ItemStack binderItem, Player clientPlayer) {
+        if(isIntegratedServer()) return StackTheCardsClient.PAGE_INDEX;
+        return getOrCreate(binderItem);
+    }
+
+    public static void setIndex(ItemStack binderItem, int index, Player clientPlayer) {
+        if(isIntegratedServer()) StackTheCardsClient.PAGE_INDEX = index;
+        binderItem.set(StackTheCardsComponentTypes.CARD_BINDER_PAGE_INDEX.get(), index);
+    }
+
+    public static void incrementIndex(ItemStack binderItem, Player clientPlayer) {
+        setIndex(binderItem, getIndex(binderItem, clientPlayer) + 1, clientPlayer);
+    }
+
+    public static void decrementIndex(ItemStack binderItem, Player clientPlayer) {
+        setIndex(binderItem, getIndex(binderItem, clientPlayer) - 1, clientPlayer);
     }
 
     @Override
@@ -85,57 +113,57 @@ public class CardBinder extends Item {
 
     private static ItemLike get(DyeColor color) {
         if (color == null) {
-            return StackTheCardsItems.CARD_BINDER;
+            return StackTheCardsItems.CARD_BINDER.get();
         }
         switch (color) {
             case WHITE: {
-                return StackTheCardsItems.WHITE_CARD_BINDER;
+                return StackTheCardsItems.WHITE_CARD_BINDER.get();
             }
             case ORANGE: {
-                return StackTheCardsItems.ORANGE_CARD_BINDER;
+                return StackTheCardsItems.ORANGE_CARD_BINDER.get();
             }
             case MAGENTA: {
-                return StackTheCardsItems.MAGENTA_CARD_BINDER;
+                return StackTheCardsItems.MAGENTA_CARD_BINDER.get();
             }
             case LIGHT_BLUE: {
-                return StackTheCardsItems.LIGHT_BLUE_CARD_BINDER;
+                return StackTheCardsItems.LIGHT_BLUE_CARD_BINDER.get();
             }
             case YELLOW: {
-                return StackTheCardsItems.YELLOW_CARD_BINDER;
+                return StackTheCardsItems.YELLOW_CARD_BINDER.get();
             }
             case LIME: {
-                return StackTheCardsItems.LIME_CARD_BINDER;
+                return StackTheCardsItems.LIME_CARD_BINDER.get();
             }
             case PINK: {
-                return StackTheCardsItems.PINK_CARD_BINDER;
+                return StackTheCardsItems.PINK_CARD_BINDER.get();
             }
             case GRAY: {
-                return StackTheCardsItems.GRAY_CARD_BINDER;
+                return StackTheCardsItems.GRAY_CARD_BINDER.get();
             }
             case LIGHT_GRAY: {
-                return StackTheCardsItems.LIGHT_GRAY_CARD_BINDER;
+                return StackTheCardsItems.LIGHT_GRAY_CARD_BINDER.get();
             }
             case CYAN: {
-                return StackTheCardsItems.CYAN_CARD_BINDER;
+                return StackTheCardsItems.CYAN_CARD_BINDER.get();
             }
             default: {
-                return StackTheCardsItems.CARD_BINDER;
+                return StackTheCardsItems.CARD_BINDER.get();
             }
             case BLUE: {
-                return StackTheCardsItems.BLUE_CARD_BINDER;
+                return StackTheCardsItems.BLUE_CARD_BINDER.get();
             }
             case PURPLE: {
-                return StackTheCardsItems.PURPLE_CARD_BINDER;
+                return StackTheCardsItems.PURPLE_CARD_BINDER.get();
             }
             case GREEN: {
-                return StackTheCardsItems.GREEN_CARD_BINDER;
+                return StackTheCardsItems.GREEN_CARD_BINDER.get();
             }
             case RED: {
-                return StackTheCardsItems.RED_CARD_BINDER;
+                return StackTheCardsItems.RED_CARD_BINDER.get();
             }
             case BLACK:
         }
-        return StackTheCardsItems.BLACK_CARD_BINDER;
+        return StackTheCardsItems.BLACK_CARD_BINDER.get();
     }
 
     @Override
@@ -143,7 +171,7 @@ public class CardBinder extends Item {
         if(hand == InteractionHand.MAIN_HAND){
             if(!level.isClientSide){
                 user.openMenu(new SimpleMenuProvider(
-                        (id, inventory, playerEntity) -> StackTheCards.CARD_BINDER_SCREEN_HANDLER.create(id, inventory), Component.literal("Card Binder")));
+                        (id, inventory, playerEntity) -> StackTheCards.CARD_BINDER_SCREEN_HANDLER.get().create(id, inventory), Component.literal("Card Binder")));
             }
             return InteractionResultHolder.success(user.getItemInHand(hand));
         }

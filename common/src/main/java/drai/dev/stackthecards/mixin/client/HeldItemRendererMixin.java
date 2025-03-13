@@ -34,12 +34,12 @@ public abstract class HeldItemRendererMixin {
     private void setCardItem(AbstractClientPlayer player, float tickDelta, float pitch, InteractionHand hand, float swingProgress, ItemStack item,
                              float equipProgress, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci){
         if (!player.isScoping()) {
-            if (item.is(StackTheCardsItems.CARD) || item.is(StackTheCardsItems.CARD_PACK)) {
+            if (item.is(StackTheCardsItems.CARD.get()) || item.is(StackTheCardsItems.CARD_PACK.get())) {
                 boolean bl = hand == InteractionHand.MAIN_HAND;
                 HumanoidArm arm = bl ? player.getMainArm() : player.getMainArm().getOpposite();
                 matrices.pushPose();
                 var offhand = this.offHandItem;
-                if (bl && offhand.isEmpty() && item.is(StackTheCardsItems.CARD)) {
+                if (bl && offhand.isEmpty() && item.is(StackTheCardsItems.CARD.get())) {
                     this.renderCardInBothHands(matrices, vertexConsumers, light, pitch, equipProgress, swingProgress);
                 } else {
                     this.renderCardInOneHand(matrices, vertexConsumers, light, equipProgress, arm, swingProgress, item);
@@ -53,7 +53,7 @@ public abstract class HeldItemRendererMixin {
     @Inject(method = "renderItem", at = @At("HEAD"), cancellable = true)
     private void setCardItem(LivingEntity entity, ItemStack item, ItemDisplayContext renderMode, boolean leftHanded,
                              PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci){
-            if (item.is(StackTheCardsItems.CARD_PACK)) {
+            if (item.is(StackTheCardsItems.CARD_PACK.get())) {
                 matrices.pushPose();
                 matrices.translate(0, 0.2f, 0.1F);
                 matrices.scale(1.6f, 1.6f, 1.6f);

@@ -10,7 +10,7 @@ import java.util.*;
 public class TooltipScreenRestrictor {
     private static boolean shouldFlip = false;
 
-    public static void newFix(List<ClientTooltipComponent> components, Font font, int x, int width) {
+    public static void fix(List<ClientTooltipComponent> components, Font font, int x, int width) {
         shouldFlip = false;
 
         int forcedWidth = 0;

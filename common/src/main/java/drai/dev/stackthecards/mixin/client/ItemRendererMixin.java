@@ -24,15 +24,15 @@ public abstract class ItemRendererMixin {
     @Inject(method = "getModel", at = @At("RETURN"), cancellable = true)
     private void injected(ItemStack stack, Level level, LivingEntity entity, int seed, CallbackInfoReturnable<BakedModel> cir) {
         if (!stack.isEmpty()) {
-            if (stack.is(StackTheCardsItems.CARD) || stack.is(StackTheCardsItems.CARD_PACK)) {
+            if (stack.is(StackTheCardsItems.CARD.get()) || stack.is(StackTheCardsItems.CARD_PACK.get())) {
                 ModelResourceLocation modelResourceLocation;
                 ModelResourceLocation fallBackModel;
-                if(stack.is(StackTheCardsItems.CARD)){
+                if(stack.is(StackTheCardsItems.CARD.get())){
                     var cardData = Card.getCardData(stack);
                     if(cardData == null) return;
                     modelResourceLocation = cardData.getModelResourceLocation();
                     fallBackModel = cardData.getFallbackModel();
-                } else /*if(stack.is(Items.CARD_PACK))*/{
+                } else /*if(stack.is(Items.CARD_PACK.get()))*/{
                     var cardPack = CardPack.getCardPack(stack);
                     modelResourceLocation = cardPack.getModelResourceLocation();
                     fallBackModel = cardPack.getFallbackModel();
