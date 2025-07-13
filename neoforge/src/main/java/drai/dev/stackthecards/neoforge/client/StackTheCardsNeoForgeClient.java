@@ -37,18 +37,19 @@ public class StackTheCardsNeoForgeClient {
 
     @SubscribeEvent
     public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener((barrier, manager, pro, profilerFiller, ex, _d) -> CompletableFuture.runAsync(() -> {
-            StackTheCardsModelLoader.loadModels(manager);
-        }, ex));
+        event.registerReloadListener(new StackTheCardsModelReloadListener());
     }
 
-    // Client-side mod bus event handler
+//    @SubscribeEvent
+//    public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
+//        event.registerReloadListener((barrier, manager, pro, profilerFiller, ex, _d) -> CompletableFuture.runAsync(() -> {
+//            StackTheCardsModelLoader.loadModels(manager);
+//        }, ex));
+//    }
+
     @SubscribeEvent
     public static void registerAdditional(ModelEvent.RegisterAdditional event) {
-        // The model id, relative to `assets/<namespace>/models/<path>.json`
-
         StackTheCardsClient.CARD_BACK_MODELS.forEach(model->event.register(ModelResourceLocation.standalone(model)));
         StackTheCardsClient.CARD_PACK_MODELS.forEach(model->event.register(ModelResourceLocation.standalone(model)));
-//        event.register(new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath("examplemod", "block/example_unused_model")));
     }
 }
