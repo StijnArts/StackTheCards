@@ -1,0 +1,14 @@
+- Command to get a specific card thats compatible with moxfield notations
+- command to import moxfield deck
+- command to gift deckbox with all cards of a set/game
+- Deckboxes
+    - Stores infinite amount of cards for 1 game
+    - Searchable like backpacks
+    - Placeable block entity
+    - restone power draws a card
+    - shift rightclick to shuffle
+    - rightclick with a card to place card in box
+    - shift rightclick with another deckbox to place all cards into target deckbox
+    - parse moxfield decklist to fill a different deckbox with those cards
+    - crafted with shulkershell binder shulkershell
+- Some kind of searchable collection item (possibly from deckbox) to quickly find cards in your collection
