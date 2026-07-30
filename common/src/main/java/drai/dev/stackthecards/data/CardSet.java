@@ -9,7 +9,7 @@ import net.minecraft.network.*;
 import net.minecraft.network.codec.*;
 import net.minecraft.resources.*;
 import org.jetbrains.annotations.*;
-import org.json.simple.*;
+import com.google.gson.*;
 
 import java.util.*;
 
@@ -17,8 +17,8 @@ import static drai.dev.stackthecards.data.CardGame.*;
 import static drai.dev.stackthecards.data.carddata.CardData.*;
 
 public class CardSet {
-    private static final String JSON_SET_ID_KEY = "setId";
-    private static final String JSON_GAME_CARD_BACK_NAMESPACE_CARD_KEY = "cardBackTextureNameSpace";
+    private static final String Json_SET_ID_KEY = "setId";
+    private static final String Json_GAME_CARD_BACK_NAMESPACE_CARD_KEY = "cardBackTextureNameSpace";
     public String gameId;
     public final String setId;
     public HashMap<String, CardData> cards = new HashMap<>();
@@ -121,68 +121,68 @@ public class CardSet {
         this.setId = cardSetId;
     }
 
-    public static CardSet parse(JSONObject json) throws MalformedJsonException {
-        if(json.isEmpty() || !json.containsKey(JSON_SET_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+    public static CardSet parse(JsonObject json) throws MalformedJsonException {
+        if(json.isEmpty() || !json.has(Json_SET_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         CardSet cardSet;
         try{
-            cardSet = new CardSet((String) json.get(JSON_SET_ID_KEY));
+            cardSet = new CardSet(json.get(Json_SET_ID_KEY).getAsString());
         } catch (Exception e){
             throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
         }
-        if(json.containsKey("name")){
+        if(json.has("name")){
             try{
-                cardSet.name = (String) json.get("name");
+                cardSet.name = json.get("name").getAsString();
             } catch (Exception e){
                 throw new MalformedJsonException("Card set name was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)){
+        if(json.has(Json_GAME_CARD_BACK_ITEM_MODEL_KEY)){
             try{
-                var identifierArray = ((String) json.get(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)).split(":");
+                var identifierArray = (json.get(Json_GAME_CARD_BACK_ITEM_MODEL_KEY).getAsString()).split(":");
                 cardSet.setCardBackModel(ResourceLocation.fromNamespaceAndPath(identifierArray[0], identifierArray[1]));
             } catch (Exception e){
                 throw new MalformedJsonException("Card back identifier was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey("ordering")){
+        if(json.has("ordering")){
             try{
-                cardSet.ordering = (int)(long) json.get("ordering");
+                cardSet.ordering = (int)(long) json.get("ordering").getAsInt();
             } catch (Exception e){
                 throw new MalformedJsonException("Card pack name value was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_GAME_CARD_BACK_CARD_KEY)){
+        if(json.has(Json_GAME_CARD_BACK_CARD_KEY)){
             try{
-                cardSet.setCardBackTextureName((String) json.get(JSON_GAME_CARD_BACK_CARD_KEY));
+                cardSet.setCardBackTextureName(json.get(Json_GAME_CARD_BACK_CARD_KEY).getAsString());
             } catch (Exception e){
                 throw new MalformedJsonException("Card back cardId was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_GAME_CARD_BACK_NAMESPACE_CARD_KEY)){
+        if(json.has(Json_GAME_CARD_BACK_NAMESPACE_CARD_KEY)){
             try{
-                cardSet.cardBackTextureNameSpace = (String) json.get(JSON_GAME_CARD_BACK_NAMESPACE_CARD_KEY);
+                cardSet.cardBackTextureNameSpace = json.get(Json_GAME_CARD_BACK_NAMESPACE_CARD_KEY).getAsString();
             } catch (Exception e){
                 throw new MalformedJsonException("Card back namespace was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
+        if(json.has(Json_ROUNDED_CORNERS_ID_KEY)){
             try{
-                var hasRoundedCorners = (boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY);
+                var hasRoundedCorners =  json.get(Json_ROUNDED_CORNERS_ID_KEY).getAsBoolean();
                 cardSet.hasRoundedCorners = hasRoundedCorners;
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey("effect")){
+        if(json.has("effect")){
             try{
-                cardSet.effectResourceLocation = (String) json.get("effect");
+                cardSet.effectResourceLocation = json.get("effect").getAsString();
             } catch (Exception e){
                 throw new MalformedJsonException("Card set effect was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_GAME_SHOULD_APPLY_EFFECT_KEY)){
+        if(json.has(Json_GAME_SHOULD_APPLY_EFFECT_KEY)){
             try{
-                cardSet.appliesEffect = (boolean) json.get(JSON_GAME_SHOULD_APPLY_EFFECT_KEY);
+                cardSet.appliesEffect =  json.get(Json_GAME_SHOULD_APPLY_EFFECT_KEY).getAsBoolean();
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }

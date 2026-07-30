@@ -5,15 +5,15 @@ import drai.dev.stackthecards.data.*;
 import net.minecraft.network.*;
 import net.minecraft.network.chat.*;
 import net.minecraft.network.codec.*;
-import org.json.simple.*;
+import com.google.gson.*;
 
 import java.util.*;
 
 import static drai.dev.stackthecards.data.CardTextFormatting.*;
 
 public class CardTooltipLine {
-    private static final String JSON_TEXT_KEY = "text";
-    private static final String JSON_FORMATTING_KEY = "formatting";
+    private static final String Json_TEXT_KEY = "text";
+    private static final String Json_FORMATTING_KEY = "formatting";
     public CardTextFormatting cardTextFormatting = new CardTextFormatting();
     public String text = "";
     public List<CardTooltipLine> lineSegments = new ArrayList<>();
@@ -75,20 +75,20 @@ public class CardTooltipLine {
     public CardTooltipLine() {
     }
 
-    public static CardTooltipLine parse(JSONObject json, CardGame game) throws MalformedJsonException{
-        if(json.isEmpty() || !json.containsKey(JSON_TEXT_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+    public static CardTooltipLine parse(JsonObject json, CardGame game) throws MalformedJsonException{
+        if(json.isEmpty() || !json.has(Json_TEXT_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         var part = new CardTooltipLine();
-        var textContents = json.get(JSON_TEXT_KEY);
-        if(textContents instanceof String contentsAsString){
-            part.text = contentsAsString;
-        } else if(textContents instanceof JSONArray contentsAsJsonArray){
-            for (var textSegment: contentsAsJsonArray) {
-                part.lineSegments.add(CardTooltipLine.parse((JSONObject) textSegment, game));
+        var textContents = json.get(Json_TEXT_KEY);
+        if(textContents.isJsonArray()){
+            for (var textSegment: textContents.getAsJsonArray()) {
+                part.lineSegments.add(CardTooltipLine.parse( textSegment.getAsJsonObject(), game));
             }
+        } else {
+            part.text = textContents.getAsString();
         }
-        if(json.containsKey(JSON_FORMATTING_KEY)){
+        if(json.has(Json_FORMATTING_KEY)){
             try{
-                String formattingId = (String) json.get(JSON_FORMATTING_KEY);
+                String formattingId = json.get(Json_FORMATTING_KEY).getAsString();
                 if(game.formatting.containsKey(formattingId)){
                     part.cardTextFormatting = game.formatting.get(formattingId);
                 } else {
@@ -101,23 +101,23 @@ public class CardTooltipLine {
         } else {
             part.cardTextFormatting = new CardTextFormatting();
         }
-        if(json.containsKey(JSON_IS_BOLD_KEY)){
+        if(json.has(Json_IS_BOLD_KEY)){
             try{
-                part.cardTextFormatting.isBold = (Boolean) json.get(JSON_IS_BOLD_KEY);
+                part.cardTextFormatting.isBold = json.get(Json_IS_BOLD_KEY).getAsBoolean();
             } catch (Exception e){
                 throw new MalformedJsonException("Component format isBold was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_IS_ITALIC_KEY)){
+        if(json.has(Json_IS_ITALIC_KEY)){
             try{
-                part.cardTextFormatting.isItalic = (Boolean) json.get(JSON_IS_ITALIC_KEY);
+                part.cardTextFormatting.isItalic = json.get(Json_IS_ITALIC_KEY).getAsBoolean();
             } catch (Exception e){
                 throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_COLOR_KEY)){
+        if(json.has(Json_COLOR_KEY)){
             try{
-                part.cardTextFormatting.argbColorValue = (Integer) json.get(JSON_COLOR_KEY);
+                part.cardTextFormatting.argbColorValue = json.get(Json_COLOR_KEY).getAsInt();
             } catch (Exception e){
                 throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }

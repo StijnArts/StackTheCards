@@ -38,14 +38,10 @@ public class StackTheCardsClient {
     public static boolean shiftKeyPressed = false;
 
 
-    public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TAB_DEFERRED_REGISTER = DeferredRegister.create(MOD_ID, Registries.CREATIVE_MODE_TAB);
-
     public static void initClient() {
         CARD_RENDERER = new CardRenderer();
         CARD_TOOLTIP_RENDERER = new CardTooltipRenderer(CARD_RENDERER);
         ItemGroups.touch();
-        CREATIVE_MODE_TAB_DEFERRED_REGISTER.register("item_group", ()-> ItemGroups.CARD_ITEM_GROUP);
-        CREATIVE_MODE_TAB_DEFERRED_REGISTER.register();
         NetworkManager.registerReceiver(NetworkManager.Side.S2C, SYNC_REGISTRY_ID, (buf, context) -> {
             Player player = context.getPlayer();
             // Logic

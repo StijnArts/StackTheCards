@@ -2,6 +2,7 @@ package drai.dev.stackthecards.data.carddata;
 
 import com.google.gson.stream.*;
 import com.mojang.datafixers.util.*;
+import dev.architectury.platform.*;
 import drai.dev.stackthecards.client.*;
 import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.registry.*;
@@ -14,26 +15,30 @@ import net.minecraft.network.chat.*;
 import net.minecraft.network.codec.*;
 import net.minecraft.resources.*;
 import org.jetbrains.annotations.*;
-import org.json.simple.*;
+import com.google.gson.*;
 
 import java.util.*;
 
 import static drai.dev.stackthecards.data.CardRarity.*;
 
 public class CardData {
-    public static final String JSON_CARD_ID_KEY = "cardId";
-    public static final String JSON_CARD_HOVER_TOOLTIP_KEY = "textSectionsForHoverTooltip";
-    public static final String JSON_CARD_DETAIL_TOOLTIP_KEY = "textSectionsForDetailTooltip";
-    public static final String JSON_ROUNDED_CORNERS_ID_KEY = "hasRoundedCorners";
-    public static final String JSON_DETAIL_HEADER_KEY = "detailHeader";
-    public static final String JSON_INDEX_KEY = "index";
-    public static final String JSON_NAME_HEADER_KEY = "name";
+    public static final String Json_CARD_ID_KEY = "cardId";
+    public static final String Json_CARD_HOVER_TOOLTIP_KEY = "textSectionsForHoverTooltip";
+    public static final String Json_CARD_DETAIL_TOOLTIP_KEY = "textSectionsForDetailTooltip";
+    public static final String Json_ROUNDED_CORNERS_ID_KEY = "hasRoundedCorners";
+    public static final String Json_REMOTE_TEXTURE_ID_KEY = "usesRemoteTexture";
+    public static final String Json_CARD_TEXTURE_LOCATION_ID_KEY = "cardTextureLocation";
+    public static final String Json_DETAIL_HEADER_KEY = "detailHeader";
+    public static final String Json_INDEX_KEY = "index";
+    public static final String Json_NAME_HEADER_KEY = "name";
     public String nameSpace;
     //    private static CardSet TEST_CARD_SET = new CardSet();
     protected transient CardSet cardSet = new CardSet("missing");
     protected String cardId;
     protected String gameId = "missing";
+    private String cardTextureLocation;
     private boolean hasRoundedCorners = false;
+    private boolean usesRemoteTexture = false;
     private ArrayList<CardTooltipSection> hoverTooltipSections = new ArrayList<>();
     private ArrayList<CardTooltipSection> detailTooltipSections = new ArrayList<>();
     private CardTooltipLine detailHeader;
@@ -48,7 +53,9 @@ public class CardData {
             ByteBufCodecs.STRING_UTF8.encode(buffer, value.nameSpace);
             ByteBufCodecs.STRING_UTF8.encode(buffer, value.cardId);
             ByteBufCodecs.STRING_UTF8.encode(buffer, value.gameId);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.cardTextureLocation);
             ByteBufCodecs.BOOL.encode(buffer, value.hasRoundedCorners);
+            ByteBufCodecs.BOOL.encode(buffer, value.usesRemoteTexture);
 
             if (CardTooltipSection.SYNC_CODEC == null) {
                 throw new IllegalStateException("CardTooltipSection.SYNC_CODEC is null!");
@@ -75,7 +82,9 @@ public class CardData {
             String nameSpace = ByteBufCodecs.STRING_UTF8.decode(buffer);
             String cardId = ByteBufCodecs.STRING_UTF8.decode(buffer);
             String gameId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            String cardTextureLocation = ByteBufCodecs.STRING_UTF8.decode(buffer);
             boolean hasRoundedCorners = ByteBufCodecs.BOOL.decode(buffer);
+            boolean usesRemoteTexture = ByteBufCodecs.BOOL.decode(buffer);
 
             ArrayList<CardTooltipSection> hoverTooltipSections =
                     ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC).decode(buffer);
@@ -90,7 +99,7 @@ public class CardData {
             String rarity = ByteBufCodecs.STRING_UTF8.decode(buffer);
             int index = ByteBufCodecs.INT.decode(buffer);
 
-            return new CardData(nameSpace, cardId, gameId, hasRoundedCorners,
+            return new CardData(nameSpace, cardId, gameId, cardTextureLocation, hasRoundedCorners, usesRemoteTexture,
                     hoverTooltipSections, detailTooltipSections, detailHeader,
                     cardName, cardRarityIds, rarity, index);
         }
@@ -100,7 +109,9 @@ public class CardData {
             String nameSpace,
             String cardId,
             String gameId,
+            String cardTextureLocation,
             boolean hasRoundedCorners,
+            boolean usesRemoteTexture,
             ArrayList<CardTooltipSection> hoverTooltipSections,
             ArrayList<CardTooltipSection> detailTooltipSections,
             CardTooltipLine detailHeader,
@@ -112,7 +123,9 @@ public class CardData {
         this.nameSpace = nameSpace;
         this.cardId = cardId;
         this.gameId = gameId;
+        this.cardTextureLocation = cardTextureLocation;
         this.hasRoundedCorners = hasRoundedCorners;
+        this.usesRemoteTexture = usesRemoteTexture;
         this.hoverTooltipSections = hoverTooltipSections;
         this.detailTooltipSections = detailTooltipSections;
         this.detailHeader = detailHeader;
@@ -131,94 +144,111 @@ public class CardData {
         this.nameSpace = nameSpace;
     }
 
-    public static CardData parse(JSONObject json, CardGame game, String nameSpace) throws MalformedJsonException {
-        if(json.isEmpty() || !json.containsKey(JSON_CARD_ID_KEY) || !json.containsKey(JSON_INDEX_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+    public static CardData parse(JsonObject json, CardGame game, String nameSpace) throws MalformedJsonException {
+        if(json.isEmpty() || !json.has(Json_CARD_ID_KEY) || !json.has(Json_INDEX_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         CardData cardData;
         try{
-            cardData = new CardData((String) json.get(JSON_CARD_ID_KEY), nameSpace);
+            cardData = new CardData(json.get(Json_CARD_ID_KEY).getAsString(), nameSpace);
         } catch (Exception e){
             throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
         }
-        if(json.containsKey(JSON_NAME_HEADER_KEY)){
+        if(json.has(Json_NAME_HEADER_KEY)){
             try{
-                cardData.cardName = (String) json.get(JSON_NAME_HEADER_KEY);
+                cardData.cardName = json.get(Json_NAME_HEADER_KEY).getAsString();
             } catch (Exception e){
                 throw new MalformedJsonException("Card name header was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_RARITY_ID_KEY)){
+        if(json.has(Json_CARD_TEXTURE_LOCATION_ID_KEY)){
             try{
-                var retrievedJson = json.get(JSON_RARITY_ID_KEY);
-                if(retrievedJson instanceof String jsonString){
-                    cardData.cardRarityIds.add(jsonString);
-                } else if(retrievedJson instanceof JSONArray jsonArray){
-                    for (var jsonContent :
-                            jsonArray) {
-                        cardData.cardRarityIds.add((String) jsonContent);
+                cardData.cardTextureLocation = json.get(Json_CARD_TEXTURE_LOCATION_ID_KEY).getAsString();
+            } catch (Exception e){
+                throw new MalformedJsonException("Card name header was malformed: "+e.getMessage());
+            }
+        }
+        if(json.has(Json_RARITY_ID_KEY)){
+            try{
+                var retrievedJson = json.get(Json_RARITY_ID_KEY);
+                if(retrievedJson.isJsonArray()){
+                    for (var jsonContent : retrievedJson.getAsJsonArray()) {
+                        cardData.cardRarityIds.add(jsonContent.getAsString());
                     }
+                } else {
+                    cardData.cardRarityIds.add(retrievedJson.getAsString());
                 }
                 cardData.rarity = cardData.cardRarityIds.get(0);
             } catch (Exception e){
                 throw new MalformedJsonException("Card rarity id was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
+        if(json.has(Json_ROUNDED_CORNERS_ID_KEY)){
             try{
-                cardData.setHasRoundedCorners((boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY));
+                cardData.setHasRoundedCorners(json.get(Json_ROUNDED_CORNERS_ID_KEY).getAsBoolean());
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_INDEX_KEY)){
+        if(json.has(Json_REMOTE_TEXTURE_ID_KEY)){
             try{
-                cardData.index =  (int)(long) json.get(JSON_INDEX_KEY);
+                cardData.setUsesRemoteTexture(json.get(Json_REMOTE_TEXTURE_ID_KEY).getAsBoolean());
+            } catch (Exception e){
+                throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
+            }
+        }
+        if(json.has(Json_INDEX_KEY)){
+            try{
+                cardData.index =  json.get(Json_INDEX_KEY).getAsInt();
             } catch (Exception e){
                 throw new MalformedJsonException("Card index value was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_CARD_HOVER_TOOLTIP_KEY)){
+        if(json.has(Json_CARD_HOVER_TOOLTIP_KEY)){
             try{
-                JSONArray contents = (JSONArray) json.get(JSON_CARD_HOVER_TOOLTIP_KEY);
+                JsonArray contents =  json.get(Json_CARD_HOVER_TOOLTIP_KEY).getAsJsonArray();
                 for (var section : contents) {
-                    cardData.hoverTooltipSections.add(CardTooltipSection.parse((JSONObject) section, game));
+                    cardData.hoverTooltipSections.add(CardTooltipSection.parse( section.getAsJsonObject(), game));
                 }
             } catch (Exception e){
                 throw new MalformedJsonException("Card hover tooltip value was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_CARD_DETAIL_TOOLTIP_KEY)){
+        if(json.has(Json_CARD_DETAIL_TOOLTIP_KEY)){
             try{
-                JSONArray contents = (JSONArray) json.get(JSON_CARD_DETAIL_TOOLTIP_KEY);
+                JsonArray contents = json.get(Json_CARD_DETAIL_TOOLTIP_KEY).getAsJsonArray();
                 for (var section : contents) {
-                    cardData.detailTooltipSections.add(CardTooltipSection.parse((JSONObject) section, game));
+                    if(section.isJsonObject()) cardData.detailTooltipSections.add(CardTooltipSection.parse( section.getAsJsonObject(), game));
                 }
-            } catch (Exception e){
+            } catch (MalformedJsonException e){
                 throw new MalformedJsonException("Card detail tooltip value was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_DETAIL_HEADER_KEY)){
+        if(json.has(Json_DETAIL_HEADER_KEY)){
             try{
                 cardData.detailHeader = new CardTooltipLine();
-                var textContents = json.get(JSON_DETAIL_HEADER_KEY);
-                if(textContents instanceof String contentsAsString){
-                    cardData.detailHeader.text = contentsAsString;
-                } else if(textContents instanceof JSONArray contentsAsJsonArray){
-                    for (var textSegment: contentsAsJsonArray) {
-                        cardData.detailHeader.lineSegments.add(CardTooltipLine.parse((JSONObject) textSegment, game));
+                var textContents = json.get(Json_DETAIL_HEADER_KEY);
+                if(textContents.isJsonArray()){
+                    for (var textSegment: textContents.getAsJsonArray()) {
+                        cardData.detailHeader.lineSegments.add(CardTooltipLine.parse(textSegment.getAsJsonObject(), game));
                     }
+                } else {
+                    cardData.detailHeader.text = textContents.getAsString();
                 }
             } catch (Exception e){
                 throw new MalformedJsonException("Card detail header value was malformed: "+e.getMessage());
             }
         }
-//        if(json.containsKey(JSON_GAME_CARD_BACK_CARD_KEY)){
+//        if(json.has(Json_GAME_CARD_BACK_CARD_KEY)){
 //            try{
-//                cardData.setCardBackTextureName((String) json.get(JSON_GAME_CARD_BACK_CARD_KEY));
+//                cardData.setCardBackTextureName(json.get(Json_GAME_CARD_BACK_CARD_KEY));
 //            } catch (Exception e){
 //                throw new MalformedJsonException("Card back cardId was malformed: "+e.getMessage());
 //            }
 //        }
         return cardData;
+    }
+
+    private void setUsesRemoteTexture(boolean asBoolean) {
+        this.usesRemoteTexture = asBoolean;
     }
 
     private void setHasRoundedCorners(boolean b) {
@@ -340,15 +370,15 @@ public class CardData {
     public ModelResourceLocation getModelResourceLocation() {
         if(cardSet!=null){
             var cardSetBackModel = this.cardSet.getCardBackModel();
-            if(cardSetBackModel != null) return new ModelResourceLocation(cardSetBackModel, "");
+            if(cardSetBackModel != null) return new ModelResourceLocation(cardSetBackModel, Platform.isFabric() ? "" : "standalone");
         }
         var cardGame = this.getCardGame();
         if(cardGame!=null) {
             var cardGameBackModel = cardGame.getCardBackModel();
-            if(cardGameBackModel != null) return new ModelResourceLocation(cardGameBackModel, "");
+            if(cardGameBackModel != null) return new ModelResourceLocation(cardGameBackModel, Platform.isFabric() ? "" : "standalone");
         }
 
-        return new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath("stack_the_cards", "stc_cards/backs/fallback"), "");
+        return new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath("stack_the_cards", "stc_cards/backs/fallback"), Platform.isFabric() ? "" : "standalone");
     }
 
     public CardData getCardBackData() {
@@ -373,6 +403,7 @@ public class CardData {
     }
 
     public String getCardTextureLocation() {
+        if(null != cardTextureLocation) return cardTextureLocation;
         return gameId + "/" + cardSet.getSetId() + "/" + cardId;
     }
 
@@ -431,5 +462,9 @@ public class CardData {
     public void relink(CardGame value, CardSet set) {
         setSet(set);
         setGame(value);
+    }
+
+    public boolean getUsesRemoteTexture() {
+        return usesRemoteTexture;
     }
 }

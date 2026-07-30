@@ -29,7 +29,7 @@ public class CardBinderRemoveCustomizationRecipe extends CustomRecipe {
         }
         if(cardBinder == null) return false;
         var data = CardBinderData.getOrCreate(cardBinder);
-        var inventoryIsEmpty = data.inventory.stream().allMatch(ItemStack::isEmpty);
+        var inventoryIsEmpty = data.getInventory().stream().allMatch(ItemStack::isEmpty);
         return inventoryIsEmpty;
     }
 

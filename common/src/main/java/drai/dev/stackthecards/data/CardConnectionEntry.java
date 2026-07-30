@@ -8,18 +8,18 @@ import drai.dev.stackthecards.items.*;
 import net.minecraft.network.*;
 import net.minecraft.network.codec.*;
 import net.minecraft.world.item.*;
-import org.json.simple.*;
+import com.google.gson.*;
 
 public class CardConnectionEntry {
-    public static final String JSON_SELF_GAME_ID_KEY = "gameId";
-    public static final String JSON_SELF_SET_ID_KEY = "setId";
-    public static final String JSON_SELF_CARD_ID_KEY = "cardId";
-    public static final String JSON_SELF_RARITY_ID_KEY = "rarityId";
-    public static final String JSON_ROTATION_KEY = "rotated";
-    public static final String JSON_CONNECTION_DIRECTION_KEY = "connectionDirection";
-    public static final String JSON_X_MODIFIER_KEY = "xTranslationModifier";
-    public static final String JSON_Y_MODIFIER_KEY = "yTranslationModifier";
-    public static final String JSON_LAYER_KEY = "layer";
+    public static final String Json_SELF_GAME_ID_KEY = "gameId";
+    public static final String Json_SELF_SET_ID_KEY = "setId";
+    public static final String Json_SELF_CARD_ID_KEY = "cardId";
+    public static final String Json_SELF_RARITY_ID_KEY = "rarityId";
+    public static final String Json_ROTATION_KEY = "rotated";
+    public static final String Json_CONNECTION_DIRECTION_KEY = "connectionDirection";
+    public static final String Json_X_MODIFIER_KEY = "xTranslationModifier";
+    public static final String Json_Y_MODIFIER_KEY = "yTranslationModifier";
+    public static final String Json_LAYER_KEY = "layer";
     public static final CardConnectionEntry EMPTY = new CardConnectionEntry(null, 0, 0, 0,null, null);
     public CardIdentifier self = new CardIdentifier();
     public float xModifier= 0;
@@ -66,50 +66,50 @@ public class CardConnectionEntry {
         this.self = self;
     }
 
-    public static CardConnectionEntry parse(JSONObject json) throws MalformedJsonException {
+    public static CardConnectionEntry parse(JsonObject json) throws MalformedJsonException {
         if(json.isEmpty() ||
-                (!json.containsKey(JSON_SELF_GAME_ID_KEY) && !json.containsKey(JSON_SELF_SET_ID_KEY) && !json.containsKey(JSON_SELF_CARD_ID_KEY))) {
+                (!json.has(Json_SELF_GAME_ID_KEY) && !json.has(Json_SELF_SET_ID_KEY) && !json.has(Json_SELF_CARD_ID_KEY))) {
             throw new MalformedJsonException("Card Game Json was invalid");
         }
         CardConnectionEntry connectionEntry;
         try{
-            connectionEntry = new CardConnectionEntry(new CardIdentifier((String) json.get(JSON_SELF_GAME_ID_KEY),
-                    (String) json.get(JSON_SELF_SET_ID_KEY),(String) json.get(JSON_SELF_CARD_ID_KEY), (String) json.get(JSON_SELF_RARITY_ID_KEY)));
+            connectionEntry = new CardConnectionEntry(new CardIdentifier(json.get(Json_SELF_GAME_ID_KEY).getAsString(),
+                    json.get(Json_SELF_SET_ID_KEY).getAsString(),json.get(Json_SELF_CARD_ID_KEY).getAsString(), json.has(Json_SELF_RARITY_ID_KEY)? json.get(Json_SELF_RARITY_ID_KEY).getAsString():""));
         } catch (Exception e){
             throw new MalformedJsonException("Card identifier was malformed: "+e.getMessage());
         }
 
-        if(json.containsKey(JSON_ROTATION_KEY)){
+        if(json.has(Json_ROTATION_KEY)){
             try{
-                connectionEntry.rotation = CardRotation.valueOf((String) json.get(JSON_ROTATION_KEY));
+                connectionEntry.rotation = CardRotation.valueOf(json.get(Json_ROTATION_KEY).getAsString());
             } catch (Exception e){
                 throw new MalformedJsonException("Card rotation was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_CONNECTION_DIRECTION_KEY)){
+        if(json.has(Json_CONNECTION_DIRECTION_KEY)){
             try{
-                connectionEntry.connectingDirection = CardConnectingDirection.valueOf((String) json.get(JSON_CONNECTION_DIRECTION_KEY));
+                connectionEntry.connectingDirection = CardConnectingDirection.valueOf(json.get(Json_CONNECTION_DIRECTION_KEY).getAsString());
             } catch (Exception e){
                 throw new MalformedJsonException("Card connecting direction was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_X_MODIFIER_KEY)){
+        if(json.has(Json_X_MODIFIER_KEY)){
             try{
-                connectionEntry.xModifier = (float)(long) json.get(JSON_X_MODIFIER_KEY);
+                connectionEntry.xModifier = (float) json.get(Json_X_MODIFIER_KEY).getAsLong();
             } catch (Exception e){
                 throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_Y_MODIFIER_KEY)){
+        if(json.has(Json_Y_MODIFIER_KEY)){
             try{
-                connectionEntry.yModifier = (float)(long) json.get(JSON_Y_MODIFIER_KEY);
+                connectionEntry.yModifier = (float) json.get(Json_Y_MODIFIER_KEY).getAsLong();
             } catch (Exception e){
                 throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_LAYER_KEY)) {
+        if(json.has(Json_LAYER_KEY)) {
             try {
-                connectionEntry.layer = (int)(long) json.get(JSON_LAYER_KEY);
+                connectionEntry.layer = (int) json.get(Json_LAYER_KEY).getAsLong();
             } catch (Exception e) {
                 throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
@@ -118,11 +118,6 @@ public class CardConnectionEntry {
     }
 
     public static CardConnectionEntryData createConnectionData(CardConnectionEntry connectionEntry) {
-//        CompoundTag nbtCompound = (CompoundTag) CardConnectionData.createNbt(connectionEntry.self);
-//        nbtCompound.putString(CardConnectionEntry.CONNECTION_X_MODIFIER, String.valueOf(connectionEntry.xModifier));
-//        nbtCompound.putString(CardConnectionEntry.CONNECTION_Y_MODIFIER, String.valueOf(connectionEntry.yModifier));
-//        nbtCompound.putString(CardConnectionEntry.CONNECTION_DIRECTION, String.valueOf(connectionEntry.connectingDirection));
-//        nbtCompound.putString(CardConnectionEntry.CONNECTION_ROTATION, String.valueOf(connectionEntry.rotation));
         return CardConnectionEntryData.from(connectionEntry);
     }
 
@@ -160,7 +155,6 @@ public class CardConnectionEntry {
 
         public CardConnectionEntryData(CardIdentifier self, float xModifier, float yModifier, CardConnectingDirection connectingDirection, CardRotation rotation) {
             this.self = self;
-            this.self.fixMissingRarity();
             this.xModifier = xModifier;
             this.yModifier = yModifier;
             this.connectingDirection = connectingDirection;

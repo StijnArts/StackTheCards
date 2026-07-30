@@ -25,7 +25,6 @@ public class CardRenderer {
 
     public void draw(PoseStack poseStack, MultiBufferSource vertexConsumers, ItemStack stack, int light){
         CardGame cardGame = null;
-        CardTexture texture = null;
         if(stack.is(StackTheCardsItems.CARD.get())){
             var cardData = Card.getCardData(stack);
             cardGame = cardData.getCardSet().getCardGame();
@@ -51,6 +50,7 @@ public class CardRenderer {
                 drawAttachedCards(poseStack, vertexConsumers, stack, light, 1, isFlipped,cardGame);
             }
         } else if(stack.is(StackTheCardsItems.CARD_PACK.get())){
+            CardTexture texture = null;
             var cardPack = CardPack.getCardPack(stack);
             cardGame = CardGameRegistry.getCardGame(cardPack.getGameId());
             texture = getCardPackTexture(cardPack);

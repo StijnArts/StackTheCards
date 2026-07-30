@@ -9,9 +9,10 @@ public class StackTheCardsModelLoaderImpl {
 
     @Unique
     public static @NotNull BakedModel getBakedModel(ItemRenderer itemRenderer, ModelResourceLocation modelResourceLocation, ModelResourceLocation fallBackModel) {
-        //        if(model == null){
-//            model = itemRenderer.getItemModelShaper().getModelManager().getModel(fallBackModel);
-//        }
-        return itemRenderer.getItemModelShaper().getModelManager().getModel(modelResourceLocation.id());
+        var model = itemRenderer.getItemModelShaper().getModelManager().getModel(modelResourceLocation.id());
+        if(model == null){
+            model = itemRenderer.getItemModelShaper().getModelManager().getModel(fallBackModel);
+        }
+        return model;
     }
 }

@@ -39,7 +39,7 @@ public class Card extends Item {
 
     public static void toggleCardFlipped(ItemStack stack){
         var record = getOrCreateCardRecord(stack);
-        record.isFlipped = !record.isFlipped;
+        record = record.withFlipped(!record.isFlipped);
         saveChanges(stack, record);
     }
 
@@ -57,8 +57,6 @@ public class Card extends Item {
 
     public static ItemStack getAsItemStack(CardIdentifier cardResourceLocation) {
         var itemStack = new ItemStack(StackTheCardsItems.CARD.get());
-        if(cardResourceLocation.rarityId.equalsIgnoreCase("missing"))
-            cardResourceLocation.rarityId = CardGameRegistry.getCardData(cardResourceLocation).rarity;
         cardResourceLocation.setCardIdentifier(itemStack);
 //        addCardResourceLocation(itemStack, cardResourceLocation);
         return itemStack;
@@ -109,8 +107,7 @@ public class Card extends Item {
 
     public static void removeAttachedCards(ItemStack stack) {
         var record = getOrCreateCardRecord(stack);
-        record.clearAttachedCards();
-        saveChanges(stack, record);
+        saveChanges(stack, record.clearAttachedCards());
     }
 
     public static boolean getIsFlipped(ItemStack stack) {
@@ -133,45 +130,63 @@ public class Card extends Item {
 
     public static void resetFlipped(ItemStack stack) {
         var data = getOrCreateCardRecord(stack);
-        data.isFlipped = false;
+        data = data.withFlipped(false);
         saveChanges(stack, data);
     }
 
     public static class CardRecord {
-        private boolean isFlipped = false;
-        private final List<CardIdentifier> attachedCards = new ArrayList<>();
-        private final List<CardConnectionEntry.CardConnectionEntryData> connectedCards = new ArrayList<>();
+        private final boolean isFlipped;
+        private final List<CardIdentifier> attachedCards;
+        private final List<CardConnectionEntry.CardConnectionEntryData> connectedCards;
         public CardRecord(){
+            isFlipped = false;
+            attachedCards = List.of();
+            connectedCards = List.of();
         }
 
         public CardRecord(boolean isFlipped, List<CardIdentifier> attachedCards, List<CardConnectionEntry.CardConnectionEntryData> connectedCards) {
             this.isFlipped = isFlipped;
-            this.attachedCards.addAll(attachedCards);
-            this.connectedCards.addAll(connectedCards);
+            this.attachedCards = List.copyOf(attachedCards);
+            this.connectedCards = List.copyOf(connectedCards);
         }
 
         public boolean isFlipped() {
             return isFlipped;
         }
 
-        public void setFlipped(boolean flipped) {
-            isFlipped = flipped;
+        // "With"-style methods to create updated copies
+        public CardRecord withFlipped(boolean flipped) {
+            return new CardRecord(flipped, this.attachedCards, this.connectedCards);
         }
 
         public List<CardIdentifier> getAttachedCards() {
             return attachedCards;
         }
 
-        public void clearAttachedCards() {
-            attachedCards.clear();
+        public CardRecord clearAttachedCards() {
+            return new CardRecord(this.isFlipped, List.of(), this.connectedCards);
         }
 
         public List<CardConnectionEntry.CardConnectionEntryData> getConnectedCards() {
             return connectedCards;
         }
 
-        public void clearConnectedCards() {
-            connectedCards.clear();
+        public CardRecord clearConnectedCards() {
+            return new CardRecord(this.isFlipped, this.attachedCards, List.of());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof CardRecord that)) return false;
+            return isFlipped == that.isFlipped &&
+                    Objects.equals(attachedCards, that.attachedCards) &&
+                    Objects.equals(connectedCards, that.connectedCards);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(isFlipped, attachedCards, connectedCards);
         }
     }
 

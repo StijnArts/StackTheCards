@@ -8,7 +8,7 @@ public class StackTheCardsModelReloadListener extends SimplePreparableReloadList
 
     @Override
     protected Void prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
-        // Load and parse model JSON here, but don't touch rendering
+        // Load and parse model Json here, but don't touch rendering
         StackTheCardsModelLoader.loadModels(resourceManager);
         return null;
     }

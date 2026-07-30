@@ -9,7 +9,7 @@ import io.netty.buffer.*;
 import net.minecraft.network.*;
 import net.minecraft.network.codec.*;
 import net.minecraft.world.item.*;
-import org.json.simple.*;
+import com.google.gson.*;
 
 import java.util.*;
 import java.util.stream.*;
@@ -17,8 +17,8 @@ import java.util.stream.*;
 import static drai.dev.stackthecards.data.components.StackTheCardsComponentTypes.*;
 
 public class CardConnection {
-    private static final String JSON_CONNECTION_ID_KEY = "connectionId";
-    private static final String JSON_LAYOUT_KEY = "layout";
+    private static final String Json_CONNECTION_ID_KEY = "connectionId";
+    private static final String Json_LAYOUT_KEY = "layout";
     public final String connectionId;
     public boolean isSingle = false;
     public String cardGameId = "";
@@ -70,26 +70,28 @@ public class CardConnection {
         this.cardGameId = cardGameId;
     }
 
-    public static CardConnection parse(JSONObject json, CardGame game) throws MalformedJsonException {
-        if(json.isEmpty() || !json.containsKey(JSON_CONNECTION_ID_KEY)) throw new MalformedJsonException("Card connection json was empty");
+    public static CardConnection parse(JsonObject json, CardGame game) throws MalformedJsonException {
+        if(json.isEmpty() || !json.has(Json_CONNECTION_ID_KEY)) throw new MalformedJsonException("Card connection json was empty");
         CardConnection cardConnection;
         try{
-            cardConnection = new CardConnection((String) json.get(JSON_CONNECTION_ID_KEY), game.getGameId());
+            cardConnection = new CardConnection(json.get(Json_CONNECTION_ID_KEY).getAsString(), game.getGameId());
         } catch (Exception e){
             throw new MalformedJsonException("Card connection id was malformed: "+e.getMessage());
         }
-        if(json.containsKey(JSON_LAYOUT_KEY)){
+        if(json.has(Json_LAYOUT_KEY)){
             try{
-                var layoutJson = (JSONArray) json.get(JSON_LAYOUT_KEY);
+                var layoutJson =  json.get(Json_LAYOUT_KEY);
                 var layout = new ArrayList<ArrayList<CardConnectionEntry>>();
                 int i = 0;
                 int j = 0;
-                for (var rowJson : layoutJson) {
-                    JSONArray row = (JSONArray) ((JSONObject) rowJson).get("row");
+                for (var rowJson : layoutJson.getAsJsonArray()) {
+                    JsonArray row =  ( rowJson.getAsJsonObject()).get("row").getAsJsonArray();
                     var rowList = new ArrayList<CardConnectionEntry>();
                     for (var entry  : row) {
-                        rowList.add(CardConnectionEntry.parse((JSONObject)entry));
-                        j++;
+                        if(entry.isJsonObject()) {
+                            rowList.add(CardConnectionEntry.parse(entry.getAsJsonObject()));
+                            j++;
+                        }
                     }
                     layout.add(rowList);
                     i++;
@@ -177,9 +179,9 @@ public class CardConnection {
         var selfCardResourceLocation = Card.getCardIdentifier(self);
         var otherCardResourceLocation = Card.getCardIdentifier(other);
 //        if(selfCardResourceLocation.isEqual(CardGameRegistry.MISSING_CARD_DATA.getCardIdentifier()) || otherCardResourceLocation.isEqual(CardGameRegistry.MISSING_CARD_DATA.getCardIdentifier()))
-        if(selfCardResourceLocation.isEqual(otherCardResourceLocation)) return false;
+        if(selfCardResourceLocation.equals(otherCardResourceLocation)) return false;
         //if its already in the connection, don't add it
-        if(connectedCards.stream().anyMatch(cardResourceLocation -> cardResourceLocation.isEqual(otherCardResourceLocation)) || selfCardResourceLocation.isEqual(otherCardResourceLocation)) return true;
+        if(connectedCards.stream().anyMatch(cardResourceLocation -> cardResourceLocation.equals(otherCardResourceLocation)) || selfCardResourceLocation.equals(otherCardResourceLocation)) return true;
         //if card canCraftInDimensions in the current connection, add it to the current one
         if(currentConnection!=null && currentConnection.accepts(otherCardResourceLocation)) {
             CardConnection.addToConnection(self, otherCardResourceLocation, currentConnection);
@@ -216,14 +218,14 @@ public class CardConnection {
     public boolean contains(List<CardIdentifier> cardsToConnect) {
             for (var identifier : getCardIdentifiers()) {
                 if(identifier==null) continue;
-                if(cardsToConnect.stream().noneMatch(cardResourceLocation -> cardResourceLocation.isEqual(identifier))) return false;
+                if(cardsToConnect.stream().noneMatch(cardResourceLocation -> cardResourceLocation.equals(identifier))) return false;
             }
             return true;
     }
 
     public boolean matches(List<CardIdentifier> cardsToConnect) {
         for (var identifier : cardsToConnect) {
-            if(getCardIdentifiers().stream().noneMatch(cardResourceLocation -> cardResourceLocation == null || cardResourceLocation.isEqual(identifier))) return false;
+            if(getCardIdentifiers().stream().noneMatch(cardResourceLocation -> cardResourceLocation == null || cardResourceLocation.equals(identifier))) return false;
         }
         return true;
     }
@@ -231,7 +233,7 @@ public class CardConnection {
     public static List<CardIdentifier> getConnectedCards(ItemStack self) {
         var connectedCards = new ArrayList<>(Card.getOrCreateCardRecord(self).getConnectedCards().stream().map(CardConnectionEntry.CardConnectionEntryData::getSelf).toList());
         var selfId = CardIdentifier.getCardIdentifier(self);
-        if(connectedCards.stream().noneMatch(cardResourceLocation -> cardResourceLocation.isEqual(selfId))) connectedCards.add(selfId);
+        if(connectedCards.stream().noneMatch(cardResourceLocation -> cardResourceLocation.equals(selfId))) connectedCards.add(selfId);
         return connectedCards;
     }
 
@@ -299,14 +301,13 @@ public class CardConnection {
         if(connectedCardEntries.size() < 2){
             CardConnection.breakConnections(stack);
         }
-        poppedCard.self.fixMissingRarity();
         return poppedCard.self;
     }
 
     private CardConnectionEntry getConnectionEntry(CardIdentifier cardResourceLocation) {
         for (var row : layout) {
             for (var column: row) {
-                if(column.self.isEqual(cardResourceLocation)) return column;
+                if(column.self.equals(cardResourceLocation)) return column;
             }
         }
         return null;
@@ -314,8 +315,7 @@ public class CardConnection {
 
     public static void breakConnections(ItemStack stack) {
         var record = Card.getOrCreateCardRecord(stack);
-        record.clearConnectedCards();
-        Card.saveChanges(stack, record);
+        Card.saveChanges(stack, record.clearConnectedCards());
 //        ListTag nbtList = Card.getCardDataNBT(stack, Card.STORED_CARD_CONNECTION_KEY);
 //        nbtList.clear();
 //        stack.remove(Card.STORED_CARD_CONNECTION_KEY);
@@ -358,30 +358,14 @@ public class CardConnection {
 
     public static final Codec<CardConnection.CardConnectionData> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.STRING.fieldOf("connectionId").forGetter(CardConnection.CardConnectionData::getConnectionId),
-                    Codec.STRING.fieldOf("gameId").forGetter(CardConnection.CardConnectionData::getGameId)
+                    Codec.STRING.fieldOf("connectionId").forGetter(CardConnection.CardConnectionData::connectionId),
+                    Codec.STRING.fieldOf("gameId").forGetter(CardConnection.CardConnectionData::gameId)
             ).apply(instance, CardConnection.CardConnectionData::new)
     );
     public static final StreamCodec<ByteBuf, CardConnection.CardConnectionData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, CardConnection.CardConnectionData::getConnectionId,
-            ByteBufCodecs.STRING_UTF8, CardConnection.CardConnectionData::getGameId,
+            ByteBufCodecs.STRING_UTF8, CardConnection.CardConnectionData::connectionId,
+            ByteBufCodecs.STRING_UTF8, CardConnection.CardConnectionData::gameId,
             CardConnection.CardConnectionData::new);
 
-    public static class CardConnectionData {
-        public String connectionId = "";
-        public String gameId = "";
-        public CardConnectionData() {}
-        public CardConnectionData(String connectionId, String gameId) {
-            this.connectionId = connectionId;
-            this.gameId = gameId;
-        }
-
-        public String getConnectionId() {
-            return connectionId;
-        }
-
-        public String getGameId() {
-            return gameId;
-        }
-    }
+    public record CardConnectionData(String connectionId, String gameId) {}
 }

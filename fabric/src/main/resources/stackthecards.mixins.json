@@ -18,7 +18,8 @@
     "client.KeyboardMixin",
     "client.ClientTextTooltipRendererMixin",
     "client.TooltipBackgroundRendererMixin",
-    "client.ClientTextTooltipAccessor"
+    "client.ClientTextTooltipAccessor",
+    "client.ModelManagerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

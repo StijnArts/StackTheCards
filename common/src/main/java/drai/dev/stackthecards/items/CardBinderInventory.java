@@ -57,7 +57,7 @@ public class CardBinderInventory implements Container {
         var itemStack = player.getMainHandItem();
         var data = CardBinderData.getOrCreate(itemStack);
         size = data.getAmountOfSlots();
-        inventory = data.inventory;
+        inventory = data.getInventory();
     }
 
     public String getColorAffix(Player player){
@@ -78,7 +78,7 @@ public class CardBinderInventory implements Container {
     public void stopOpen(Player player) {
         var itemStack = player.getMainHandItem();
         var data = CardBinderData.getOrCreate(itemStack);
-        data.inventory = inventory;
+//        data.setInventory(inventory);
         var shouldApplyEffect = true;
         String effect = "";
         List<CardData> collectionCards;
@@ -98,12 +98,14 @@ public class CardBinderInventory implements Container {
         var cardsInInventory = distinctCards.stream().filter(collectionCards::contains).toList();
         var isBoundToSetOrGame = isBound(player);
         if(isBoundToSetOrGame && cardsInInventory.size() == collectionCards.size() && shouldApplyEffect){
-            data.appliesEffect =  true;
+            data = data.setAppliesEffect(true);
         } else {
-            data.appliesEffect = false;
+            data = data.setAppliesEffect(false);
         }
-        data.cardBinderCount = distinctCards.size();
-        data.effect = effect;
+        data = data.setCardBinderCount(distinctCards.size());
+        data = data.setEffect(effect);
+        data = data.setInventory(inventory);
+        var inv = data.getInventory();
         CardBinderData.saveChanges(itemStack, data);
     }
 

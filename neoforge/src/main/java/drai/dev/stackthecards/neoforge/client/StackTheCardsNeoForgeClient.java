@@ -28,6 +28,7 @@ public class StackTheCardsNeoForgeClient {
     @SubscribeEvent
     public static void registerTooltipComponent(RegisterClientTooltipComponentFactoriesEvent event) {
         event.register(CardTooltipComponentServerSafe.class, component -> new CardTooltipComponent(component.getCardTooltipData()));
+        event.register(CardTooltipData.class, CardTooltipComponent::new);
     }
 
     @SubscribeEvent
@@ -39,13 +40,6 @@ public class StackTheCardsNeoForgeClient {
     public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
         event.registerReloadListener(new StackTheCardsModelReloadListener());
     }
-
-//    @SubscribeEvent
-//    public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
-//        event.registerReloadListener((barrier, manager, pro, profilerFiller, ex, _d) -> CompletableFuture.runAsync(() -> {
-//            StackTheCardsModelLoader.loadModels(manager);
-//        }, ex));
-//    }
 
     @SubscribeEvent
     public static void registerAdditional(ModelEvent.RegisterAdditional event) {

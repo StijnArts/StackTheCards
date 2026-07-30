@@ -34,8 +34,6 @@ subprojects {
     dependencies {
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
         mappings loom.officialMojangMappings()
-        include 'com.googlecode.json-simple:json-simple:1.1.1'
-        implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     }
 
     java {

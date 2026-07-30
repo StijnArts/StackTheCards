@@ -5,13 +5,13 @@ import net.minecraft.*;
 import net.minecraft.network.*;
 import net.minecraft.network.chat.*;
 import net.minecraft.network.codec.*;
-import org.json.simple.*;
+import com.google.gson.*;
 
 public class CardTextFormatting {
-    public static final String JSON_FORMAT_ID_KEY = "formatId";
-    public static final String JSON_IS_BOLD_KEY = "bold";
-    public static final String JSON_IS_ITALIC_KEY = "italic";
-    public static final String JSON_COLOR_KEY = "argbColorHex";
+    public static final String Json_FORMAT_ID_KEY = "formatId";
+    public static final String Json_IS_BOLD_KEY = "bold";
+    public static final String Json_IS_ITALIC_KEY = "italic";
+    public static final String Json_COLOR_KEY = "argbColorHex";
     public String formatId = "";
     public boolean isItalic = false;
     public int argbColorValue = ChatFormatting.WHITE.getColor();
@@ -42,31 +42,31 @@ public class CardTextFormatting {
     public CardTextFormatting() {
     }
 
-    public static CardTextFormatting parse(JSONObject json) throws MalformedJsonException{
-        if(json.isEmpty() || !json.containsKey(JSON_FORMAT_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+    public static CardTextFormatting parse(JsonObject json) throws MalformedJsonException{
+        if(json.isEmpty() || !json.has(Json_FORMAT_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         CardTextFormatting format;
         try{
-            format = new CardTextFormatting((String) json.get(JSON_FORMAT_ID_KEY));
+            format = new CardTextFormatting(json.get(Json_FORMAT_ID_KEY).getAsString());
         } catch (Exception e){
             throw new MalformedJsonException("Component format id was malformed: "+e.getMessage());
         }
-        if(json.containsKey(JSON_IS_BOLD_KEY)){
+        if(json.has(Json_IS_BOLD_KEY)){
             try{
-                format.isBold = (Boolean) json.get(JSON_IS_BOLD_KEY);
+                format.isBold = (Boolean) json.get(Json_IS_BOLD_KEY).getAsBoolean();
             } catch (Exception e){
                 throw new MalformedJsonException("Component format isBold was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_IS_ITALIC_KEY)){
+        if(json.has(Json_IS_ITALIC_KEY)){
             try{
-                format.isItalic = (Boolean) json.get(JSON_IS_ITALIC_KEY);
+                format.isItalic = (Boolean) json.get(Json_IS_ITALIC_KEY).getAsBoolean();
             } catch (Exception e){
                 throw new MalformedJsonException("Component format isItalic was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_COLOR_KEY)){
+        if(json.has(Json_COLOR_KEY)){
             try{
-                format.argbColorValue =  Integer.parseUnsignedInt((String) json.get(JSON_COLOR_KEY), 16);
+                format.argbColorValue =  Integer.parseUnsignedInt(json.get(Json_COLOR_KEY).getAsString(), 16);
             } catch (Exception e){
                 throw new MalformedJsonException("Component format color value was malformed:" + e.toString());
             }

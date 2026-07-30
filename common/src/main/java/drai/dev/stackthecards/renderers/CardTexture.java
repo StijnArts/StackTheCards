@@ -14,22 +14,35 @@ import org.joml.*;
 
 import java.io.*;
 import java.lang.Math;
+import java.net.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 public class CardTexture {
-    private CardData cardData;
-    private final DynamicTexture texture;
+    private static final ResourceLocation PLACEHOLDER_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(
+                    "stack_the_cards",
+                    "stc_cards/cards/missing/missing.png"
+            );
+
+    private static final NativeImage PLACEHOLDER_IMAGE = loadPlaceholder();
+    //    private CardData cardData;
+    private DynamicTexture texture;
     private final RenderType renderLayer;
     private int originalImageWidth = 0;
     private int originalImageHeight = 0;
 
     public CardTexture(CardData cardData) {
-        this.cardData = cardData;
-        var foundTexture = getCardTextureFromData(cardData);
+//        this.cardData = cardData;
+        NativeImage foundTexture = null;
+        if(cardData.getUsesRemoteTexture()) {
+            foundTexture = getCardTextureFromRemote(cardData);
+        } else foundTexture = getCardTextureFromData(cardData);
         this.texture = createTexture(cardData.hasRoundedCorners(), foundTexture, this);
+        this.texture.upload();
+
         ResourceLocation identifier = Minecraft.getInstance().getTextureManager().register("stc_card/"+cardData.getTextureId(), this.texture);
         this.renderLayer = RenderType.text(identifier);
-        this.texture.upload();
     }
 
     public CardTexture(CardPack cardPack){
@@ -192,6 +205,7 @@ public class CardTexture {
     }
 
     private static NativeImage getCardTextureFromData(CardData cardData) {
+
         ResourceManager testResourceManager = Minecraft.getInstance().getResourceManager();
         ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath(cardData.nameSpace, "stc_cards/cards/"+ cardData.getCardTextureLocation() +".png");
         NativeImage textureImage = null;
@@ -206,6 +220,41 @@ public class CardTexture {
             e.printStackTrace();
         }
         return textureImage;
+    }
+
+    private NativeImage getCardTextureFromRemote(CardData cardData) {
+        String url = cardData.getCardTextureLocation();
+
+        CompletableFuture
+                .supplyAsync(() -> downloadTexture(url))
+                .thenAccept(image -> {
+                    if (image == null) {
+                        return;
+                    }
+
+                    Minecraft.getInstance().execute(() -> {
+                        this.texture.close(); // dispose old GPU texture
+
+                        this.texture = createTexture(
+                                cardData.hasRoundedCorners(),
+                                image,
+                                this
+                        );
+
+                        this.texture.upload();
+                    });
+                });
+
+        return PLACEHOLDER_IMAGE;
+    }
+
+    private static NativeImage downloadTexture(String url) {
+        try (InputStream in = URI.create(url).toURL().openStream()) {
+            return NativeImage.read(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private NativeImage getPackTextureFromData(CardPack cardPack) {
@@ -275,5 +324,20 @@ public class CardTexture {
 
     public int maxSide(){
         return Math.max(originalImageWidth, originalImageHeight);
+    }
+
+    private static NativeImage loadPlaceholder() {
+        try {
+            Resource resource = Minecraft.getInstance()
+                    .getResourceManager()
+                    .getResource(PLACEHOLDER_TEXTURE)
+                    .orElseThrow();
+
+            try (InputStream in = resource.open()) {
+                return NativeImage.read(in);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load placeholder texture", e);
+        }
     }
 }

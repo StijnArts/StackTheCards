@@ -5,14 +5,14 @@ import drai.dev.stackthecards.tooltips.parts.*;
 import net.minecraft.network.*;
 import net.minecraft.network.chat.*;
 import net.minecraft.network.codec.*;
-import org.json.simple.*;
+import com.google.gson.*;
 
 import java.util.*;
 import java.util.stream.*;
 
 public class CardRarity {
-    public static String JSON_RARITY_NAME_KEY = "rarityName";
-    public static String JSON_RARITY_ID_KEY = "rarityId";
+    public static String Json_RARITY_NAME_KEY = "rarityName";
+    public static String Json_RARITY_ID_KEY = "rarityId";
 
     public String rarityId;
     public String rarityName;
@@ -35,30 +35,30 @@ public class CardRarity {
         this.rarityId = rarityId;
     }
 
-    public static CardRarity parse(JSONObject json, CardGame game) throws MalformedJsonException{
-        if(json.isEmpty() || !json.containsKey(JSON_RARITY_ID_KEY)) throw new MalformedJsonException("Card rarity Json was empty");
+    public static CardRarity parse(JsonObject json, CardGame game) throws MalformedJsonException{
+        if(json.isEmpty() || !json.has(Json_RARITY_ID_KEY)) throw new MalformedJsonException("Card rarity Json was empty");
         CardRarity cardRarity;
         try{
-            cardRarity = new CardRarity((String) json.get(JSON_RARITY_ID_KEY));
+            cardRarity = new CardRarity(json.get(Json_RARITY_ID_KEY).getAsString());
         } catch (Exception e){
             throw new MalformedJsonException("Card rarity id was malformed: "+e.getMessage());
         }
-        if(json.containsKey(JSON_RARITY_NAME_KEY)){
+        if(json.has(Json_RARITY_NAME_KEY)){
             try{
-                cardRarity.rarityName = (String) json.get(JSON_RARITY_NAME_KEY);
+                cardRarity.rarityName = json.get(Json_RARITY_NAME_KEY).getAsString();
             } catch (Exception e){
                 throw new MalformedJsonException("Card rarity name was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey("text")){
+        if(json.has("text")){
             try{
                 var contents = json.get("text");
-                if(contents instanceof JSONArray arrayContents){
+                if(contents instanceof JsonArray arrayContents){
                     for (var section : arrayContents) {
-                        cardRarity.text.add(CardTooltipSection.parse((JSONObject) section, game));
+                        cardRarity.text.add(CardTooltipSection.parse( section.getAsJsonObject(), game));
                     }
                 } else {
-                    cardRarity.text.add(CardTooltipSection.parse((JSONObject) contents, game));
+                    cardRarity.text.add(CardTooltipSection.parse( contents.getAsJsonObject(), game));
                 }
 
             } catch (Exception e){

@@ -35,7 +35,7 @@ public class CardBinderCustomizationRecipe extends CustomRecipe {
             return false;
         }
         var data = CardBinderData.getOrCreate(cardBinder);
-        var inventoryIsEmpty = data.inventory.stream().allMatch(ItemStack::isEmpty);
+        var inventoryIsEmpty = data.getInventory().stream().allMatch(ItemStack::isEmpty);
         return i == 1 && j == 1 && inventoryIsEmpty;
     }
 
@@ -74,7 +74,7 @@ public class CardBinderCustomizationRecipe extends CustomRecipe {
 //        nbt.putInt(CARD_BINDER_SIZE_KEY, inventorySize);
 //        nbt.put(CARD_BINDER_RESTRICTION_KEY, cardResourceLocation);
         var data = new CardBinderData(inventorySize);
-        data.restrictedTo = cardResourceLocation;
+        data=data.setRestrictedTo(cardResourceLocation);
         CardBinderData.saveChanges(itemStackResult, data);
         return itemStackResult;
     }

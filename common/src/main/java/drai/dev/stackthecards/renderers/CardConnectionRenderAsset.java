@@ -73,7 +73,7 @@ public class CardConnectionRenderAsset {
                     }
                     xOffset+=xOffsetForRow + connectionSlot.xModifier;
                     yOffset+=yOffsetForAllCards + connectionSlot.yModifier;
-                    if(containedCards.stream().anyMatch(cardResourceLocation -> cardResourceLocation.isEqual(connectionSlot.self))){
+                    if(containedCards.stream().anyMatch(cardResourceLocation -> cardResourceLocation.equals(connectionSlot.self))){
                         cards.add(new CardConnectionAssetEntry(xOffset, yOffset, connectionSlot.layer, connectionSlot, cardTexture));
                     }
 

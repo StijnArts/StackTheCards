@@ -11,27 +11,27 @@ import net.minecraft.world.item.*;
 
 import java.util.*;
 
-public class CardBinderData {
+public final class CardBinderData {
+    private final int amountOfSlots;
+    private final CardIdentifier restrictedTo;
+    private final NonNullList<ItemStack> inventory;
+    private final boolean appliesEffect;
+    private final String effect;
+    private final int cardBinderCount;
 
-//    public static class
+    public CardBinderData() {
+        this(120, new CardIdentifier(), NonNullList.withSize(120, ItemStack.EMPTY), false, "", 0);
+    }
 
-    public int amountOfSlots = 120;
-    public CardIdentifier restrictedTo = new CardIdentifier();
-    public NonNullList<ItemStack> inventory = NonNullList.withSize(amountOfSlots, ItemStack.EMPTY);
-    public boolean appliesEffect = false;
-    public String effect = "";
-    public int cardBinderCount = 0;
-
-    public CardBinderData(){}
     public CardBinderData(int amountOfSlots){
-        this.amountOfSlots = amountOfSlots;
-        inventory = NonNullList.withSize(amountOfSlots, ItemStack.EMPTY);
+        this(amountOfSlots, new CardIdentifier(), NonNullList.withSize(amountOfSlots, ItemStack.EMPTY), false, "", 0);
     }
 
     public CardBinderData(int amountOfSlots, CardIdentifier restrictedTo, List<ItemStack> inventory, boolean appliesEffect, String effect, int cardBinderCount) {
         this.amountOfSlots = amountOfSlots;
         this.restrictedTo = restrictedTo;
-        this.inventory = NonNullList.of(ItemStack.EMPTY, inventory.toArray(new ItemStack[0]));
+        ItemStack[] array = inventory.toArray(new ItemStack[0]);
+        this.inventory = NonNullList.of(ItemStack.EMPTY, array);
         this.appliesEffect = appliesEffect;
         this.effect = effect;
         this.cardBinderCount = cardBinderCount;
@@ -75,7 +75,11 @@ public class CardBinderData {
     }
 
     public NonNullList<ItemStack> getInventory() {
-        return inventory;
+        NonNullList<ItemStack> copy = NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
+        for (int i = 0; i < inventory.size(); i++) {
+            copy.set(i, inventory.get(i));
+        }
+        return copy;
     }
 
     public boolean isAppliesEffect() {
@@ -92,5 +96,54 @@ public class CardBinderData {
 
     public boolean isRestricted() {
         return !restrictedTo.setId.equalsIgnoreCase("missing");
+    }
+
+    public CardBinderData setRestrictedTo(CardIdentifier cardResourceLocation) {
+        return new CardBinderData(amountOfSlots, cardResourceLocation, inventory, appliesEffect, effect, cardBinderCount);
+    }
+
+    public CardBinderData setAppliesEffect(boolean appliesEffect) {
+        return new CardBinderData(amountOfSlots, restrictedTo, inventory, appliesEffect, effect, cardBinderCount);
+    }
+
+    public CardBinderData setCardBinderCount(int cardBinderCount) {
+        return new CardBinderData(amountOfSlots, restrictedTo, inventory, appliesEffect, effect, cardBinderCount);
+    }
+
+    public CardBinderData setEffect(String effect) {
+        return new CardBinderData(amountOfSlots, restrictedTo, inventory, appliesEffect, effect, cardBinderCount);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CardBinderData that)) return false;
+        return amountOfSlots == that.amountOfSlots &&
+                appliesEffect == that.appliesEffect &&
+                cardBinderCount == that.cardBinderCount &&
+                Objects.equals(restrictedTo, that.restrictedTo) &&
+                inventory.equals(that.inventory) &&
+                Objects.equals(effect, that.effect);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amountOfSlots, restrictedTo, inventory, appliesEffect, effect, cardBinderCount);
+    }
+
+    @Override
+    public String toString() {
+        return "CardBinderData{" +
+                "amountOfSlots=" + amountOfSlots +
+                ", restrictedTo=" + restrictedTo +
+                ", inventory=" + inventory +
+                ", appliesEffect=" + appliesEffect +
+                ", effect='" + effect + '\'' +
+                ", cardBinderCount=" + cardBinderCount +
+                '}';
+    }
+
+    public CardBinderData setInventory(NonNullList<ItemStack> inventory) {
+        return new CardBinderData(amountOfSlots, restrictedTo, inventory, appliesEffect, effect, cardBinderCount);
     }
 }

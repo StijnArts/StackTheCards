@@ -9,7 +9,7 @@ import net.minecraft.client.resources.model.*;
 import net.minecraft.network.*;
 import net.minecraft.network.codec.*;
 import net.minecraft.resources.*;
-import org.json.simple.*;
+import com.google.gson.*;
 
 import java.util.*;
 import java.util.stream.*;
@@ -17,14 +17,14 @@ import java.util.stream.*;
 import static drai.dev.stackthecards.data.carddata.CardData.*;
 
 public class CardGame {
-    private static final String JSON_CARD_STACKING_KEY = "cardStackingDirection";
-    private static final String JSON_CARD_STACKING_DISTANCE_KEY = "cardStackingDistance";
-    public static final String JSON_GAME_ID_KEY = "gameId";
-    public static final String JSON_GAME_CARD_BACK_ITEM_MODEL_KEY = "cardBackModel";
-    public static final String JSON_GAME_CARD_BACK_CARD_KEY = "cardBackTextureName";
-    public static final String JSON_GAME_CARD_PACK_ITEM_MODEL_KEY = "cardPackModel";
-    public static final String JSON_GAME_CARD_PACK_IMAGE_KEY = "cardPackTextureName";
-    public static final String JSON_GAME_SHOULD_APPLY_EFFECT_KEY = "appliesEffect";
+    private static final String Json_CARD_STACKING_KEY = "cardStackingDirection";
+    private static final String Json_CARD_STACKING_DISTANCE_KEY = "cardStackingDistance";
+    public static final String Json_GAME_ID_KEY = "gameId";
+    public static final String Json_GAME_CARD_BACK_ITEM_MODEL_KEY = "cardBackModel";
+    public static final String Json_GAME_CARD_BACK_CARD_KEY = "cardBackTextureName";
+    public static final String Json_GAME_CARD_PACK_ITEM_MODEL_KEY = "cardPackModel";
+    public static final String Json_GAME_CARD_PACK_IMAGE_KEY = "cardPackTextureName";
+    public static final String Json_GAME_SHOULD_APPLY_EFFECT_KEY = "appliesEffect";
     private static final CardRarity MISSING_RARITY = new CardRarity("missing");
     public boolean hasRoundedCorners = false;
     public boolean appliesEffect = true;
@@ -166,82 +166,82 @@ public class CardGame {
         this.nameSpace = nameSpace;
     }
 
-    public static CardGame parse(JSONObject json, String nameSpace) throws MalformedJsonException {
-        if(json.isEmpty() || !json.containsKey(JSON_GAME_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+    public static CardGame parse(JsonObject json, String nameSpace) throws MalformedJsonException {
+        if(json.isEmpty() || !json.has(Json_GAME_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
         CardGame game;
         try{
-            game = new CardGame((String) json.get(JSON_GAME_ID_KEY),nameSpace);
+            game = new CardGame(json.get(Json_GAME_ID_KEY).getAsString(),nameSpace);
         } catch (Exception e){
             throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
         }
-        if(json.containsKey(JSON_CARD_STACKING_KEY)){
+        if(json.has(Json_CARD_STACKING_KEY)){
             try{
-                game.setCardStackingDirection(CardStackingDirection.valueOf((String) json.get(JSON_CARD_STACKING_KEY)));
+                game.setCardStackingDirection(CardStackingDirection.valueOf(json.get(Json_CARD_STACKING_KEY).getAsString()));
             } catch (Exception e){
                 throw new MalformedJsonException("Card game stacking direction was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey("name")){
+        if(json.has("name")){
             try{
-                game.name = (String) json.get("name");
+                game.name = json.get("name").getAsString();
             } catch (Exception e){
                 throw new MalformedJsonException("Card game name was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey("effect")){
+        if(json.has("effect")){
             try{
-                game.effectResourceLocation = (String) json.get("effect");
+                game.effectResourceLocation = json.get("effect").getAsString();
             } catch (Exception e){
                 throw new MalformedJsonException("Card game effect was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_CARD_STACKING_DISTANCE_KEY)){
+        if(json.has(Json_CARD_STACKING_DISTANCE_KEY)){
             try{
-                game.setCardStackingDistance((float) (double) json.get(JSON_CARD_STACKING_DISTANCE_KEY));
+                game.setCardStackingDistance(json.get(Json_CARD_STACKING_DISTANCE_KEY).getAsFloat());
             } catch (Exception e){
                 throw new MalformedJsonException("Card game id was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)){
+        if(json.has(Json_GAME_CARD_BACK_ITEM_MODEL_KEY)){
             try{
-                var identifierArray = ((String) json.get(JSON_GAME_CARD_BACK_ITEM_MODEL_KEY)).split(":");
+                var identifierArray = (json.get(Json_GAME_CARD_BACK_ITEM_MODEL_KEY).getAsString()).split(":");
                 game.setCardBackModel(ResourceLocation.fromNamespaceAndPath(identifierArray[0], identifierArray[1]));
             } catch (Exception e){
                 throw new MalformedJsonException("Card back identifier was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_GAME_CARD_BACK_CARD_KEY)){
+        if(json.has(Json_GAME_CARD_BACK_CARD_KEY)){
             try{
-                game.setCardBackTextureName((String) json.get(JSON_GAME_CARD_BACK_CARD_KEY));
+                game.setCardBackTextureName(json.get(Json_GAME_CARD_BACK_CARD_KEY).getAsString());
             } catch (Exception e){
                 throw new MalformedJsonException("Card back cardId was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_GAME_CARD_PACK_ITEM_MODEL_KEY)){
+        if(json.has(Json_GAME_CARD_PACK_ITEM_MODEL_KEY)){
             try{
-                var identifierArray = ((String) json.get(JSON_GAME_CARD_PACK_ITEM_MODEL_KEY)).split(":");
+                var identifierArray = (json.get(Json_GAME_CARD_PACK_ITEM_MODEL_KEY).getAsString()).split(":");
                 game.setCardPackItemModel(ResourceLocation.fromNamespaceAndPath(identifierArray[0], identifierArray[1]));
             } catch (Exception e){
                 throw new MalformedJsonException("Card pack identifier was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_GAME_CARD_PACK_IMAGE_KEY)){
+        if(json.has(Json_GAME_CARD_PACK_IMAGE_KEY)){
             try{
-                game.setCardPackTextureName((String) json.get(JSON_GAME_CARD_PACK_IMAGE_KEY));
+                game.setCardPackTextureName(json.get(Json_GAME_CARD_PACK_IMAGE_KEY).getAsString());
             } catch (Exception e){
                 throw new MalformedJsonException("Card pack image string was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_ROUNDED_CORNERS_ID_KEY)){
+        if(json.has(Json_ROUNDED_CORNERS_ID_KEY)){
             try{
-                game.hasRoundedCorners = (boolean) json.get(JSON_ROUNDED_CORNERS_ID_KEY);
+                game.hasRoundedCorners = json.get(Json_ROUNDED_CORNERS_ID_KEY).getAsBoolean();
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }
         }
-        if(json.containsKey(JSON_GAME_SHOULD_APPLY_EFFECT_KEY)){
+        if(json.has(Json_GAME_SHOULD_APPLY_EFFECT_KEY)){
             try{
-                game.appliesEffect = (boolean) json.get(JSON_GAME_SHOULD_APPLY_EFFECT_KEY);
+                game.appliesEffect =  json.get(Json_GAME_SHOULD_APPLY_EFFECT_KEY).getAsBoolean();
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
             }
@@ -288,7 +288,7 @@ public class CardGame {
 
     public List<CardConnection> getConnections(CardIdentifier cardResourceLocation){
         var connections = cardConnections.values().stream()
-                .filter(connection -> connection.getCardIdentifiers().stream().anyMatch(identifier -> identifier!=null && identifier.isEqual(cardResourceLocation))).collect(Collectors.toList());
+                .filter(connection -> connection.getCardIdentifiers().stream().anyMatch(identifier -> identifier!=null && identifier.equals(cardResourceLocation))).collect(Collectors.toList());
         return connections;
     }
 

@@ -33,10 +33,10 @@ public class CardIdentifier {
     public static final String SET_ID_KEY = "set_id";
     public static final String GAME_ID_KEY = "game_id";
     private static final String RARITY_ID_KEY = "rarity_id";
-    public String rarityId  = "missing";
-    public String cardId = "missing";
-    public String gameId = "missing";
-    public String setId = "missing";
+    public final String rarityId;
+    public final String cardId;
+    public final String gameId;
+    public final String setId;
 
     public CardIdentifier(String gameId, String setId, String cardId, @Nullable String rarityId) {
         this.cardId = cardId;
@@ -44,6 +44,8 @@ public class CardIdentifier {
         this.setId = setId;
         if(rarityId != null) {
             this.rarityId = rarityId;
+        } else {
+            this.rarityId = CardGameRegistry.getCardData(this).cardRarityIds.get(0);
         }
     }
 
@@ -51,6 +53,7 @@ public class CardIdentifier {
         this.cardId = "missing";
         this.gameId = "missing";
         this.setId = "missing";
+        this.rarityId = "missing";
     }
 
    /* public static List<CardIdentifier> getCardIdentifiers(ListTag list){
@@ -89,8 +92,11 @@ public class CardIdentifier {
                 CardIdentifier.gameId.equalsIgnoreCase("missing");
     }*/
 
-    public boolean isEqual(CardIdentifier other){
-        return isSameItem(this, other);
+    @Override
+    public boolean equals(Object other){
+        if(other instanceof CardIdentifier cardIdentifier){
+            return isSameItem(this, cardIdentifier);
+        } return false;
     }
 
     public static boolean isSameItem(CardIdentifier identifier1, CardIdentifier identifier2){
@@ -117,36 +123,20 @@ public class CardIdentifier {
         return rarityId;
     }
 
-    public void setRarityId(String rarityId) {
-        this.rarityId = rarityId;
-    }
-
     public String getCardId() {
         return cardId;
-    }
-
-    public void setCardId(String cardId) {
-        this.cardId = cardId;
     }
 
     public String getGameId() {
         return gameId;
     }
 
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
-    }
-
     public String getSetId() {
         return setId;
     }
 
-    public void setSetId(String setId) {
-        this.setId = setId;
-    }
-
-    public void fixMissingRarity() {
-        if(this.rarityId.equalsIgnoreCase("missing") || this.rarityId.isEmpty())
-            this.rarityId = CardGameRegistry.getCardData(this).cardRarityIds.get(0);
+    @Override
+    public int hashCode() {
+        return Objects.hash(gameId, setId, cardId, rarityId);
     }
 }

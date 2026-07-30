@@ -20,6 +20,7 @@ import net.minecraft.server.packs.*;
 import net.minecraft.sounds.*;
 import net.minecraft.world.flag.*;
 import net.minecraft.world.inventory.*;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 
 import static drai.dev.stackthecards.items.CardPackItem.PACK_RIP_IDENTIFIER;
@@ -48,12 +49,16 @@ public final class StackTheCards {
             RECIPE_SERIALIZER_DEFERRED_REGISTER.register("pack_multiplying",()->
                     new SimpleCraftingRecipeSerializer<CardPackMultiplierRecipe>(CardPackMultiplierRecipe::new));
 
+    public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TAB_DEFERRED_REGISTER = DeferredRegister.create(MOD_ID, Registries.CREATIVE_MODE_TAB);
+
     public static void init() {
         ReloadListenerRegistry.register(PackType.SERVER_DATA, new CardResourceReloadListener());
         StackTheCardsComponentTypes.touch();
         StackTheCardsComponentTypes.register();
         StackTheCardsItems.touch();
         StackTheCardsItems.register();
+        CREATIVE_MODE_TAB_DEFERRED_REGISTER.register("item_group", ()-> ItemGroups.CARD_ITEM_GROUP);
+        CREATIVE_MODE_TAB_DEFERRED_REGISTER.register();
         MENU_TYPE_DEFERRED_REGISTER.register();
         RECIPE_SERIALIZER_DEFERRED_REGISTER.register();
         SOUND_EVENT_DEFERRED_REGISTER.register();
