@@ -23,5 +23,6 @@
         - shift rightclick to shuffle
         - rightclick with a card to place card in box
         - shift rightclick with another deckbox to place all cards into target deckbox
-
+- Token
+    Add a way to add tokens that don't offset anything and just have an x2, x3, x4 etc for the amount of them on there
 - Some kind of searchable collection item (possibly from deckbox) to quickly find cards in your collection
