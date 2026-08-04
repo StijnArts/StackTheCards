@@ -145,7 +145,7 @@ public class CardData {
     }
 
     public static CardData parse(JsonObject json, CardGame game, String nameSpace) throws MalformedJsonException {
-        if(json.isEmpty() || !json.has(Json_CARD_ID_KEY) || !json.has(Json_INDEX_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+        if(json.isEmpty() || !json.has(Json_CARD_ID_KEY) || !json.has(Json_INDEX_KEY)) throw new MalformedJsonException("Card data was missing Index or cardId");
         CardData cardData;
         try{
             cardData = new CardData(json.get(Json_CARD_ID_KEY).getAsString(), nameSpace);
@@ -466,5 +466,9 @@ public class CardData {
 
     public boolean getUsesRemoteTexture() {
         return usesRemoteTexture;
+    }
+
+    public void preload() {
+        CardRenderer.getCardTexture(this, false);
     }
 }

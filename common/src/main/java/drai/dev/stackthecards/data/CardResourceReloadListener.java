@@ -60,6 +60,7 @@ public class CardResourceReloadListener extends SimplePreparableReloadListener<V
                                 cardData.setSet(cardSet);
                                 cardData.setGame(cardGame);
                                 cardSet.addCard(cardData);
+//                                cardData.preload();
                             } catch (Exception e) {
                                 System.out.println("card json file " + cardResource.getKey() + " was invalid: " + e.getMessage());
                             }

@@ -122,7 +122,7 @@ public class CardSet {
     }
 
     public static CardSet parse(JsonObject json) throws MalformedJsonException {
-        if(json.isEmpty() || !json.has(Json_SET_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+        if(json.isEmpty() || !json.has(Json_SET_ID_KEY)) throw new MalformedJsonException("Card set was missing Card Set Id");
         CardSet cardSet;
         try{
             cardSet = new CardSet(json.get(Json_SET_ID_KEY).getAsString());

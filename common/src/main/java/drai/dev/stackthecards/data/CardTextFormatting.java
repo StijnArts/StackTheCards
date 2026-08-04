@@ -43,7 +43,7 @@ public class CardTextFormatting {
     }
 
     public static CardTextFormatting parse(JsonObject json) throws MalformedJsonException{
-        if(json.isEmpty() || !json.has(Json_FORMAT_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+        if(json.isEmpty() || !json.has(Json_FORMAT_ID_KEY)) throw new MalformedJsonException("Formatting is missing formatting Id");
         CardTextFormatting format;
         try{
             format = new CardTextFormatting(json.get(Json_FORMAT_ID_KEY).getAsString());

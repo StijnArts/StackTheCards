@@ -15,20 +15,24 @@ import org.joml.*;
 import java.io.*;
 import java.lang.Math;
 import java.net.*;
+import java.net.http.*;
+import java.nio.file.*;
+import java.time.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 public class CardTexture {
     private static final ResourceLocation PLACEHOLDER_TEXTURE =
             ResourceLocation.fromNamespaceAndPath(
                     "stack_the_cards",
-                    "stc_cards/cards/missing/missing.png"
+                    "stc_cards/cards/missing/missing/missing.png"
             );
 
     private static final NativeImage PLACEHOLDER_IMAGE = loadPlaceholder();
     //    private CardData cardData;
     private DynamicTexture texture;
-    private final RenderType renderLayer;
+    private RenderType renderLayer;
     private int originalImageWidth = 0;
     private int originalImageHeight = 0;
 
@@ -64,13 +68,15 @@ public class CardTexture {
             dynamicTexture = new DynamicTexture(sizeToMatch, sizeToMatch, true);
             int yOffset = (sizeToMatch- foundTexture.getHeight())/2;
             int xOffset = (sizeToMatch- foundTexture.getWidth())/2;
+            NativeImage pixels = Objects.requireNonNull(dynamicTexture.getPixels());
             for (int i = 0; i < foundTexture.getHeight(); i++) {
                 for (int j = 0; j < foundTexture.getWidth(); j++) {
 
                     int y = i + yOffset;
                     int x = j + xOffset;
                     try {
-                        Objects.requireNonNull(dynamicTexture.getPixels()).setPixelRGBA(x, y, foundTexture.getPixelRGBA(j, i));
+                        int colorToSet = foundTexture.getPixelRGBA(j, i);
+                        pixels.setPixelRGBA(x, y, colorToSet);
                     } catch (Exception e){
                         System.out.println("Tried to apply setColor out of image bounds");
                     }
@@ -222,28 +228,89 @@ public class CardTexture {
         return textureImage;
     }
 
+    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .connectTimeout(Duration.ofSeconds(5))
+            .build();
+
+    private static final Path CARD_CACHE_DIR = Path.of("stackthecards", "cache", "cards");
+    private static final Set<String> RUNNING_DOWNLOADS = new HashSet<>();
     private NativeImage getCardTextureFromRemote(CardData cardData) {
+        if(RUNNING_DOWNLOADS.contains(cardData.getTextureId())) return PLACEHOLDER_IMAGE;
         String url = cardData.getCardTextureLocation();
 
-        CompletableFuture
-                .supplyAsync(() -> downloadTexture(url))
-                .thenAccept(image -> {
-                    if (image == null) {
-                        return;
-                    }
+        try {
+            Files.createDirectories(CARD_CACHE_DIR);
 
-                    Minecraft.getInstance().execute(() -> {
-                        this.texture.close(); // dispose old GPU texture
+            Path cachedFile = CARD_CACHE_DIR.resolve(cardData.getTextureId() + ".png");
 
-                        this.texture = createTexture(
-                                cardData.hasRoundedCorners(),
-                                image,
-                                this
-                        );
+            CompletableFuture
+                    .supplyAsync(() -> {
+                        RUNNING_DOWNLOADS.add(cardData.getTextureId());
+                        long start = System.currentTimeMillis();
 
-                        this.texture.upload();
+                        try {
+                            if (Files.exists(cachedFile)) {
+                                System.out.println("Loading cached texture: " + cachedFile);
+
+                                try (InputStream stream = Files.newInputStream(cachedFile)) {
+                                    return NativeImage.read(stream);
+                                }
+                            }
+
+                            System.out.println("Downloading texture: " + url);
+
+                            NativeImage image = downloadTexture(url);
+
+                            if (image == null) {
+                                return null;
+                            }
+
+                            // Save downloaded image to disk
+                            image.writeToFile(cachedFile);
+
+                            long elapsed = System.currentTimeMillis() - start;
+                            System.out.println("Downloaded and cached texture in " + elapsed + " ms");
+
+                            return image;
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    })
+                    .thenAccept(image -> {
+                        RUNNING_DOWNLOADS.remove(cardData.getTextureId());
+                        if (image == null) {
+                            return;
+                        }
+
+                        Minecraft.getInstance().execute(() -> {
+                            this.texture.close();
+
+                            this.texture = createTexture(
+                                    cardData.hasRoundedCorners(),
+                                    image,
+                                    this
+                            );
+
+                            this.texture.upload();
+
+                            ResourceLocation identifier =
+                                    Minecraft.getInstance()
+                                            .getTextureManager()
+                                            .register(
+                                                    "stc_card/" + cardData.getTextureId(),
+                                                    this.texture
+                                            );
+
+                            this.renderLayer = RenderType.text(identifier);
+                        });
                     });
-                });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return PLACEHOLDER_IMAGE;
     }

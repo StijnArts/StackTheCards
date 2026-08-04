@@ -34,7 +34,7 @@ public class CardTooltipSection {
     }
 
     public static CardTooltipSection parse(JsonObject json, CardGame game) throws MalformedJsonException {
-        if(json.isEmpty() || !json.has(Json_SECTION_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+        if(json.isEmpty() || !json.has(Json_SECTION_KEY)) throw new MalformedJsonException("Section was missing parts array");
         var section = new CardTooltipSection();
         JsonArray parts = json.get(Json_SECTION_KEY).getAsJsonArray();
         for (var part : parts) {

@@ -76,7 +76,7 @@ public class CardTooltipLine {
     }
 
     public static CardTooltipLine parse(JsonObject json, CardGame game) throws MalformedJsonException{
-        if(json.isEmpty() || !json.has(Json_TEXT_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+        if(json.isEmpty() || !json.has(Json_TEXT_KEY)) throw new MalformedJsonException("Tooltip line was missing text");
         var part = new CardTooltipLine();
         var textContents = json.get(Json_TEXT_KEY);
         if(textContents.isJsonArray()){

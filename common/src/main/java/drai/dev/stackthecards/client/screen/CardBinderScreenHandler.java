@@ -66,7 +66,7 @@ public class CardBinderScreenHandler extends AbstractContainerMenu {
         cardBinderInventory.stopOpen(player);
         super.removed(player);
     }
-
+//todo fix index doubling
     @Override
     public void clicked(int slotIndex, int button, ClickType clickType, Player player) {
         super.clicked(slotIndex, button, clickType, player);

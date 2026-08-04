@@ -167,7 +167,7 @@ public class CardGame {
     }
 
     public static CardGame parse(JsonObject json, String nameSpace) throws MalformedJsonException {
-        if(json.isEmpty() || !json.has(Json_GAME_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty");
+        if(json.isEmpty() || !json.has(Json_GAME_ID_KEY)) throw new MalformedJsonException("Card Game Json was empty or missing Game Id");
         CardGame game;
         try{
             game = new CardGame(json.get(Json_GAME_ID_KEY).getAsString(),nameSpace);
