@@ -1,3 +1,6 @@
+- HIGH PRIORITY
+    - ADD support for using a different image when 2 cards are connected for MTG Meld cards
+
 - Command to get a specific card thats compatible with moxfield notations
     - Command structure:
 - /givedeck command
