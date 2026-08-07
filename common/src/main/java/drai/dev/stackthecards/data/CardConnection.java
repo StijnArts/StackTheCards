@@ -3,6 +3,7 @@ package drai.dev.stackthecards.data;
 import com.google.gson.stream.*;
 import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.*;
+import drai.dev.stackthecards.data.carddata.CardData;
 import drai.dev.stackthecards.items.*;
 import drai.dev.stackthecards.registry.*;
 import io.netty.buffer.*;
@@ -14,14 +15,17 @@ import com.google.gson.*;
 import java.util.*;
 import java.util.stream.*;
 
+import static drai.dev.stackthecards.data.CardConnectionEntry.*;
 import static drai.dev.stackthecards.data.components.StackTheCardsComponentTypes.*;
 
 public class CardConnection {
     private static final String Json_CONNECTION_ID_KEY = "connectionId";
     private static final String Json_LAYOUT_KEY = "layout";
+    private static final String JSON_RESULTING_CARD = "resultingCard";
     public final String connectionId;
     public boolean isSingle = false;
     public String cardGameId = "";
+    public CardData resultingCard = null;
     public ArrayList<ArrayList<CardConnectionEntry>> layout = new ArrayList<>();
     public ArrayList<ArrayList<CardConnectionEntry>> layoutByColumn = new ArrayList<>();
 
@@ -31,6 +35,7 @@ public class CardConnection {
             ByteBufCodecs.STRING_UTF8.encode(buffer, value.connectionId);
             ByteBufCodecs.BOOL.encode(buffer, value.isSingle);
             ByteBufCodecs.STRING_UTF8.encode(buffer, value.cardGameId);
+            CardData.SYNC_CODEC.encode(buffer, value.resultingCard);
 
             // Encode `layout` as List<List<CardConnectionEntry>>
             ByteBufCodecs.collection(ArrayList::new,
@@ -43,19 +48,21 @@ public class CardConnection {
             String connectionId = ByteBufCodecs.STRING_UTF8.decode(buffer);
             boolean isSingle = ByteBufCodecs.BOOL.decode(buffer);
             String cardGameId = ByteBufCodecs.STRING_UTF8.decode(buffer);
+            var meldedCard = CardData.SYNC_CODEC.decode(buffer);
 
             // Decode `layout` as List<List<CardConnectionEntry>>
             ArrayList<ArrayList<CardConnectionEntry>> layout = ByteBufCodecs.collection(ArrayList::new,
                     ByteBufCodecs.collection(ArrayList::new, CardConnectionEntry.SYNC_CODEC)
             ).decode(buffer);
 
-            return new CardConnection(connectionId, isSingle, cardGameId, layout);
+            return new CardConnection(connectionId, isSingle, cardGameId, layout, meldedCard);
         }
     };
 
-    public CardConnection(String connectionId, boolean isSingle, String cardGameId, ArrayList<ArrayList<CardConnectionEntry>> layout) {
+    public CardConnection(String connectionId, boolean isSingle, String cardGameId, ArrayList<ArrayList<CardConnectionEntry>> layout, CardData resultingCard) {
         this(connectionId, cardGameId, layout);
         this.isSingle = isSingle;
+        this.resultingCard = resultingCard;
     }
 
     public CardConnection(String connectionId, String cardGame, ArrayList<ArrayList<CardConnectionEntry>> layout) {
@@ -101,6 +108,20 @@ public class CardConnection {
             } catch (Exception e){
                 throw new MalformedJsonException("Card connection layout was malformed: "+e.getMessage());
             }
+        }
+        if (json.has(JSON_RESULTING_CARD)) {
+            var resultingCardObject = json.get(JSON_RESULTING_CARD).getAsJsonObject();
+            if(resultingCardObject.isEmpty() || (!resultingCardObject.has(Json_SELF_GAME_ID_KEY) && !json.has(Json_SELF_SET_ID_KEY) && !json.has(Json_SELF_CARD_ID_KEY))) {
+                throw new MalformedJsonException("Resulting Card Json was invalid");
+            }
+            var identifier = new CardIdentifier(
+                    json.get(Json_SELF_GAME_ID_KEY).getAsString(),
+                    json.get(Json_SELF_SET_ID_KEY).getAsString(),json.get(Json_SELF_CARD_ID_KEY).getAsString(),
+                    json.has(Json_SELF_RARITY_ID_KEY)? json.get(Json_SELF_RARITY_ID_KEY).getAsString():""
+            );
+            var resultingCard = CardGameRegistry.getCardData(identifier);
+            if(resultingCard == null) throw new MalformedJsonException("Resulting Card was not found: " + identifier.toString());
+            cardConnection.resultingCard = resultingCard;
         }
         return cardConnection;
     }
