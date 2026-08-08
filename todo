@@ -1,0 +1,31 @@
+- HIGH PRIORITY
+    - ADD support for using a different image when 2 cards are connected for MTG Meld cards
+
+- Command to get a specific card thats compatible with moxfield notations
+    - Command structure:
+- /givedeck command
+    - Requires OP
+    - command to import moxfield-like export
+        - Command structure: /givedeck <player> <game> <decklist seperated by commas>
+        - '['[nummber Of: eg. '1x'] [Card id:'Al Bhed Salvagers'][seperator:',']']'
+        - should error if one of the cards is not found and should provide the failing card in question
+        - Gives the player a deckbox with the cards of their deck
+    - command to gift deckbox with all cards of a set/game
+        - Command structure: /givedeck <player> <game> <?set>
+        - Optional set argument
+        - Gives the player a deckbox with the specified game/set
+- Deckboxes
+    - Stores infinite amount of cards for 1 game
+    - Searchable like backpacks
+    - Placeable block entity
+    - parse moxfield decklist to fill a different deckbox with those cards
+        - Sidepanel with an inventory slot for the target deckbox
+    - crafted with shulkershell binder shulkershell
+    -- Interaction
+        - restone power draws a card
+        - shift rightclick to shuffle
+        - rightclick with a card to place card in box
+        - shift rightclick with another deckbox to place all cards into target deckbox
+- Token
+    Add a way to add tokens that don't offset anything and just have an x2, x3, x4 etc for the amount of them on there
+- Some kind of searchable collection item (possibly from deckbox) to quickly find cards in your collection
