@@ -10,6 +10,11 @@ public class CardConnectionRenderAsset {
     public double maxOffsetY;
     public double minOffsetX;
     public double minOffsetY;
+    public double centerX;
+    public double centerY;
+    public double width;
+    public double height;
+
     private final List<CardConnectionAssetEntry> cards = new ArrayList<>();
 
     public CardConnectionRenderAsset(CardConnection connection, List<CardIdentifier> containedCards, boolean isFlipped) {
@@ -18,7 +23,6 @@ public class CardConnectionRenderAsset {
         maxOffsetY = 0;
         minOffsetX = 0;
         minOffsetY = 0;
-
         for (int i = 0; i < layout.size(); i++) {
             var row = layout.get(i);
             var rowSize = CardConnection.getSizeIgnoringEmpty(row);
@@ -92,6 +96,18 @@ public class CardConnectionRenderAsset {
                 }
             }
         }
+        var widestRow = 0;
+        for (var row : layout) {
+            widestRow = Math.max(widestRow, CardConnection.getSizeIgnoringEmpty(row));
+        }
+
+        var tallestColumn = CardConnection.getMaxColumnSize(connection.getLayoutByColumn());
+
+        width = (128*widestRow) - Math.max(maxOffsetX*2, minOffsetX*2);
+        height = (128*tallestColumn) - Math.max(maxOffsetY*2, minOffsetY*2);
+
+        centerX = (128*widestRow) / 2.0;
+        centerY = (128*tallestColumn) / 2.0;
     }
 
     public List<CardConnectionAssetEntry> getCards() {

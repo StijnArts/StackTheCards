@@ -115,9 +115,10 @@ public class CardConnection {
                 throw new MalformedJsonException("Resulting Card Json was invalid");
             }
             var identifier = new CardIdentifier(
-                    json.get(Json_SELF_GAME_ID_KEY).getAsString(),
-                    json.get(Json_SELF_SET_ID_KEY).getAsString(),json.get(Json_SELF_CARD_ID_KEY).getAsString(),
-                    json.has(Json_SELF_RARITY_ID_KEY)? json.get(Json_SELF_RARITY_ID_KEY).getAsString():""
+                    resultingCardObject.get(Json_SELF_GAME_ID_KEY).getAsString(),
+                    resultingCardObject.get(Json_SELF_SET_ID_KEY).getAsString(),
+                    resultingCardObject.get(Json_SELF_CARD_ID_KEY).getAsString(),
+                    ""
             );
             var resultingCard = CardGameRegistry.getCardData(identifier);
             if(resultingCard == null) throw new MalformedJsonException("Resulting Card was not found: " + identifier.toString());

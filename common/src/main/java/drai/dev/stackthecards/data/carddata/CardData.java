@@ -8,6 +8,7 @@ import drai.dev.stackthecards.data.*;
 import drai.dev.stackthecards.registry.*;
 import drai.dev.stackthecards.renderers.*;
 import drai.dev.stackthecards.tooltips.parts.*;
+import joptsimple.internal.*;
 import net.minecraft.*;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.network.*;
@@ -19,6 +20,7 @@ import com.google.gson.*;
 
 import java.util.*;
 
+import static drai.dev.stackthecards.data.CardGame.Json_GAME_CARD_BACK_CARD_KEY;
 import static drai.dev.stackthecards.data.CardRarity.*;
 
 public class CardData {
@@ -31,7 +33,7 @@ public class CardData {
     public static final String Json_DETAIL_HEADER_KEY = "detailHeader";
     public static final String Json_INDEX_KEY = "index";
     public static final String Json_NAME_HEADER_KEY = "name";
-    public String nameSpace;
+    public String nameSpace = "stack_the_cards";
     //    private static CardSet TEST_CARD_SET = new CardSet();
     protected transient CardSet cardSet = new CardSet("missing");
     protected String cardId;
@@ -56,6 +58,7 @@ public class CardData {
             ByteBufCodecs.STRING_UTF8.encode(buffer, value.cardTextureLocation);
             ByteBufCodecs.BOOL.encode(buffer, value.hasRoundedCorners);
             ByteBufCodecs.BOOL.encode(buffer, value.usesRemoteTexture);
+            ByteBufCodecs.STRING_UTF8.encode(buffer, value.cardBackTextureName);
 
             if (CardTooltipSection.SYNC_CODEC == null) {
                 throw new IllegalStateException("CardTooltipSection.SYNC_CODEC is null!");
@@ -85,6 +88,7 @@ public class CardData {
             String cardTextureLocation = ByteBufCodecs.STRING_UTF8.decode(buffer);
             boolean hasRoundedCorners = ByteBufCodecs.BOOL.decode(buffer);
             boolean usesRemoteTexture = ByteBufCodecs.BOOL.decode(buffer);
+            var cardBackTextureName = ByteBufCodecs.STRING_UTF8.decode(buffer);
 
             ArrayList<CardTooltipSection> hoverTooltipSections =
                     ByteBufCodecs.collection(ArrayList::new, CardTooltipSection.SYNC_CODEC).decode(buffer);
@@ -99,7 +103,7 @@ public class CardData {
             String rarity = ByteBufCodecs.STRING_UTF8.decode(buffer);
             int index = ByteBufCodecs.INT.decode(buffer);
 
-            return new CardData(nameSpace, cardId, gameId, cardTextureLocation, hasRoundedCorners, usesRemoteTexture,
+            return new CardData(nameSpace, cardId, gameId, cardTextureLocation, cardBackTextureName, hasRoundedCorners, usesRemoteTexture,
                     hoverTooltipSections, detailTooltipSections, detailHeader,
                     cardName, cardRarityIds, rarity, index);
         }
@@ -110,6 +114,7 @@ public class CardData {
             String cardId,
             String gameId,
             String cardTextureLocation,
+            String cardBackTextureName,
             boolean hasRoundedCorners,
             boolean usesRemoteTexture,
             ArrayList<CardTooltipSection> hoverTooltipSections,
@@ -124,6 +129,7 @@ public class CardData {
         this.cardId = cardId;
         this.gameId = gameId;
         this.cardTextureLocation = cardTextureLocation;
+        this.cardBackTextureName = cardBackTextureName;
         this.hasRoundedCorners = hasRoundedCorners;
         this.usesRemoteTexture = usesRemoteTexture;
         this.hoverTooltipSections = hoverTooltipSections;
@@ -186,6 +192,13 @@ public class CardData {
                 cardData.setHasRoundedCorners(json.get(Json_ROUNDED_CORNERS_ID_KEY).getAsBoolean());
             } catch (Exception e){
                 throw new MalformedJsonException("Card has rounded corners value was malformed: "+e.getMessage());
+            }
+        }
+        if(json.has(Json_GAME_CARD_BACK_CARD_KEY)){
+            try{
+                cardData.cardBackTextureName = json.get(Json_GAME_CARD_BACK_CARD_KEY).getAsString();
+            } catch (Exception e){
+                throw new MalformedJsonException("Card back texture name was malformed: "+e.getMessage());
             }
         }
         if(json.has(Json_REMOTE_TEXTURE_ID_KEY)){
@@ -381,7 +394,16 @@ public class CardData {
         return new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath("stack_the_cards", "stc_cards/backs/fallback"), Platform.isFabric() ? "" : "standalone");
     }
 
+    public String cardBackTextureName;
+    public CardData cardBackData;
+
     public CardData getCardBackData() {
+        if(this.cardBackTextureName != null) {
+            if(this.cardBackData == null){
+                this.cardBackData = new GameCardData(gameId, cardBackTextureName, nameSpace);
+            }
+            return cardBackData;
+        };
         if(cardSet!=null) {
             var setBackData = cardSet.getCardBackTextureName();
             if(setBackData != null) return setBackData;

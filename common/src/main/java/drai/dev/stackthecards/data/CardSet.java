@@ -23,9 +23,9 @@ public class CardSet {
     public final String setId;
     public HashMap<String, CardData> cards = new HashMap<>();
     @Nullable
-    public String cardBackTextureName  = Strings.EMPTY;
+    public String cardBackTextureName;
     @Nullable
-    public String cardBackModel = Strings.EMPTY;
+    public String cardBackModel;
     public HashMap<String, CardPack> cardPacks = new HashMap<>();
     @Nullable
     public GameCardData cardBackData;

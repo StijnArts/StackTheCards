@@ -148,7 +148,6 @@ public class CardTexture {
         }
         Matrix4f matrix4f = matrices.last().pose();
         matrix4f.translate(x, y, amountOfCardsAttached*0.1F);
-//        matrix4f Maybe rotate a little if cards attached
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(renderLayer);
 
         //bottom left
@@ -213,7 +212,7 @@ public class CardTexture {
     private static NativeImage getCardTextureFromData(CardData cardData) {
 
         ResourceManager testResourceManager = Minecraft.getInstance().getResourceManager();
-        ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath(cardData.nameSpace, "stc_cards/cards/"+ cardData.getCardTextureLocation() +".png");
+        ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath(cardData.nameSpace == null ? "stack_the_cards" : cardData.nameSpace, "stc_cards/cards/"+ cardData.getCardTextureLocation() +".png");
         NativeImage textureImage = null;
         try {
             Optional<Resource> resource = testResourceManager.getResource(textureId);
@@ -275,7 +274,6 @@ public class CardTexture {
                             return image;
 
                         } catch (IOException e) {
-                            e.printStackTrace();
                             return null;
                         }
                     })

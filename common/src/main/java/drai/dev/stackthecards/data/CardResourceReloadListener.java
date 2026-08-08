@@ -123,6 +123,7 @@ public class CardResourceReloadListener extends SimplePreparableReloadListener<V
 //                        }
                     } catch (Exception e) {
                         System.out.println("connection json file " + connectionsResource.getKey() + " was invalid: " + e.getMessage());
+                        throw new RuntimeException(e);
                     }
                 }
 

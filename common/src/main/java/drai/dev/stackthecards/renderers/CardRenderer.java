@@ -39,23 +39,29 @@ public class CardRenderer {
                 var containedCards = CardConnection.getConnectedCards(stack);
                 var connectionAsset = getConnectionTexture(connection, containedCards, isFlipped);
 
+                maxOffsetX = connectionAsset.maxOffsetX;
+                maxOffsetY = connectionAsset.maxOffsetY;
+                minOffsetX = connectionAsset.minOffsetX;
+                minOffsetY = connectionAsset.minOffsetY;
                 if (connection.resultingCard != null) {
-                    poseStack.pushPose();
 
                     // Center of the combined connected cards
-                    double centerX = (connectionAsset.minOffsetX + connectionAsset.maxOffsetX) / 2.0;
-                    double centerY = (connectionAsset.minOffsetY + connectionAsset.maxOffsetY) / 2.0;
+                    double centerX = -1 * (connectionAsset.centerX/2);
+                    double centerY = -1 * (connectionAsset.centerY/2);
 
                     // Total size occupied by the connected cards
-                    double width = connectionAsset.maxOffsetX - connectionAsset.minOffsetX;
-                    double height = connectionAsset.maxOffsetY - connectionAsset.minOffsetY;
+                    double widthScale = connectionAsset.width / 128;
+                    double heightScale = connectionAsset.height / 128;
 
                     // Scale relative to a single card
-                    float scaleX = (float) Math.max(1.0, width);
-                    float scaleY = (float) Math.max(1.0, height);
+                    float scale = (float) Math.max(widthScale, heightScale);
 
-                    poseStack.translate(centerX, centerY, 0);
-                    poseStack.scale(scaleX, scaleY, 1.0f);
+                    double attachedCardsXOffset = cardGame.cardStackingDirection.xMod == 0 ? 0 :
+                            (cardGame.cardStackingDirection.xMod < 0 ? maxOffsetX : minOffsetX);
+                    double attachedCardsYOffset = cardGame.cardStackingDirection.yMod == 0 ? 0 :
+                            (cardGame.cardStackingDirection.yMod < 0 ? maxOffsetY : minOffsetY);
+                    poseStack.translate(centerX + attachedCardsXOffset/2, centerY + attachedCardsYOffset/2,0);
+                    poseStack.scale(scale, scale, 1.0f);
 
                     CardTexture.draw(
                             poseStack,
@@ -70,36 +76,32 @@ public class CardRenderer {
                             0
                     );
 
-                    poseStack.popPose();
+                    poseStack.scale(1.0f / scale, 1.0f / scale, 1.0f);
                 } else {
-                    for (var card : connectionAsset.getCards()) {
+                    for (int i = 0; i < connectionAsset.getCards().size(); i++) {
+                        var card = connectionAsset.getCards().get(i);
                         CardTexture.drawConnectedCard(
                                 poseStack,
                                 vertexConsumers,
                                 light,
                                 card.cardTexture.getRenderLayer(),
                                 0,
-                                (int) (Card.getAttachedCards(stack).size() * -1 + card.layer * 0.1),
+                                (int) (Card.getAttachedCards(stack).size() * -1 + card.layer * 0.1 + i * 0.1),
                                 cardGame,
                                 card.xOffset,
                                 card.yOffset,
                                 card.connectionEntry.rotation
                         );
-                    }
-                }
+                    }}
 //end of new piece of code
-                maxOffsetX = connectionAsset.maxOffsetX;
-                maxOffsetY = connectionAsset.maxOffsetY;
-                minOffsetX = connectionAsset.minOffsetX;
-                minOffsetY = connectionAsset.minOffsetY;
-
 
                 double attachedCardsXOffset = cardGame.cardStackingDirection.xMod == 0 ? 0 :
                         (cardGame.cardStackingDirection.xMod < 0 ? maxOffsetX : minOffsetX);
                 double attachedCardsYOffset = cardGame.cardStackingDirection.yMod == 0 ? 0 :
                         (cardGame.cardStackingDirection.yMod < 0 ? maxOffsetY : minOffsetY);
                 if(!connection.isSingle) poseStack.translate(attachedCardsXOffset*cardGame.cardStackingDirection.xMod, attachedCardsYOffset*cardGame.cardStackingDirection.yMod,0);
-                drawAttachedCards(poseStack, vertexConsumers, stack, light, isFlipped,cardGame, true);
+
+                drawAttachedCards(poseStack, vertexConsumers, stack, light, isFlipped, cardGame, true);
             } else {
                 var cardTexture = getCardTexture(cardData, isFlipped);
                 CardTexture.draw(poseStack, vertexConsumers, light, cardTexture.getRenderLayer(), 0, Card.getAttachedCards(stack).size()*-1, cardGame, 0,0);

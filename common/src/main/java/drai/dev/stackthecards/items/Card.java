@@ -140,14 +140,14 @@ public class Card extends Item {
         private final List<CardConnectionEntry.CardConnectionEntryData> connectedCards;
         public CardRecord(){
             isFlipped = false;
-            attachedCards = List.of();
-            connectedCards = List.of();
+            attachedCards = new ArrayList<>();
+            connectedCards = new ArrayList<>();
         }
 
         public CardRecord(boolean isFlipped, List<CardIdentifier> attachedCards, List<CardConnectionEntry.CardConnectionEntryData> connectedCards) {
             this.isFlipped = isFlipped;
-            this.attachedCards = List.copyOf(attachedCards);
-            this.connectedCards = List.copyOf(connectedCards);
+            this.attachedCards = new ArrayList<>(List.copyOf(attachedCards));
+            this.connectedCards = new ArrayList<>(List.copyOf(connectedCards));
         }
 
         public boolean isFlipped() {
